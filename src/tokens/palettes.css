@@ -1,0 +1,175 @@
+/**
+ * ============================================================================
+ * DESIGN TOKENS - DYNAMIC PALETTES PRESETS
+ * Ruolo: Sovrascrive semanticamente i token primari (--primary, --ring,
+ *        --sidebar-primary, --sidebar-ring) in base all'attributo [data-palette="..."]
+ * ============================================================================
+ */
+
+/* ==========================================================================
+   1. DEFAULT PALETTE (Sky / Cyan)
+   ========================================================================== */
+:root[data-palette='default'],
+[data-theme='light'][data-palette='default'] {
+  --primary: var(--tw-color-sky-700);
+  --primary-foreground: var(--tw-color-white);
+  --ring: var(--tw-color-sky-700);
+  --sidebar-primary: var(--tw-color-sky-700);
+  --sidebar-primary-foreground: var(--tw-color-white);
+  --sidebar-ring: var(--tw-color-sky-700);
+}
+
+[data-theme='dark'][data-palette='default'],
+.dark[data-palette='default'],
+.dark [data-palette='default'] {
+  --primary: var(--tw-color-sky-400);
+  --primary-foreground: var(--tw-color-sky-950);
+  --ring: var(--tw-color-sky-400);
+  --sidebar-primary: var(--tw-color-sky-400);
+  --sidebar-primary-foreground: var(--tw-color-sky-950);
+  --sidebar-ring: var(--tw-color-sky-400);
+}
+
+/* ==========================================================================
+   2. EMERALD PALETTE (Fintech / Smeraldo)
+   ========================================================================== */
+:root[data-palette='emerald'],
+[data-theme='light'][data-palette='emerald'] {
+  --primary: var(--tw-color-emerald-700);
+  --primary-foreground: var(--tw-color-white);
+  --ring: var(--tw-color-emerald-700);
+  --sidebar-primary: var(--tw-color-emerald-700);
+  --sidebar-primary-foreground: var(--tw-color-white);
+  --sidebar-ring: var(--tw-color-emerald-700);
+}
+
+[data-theme='dark'][data-palette='emerald'],
+.dark[data-palette='emerald'],
+.dark [data-palette='emerald'] {
+  --primary: var(--tw-color-emerald-400);
+  --primary-foreground: var(--tw-color-emerald-950);
+  --ring: var(--tw-color-emerald-400);
+  --sidebar-primary: var(--tw-color-emerald-400);
+  --sidebar-primary-foreground: var(--tw-color-emerald-950);
+  --sidebar-ring: var(--tw-color-emerald-400);
+}
+
+/* ==========================================================================
+   3. VIOLET PALETTE (Viola Digitale / AI & Creative)
+   ========================================================================== */
+:root[data-palette='violet'],
+[data-theme='light'][data-palette='violet'] {
+  --primary: var(--tw-color-violet-600);
+  --primary-foreground: var(--tw-color-white);
+  --ring: var(--tw-color-violet-600);
+  --sidebar-primary: var(--tw-color-violet-600);
+  --sidebar-primary-foreground: var(--tw-color-white);
+  --sidebar-ring: var(--tw-color-violet-600);
+}
+
+[data-theme='dark'][data-palette='violet'],
+.dark[data-palette='violet'],
+.dark [data-palette='violet'] {
+  --primary: var(--tw-color-violet-400);
+  --primary-foreground: var(--tw-color-violet-950);
+  --ring: var(--tw-color-violet-400);
+  --sidebar-primary: var(--tw-color-violet-400);
+  --sidebar-primary-foreground: var(--tw-color-violet-950);
+  --sidebar-ring: var(--tw-color-violet-400);
+}
+
+/* ==========================================================================
+   4. ROSE PALETTE (Rosa / Modern SaaS & Lifestyle)
+   ========================================================================== */
+:root[data-palette='rose'],
+[data-theme='light'][data-palette='rose'] {
+  --primary: var(--tw-color-rose-600);
+  --primary-foreground: var(--tw-color-white);
+  --ring: var(--tw-color-rose-600);
+  --sidebar-primary: var(--tw-color-rose-600);
+  --sidebar-primary-foreground: var(--tw-color-white);
+  --sidebar-ring: var(--tw-color-rose-600);
+}
+
+[data-theme='dark'][data-palette='rose'],
+.dark[data-palette='rose'],
+.dark [data-palette='rose'] {
+  --primary: var(--tw-color-rose-400);
+  --primary-foreground: var(--tw-color-rose-950);
+  --ring: var(--tw-color-rose-400);
+  --sidebar-primary: var(--tw-color-rose-400);
+  --sidebar-primary-foreground: var(--tw-color-rose-950);
+  --sidebar-ring: var(--tw-color-rose-400);
+}
+
+/* ==========================================================================
+   5. AMBER PALETTE (Ambra / Warm Corporate)
+   ========================================================================== */
+:root[data-palette='amber'],
+[data-theme='light'][data-palette='amber'] {
+  --primary: var(--tw-color-amber-500);
+  --primary-foreground: var(--tw-color-amber-950);
+  --ring: var(--tw-color-amber-600);
+  --sidebar-primary: var(--tw-color-amber-500);
+  --sidebar-primary-foreground: var(--tw-color-amber-950);
+  --sidebar-ring: var(--tw-color-amber-600);
+}
+
+[data-theme='dark'][data-palette='amber'],
+.dark[data-palette='amber'],
+.dark [data-palette='amber'] {
+  --primary: var(--tw-color-amber-400);
+  --primary-foreground: var(--tw-color-amber-950);
+  --ring: var(--tw-color-amber-400);
+  --sidebar-primary: var(--tw-color-amber-400);
+  --sidebar-primary-foreground: var(--tw-color-amber-950);
+  --sidebar-ring: var(--tw-color-amber-400);
+}
+
+/* ==========================================================================
+   6. BLUE PALETTE (Blu Zaffiro / Enterprise & Cloud)
+   ========================================================================== */
+:root[data-palette='blue'],
+[data-theme='light'][data-palette='blue'] {
+  --primary: var(--tw-color-blue-600);
+  --primary-foreground: var(--tw-color-white);
+  --ring: var(--tw-color-blue-600);
+  --sidebar-primary: var(--tw-color-blue-600);
+  --sidebar-primary-foreground: var(--tw-color-white);
+  --sidebar-ring: var(--tw-color-blue-600);
+}
+
+[data-theme='dark'][data-palette='blue'],
+.dark[data-palette='blue'],
+.dark [data-palette='blue'] {
+  --primary: var(--tw-color-blue-400);
+  --primary-foreground: var(--tw-color-blue-950);
+  --ring: var(--tw-color-blue-400);
+  --sidebar-primary: var(--tw-color-blue-400);
+  --sidebar-primary-foreground: var(--tw-color-blue-950);
+  --sidebar-ring: var(--tw-color-blue-400);
+}
+
+/* ==========================================================================
+   7. ZINC PALETTE (Monocromatico / Tech Minimal)
+   ========================================================================== */
+:root[data-palette='zinc'],
+[data-theme='light'][data-palette='zinc'] {
+  --primary: var(--tw-color-zinc-900);
+  --primary-foreground: var(--tw-color-zinc-50);
+  --ring: var(--tw-color-zinc-900);
+  --sidebar-primary: var(--tw-color-zinc-900);
+  --sidebar-primary-foreground: var(--tw-color-zinc-50);
+  --sidebar-ring: var(--tw-color-zinc-900);
+}
+
+[data-theme='dark'][data-palette='zinc'],
+.dark[data-palette='zinc'],
+.dark [data-palette='zinc'] {
+  --primary: var(--tw-color-zinc-50);
+  --primary-foreground: var(--tw-color-zinc-900);
+  --ring: var(--tw-color-zinc-400);
+  --sidebar-primary: var(--tw-color-zinc-50);
+  --sidebar-primary-foreground: var(--tw-color-zinc-900);
+  --sidebar-ring: var(--tw-color-zinc-400);
+}

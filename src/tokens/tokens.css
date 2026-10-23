@@ -1,0 +1,20 @@
+/**
+ * ============================================================================
+ * DESIGN TOKENS - MASTER INDEX
+ * Source of Truth: Figma File "shadcn/ui kit for Figma + Pro Blocks - March 2026 (Copy)"
+ * File Key: pu2nlKYplmTCtTs0FVELdw
+ *
+ * Architettura a 4 Layer:
+ * 1. primitives.css: "TailwindCSS" Collection (Default mode) - Valori grezzi di base
+ * 2. semantic.css:   "Theme" Collection (Default mode)       - Decisioni semantiche & alias
+ * 3. theme.css:      "Mode" Collection (Light/Dark modes)    - Risoluzione attiva per tema
+ * 4. responsive.css: "Custom" Collection (Desktop/Mobile)    - Tipografia & Spacing responsive
+ * ============================================================================
+ */
+
+@import './primitives.css';
+@import './semantic.css';
+@import './typography.css';
+@import './theme.css';
+@import './palettes.css';
+@import './responsive.css';

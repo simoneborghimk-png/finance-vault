@@ -1,0 +1,383 @@
+/**
+ * ============================================================================
+ * DESIGN TOKENS - LAYER 2: SEMANTIC TOKENS
+ * Collection Figma: "Theme" (Default Mode)
+ * Ruolo: Decisioni semantiche che fanno da alias alle primitive.
+ *        Codifica l'intento di design (coppie light/dark, shadow, typo, radius).
+ * ============================================================================
+ */
+
+:root {
+  /* ==========================================================================
+     1. SEMANTIC COLOR PAIRS (Light / Dark Definitions)
+     Definisce i valori semantici per entrambi i temi prima della risoluzione nel Layer 3
+     ========================================================================== */
+
+  /* Base Semantic Roles */
+  --colors-background-light: var(--tw-color-white);
+  --colors-background-dark: var(--tw-color-neutral-950);
+
+  --colors-foreground-light: var(--tw-color-neutral-950);
+  --colors-foreground-dark: var(--tw-color-neutral-50);
+
+  --colors-card-light: var(--tw-color-white);
+  --colors-card-dark: var(--tw-color-neutral-900);
+  --colors-card-foreground-light: var(--tw-color-neutral-950);
+  --colors-card-foreground-dark: var(--tw-color-neutral-50);
+
+  --colors-popover-light: var(--tw-color-white);
+  --colors-popover-dark: var(--tw-color-neutral-800);
+  --colors-popover-foreground-light: var(--tw-color-neutral-950);
+  --colors-popover-foreground-dark: var(--tw-color-neutral-50);
+
+  --colors-primary-light: var(--tw-color-sky-700);
+  --colors-primary-dark: var(--tw-color-sky-400);
+  --colors-primary-foreground-light: var(--tw-color-white);
+  --colors-primary-foreground-dark: var(--tw-color-sky-950);
+
+  --colors-secondary-light: var(--tw-color-neutral-100);
+  --colors-secondary-dark: var(--tw-color-neutral-800);
+  --colors-secondary-foreground-light: var(--tw-color-neutral-900);
+  --colors-secondary-foreground-dark: var(--tw-color-neutral-50);
+
+  --colors-muted-light: var(--tw-color-neutral-100);
+  --colors-muted-dark: var(--tw-color-neutral-800);
+  --colors-muted-foreground-light: var(--tw-color-neutral-600);
+  --colors-muted-foreground-dark: var(--tw-color-neutral-400);
+
+  --colors-accent-light: var(--tw-color-neutral-100);
+  --colors-accent-dark: var(--tw-color-neutral-700);
+  --colors-accent-foreground-light: var(--tw-color-neutral-900);
+  --colors-accent-foreground-dark: var(--tw-color-neutral-50);
+
+  --colors-destructive-light: var(--tw-color-red-600);
+  --colors-destructive-dark: var(--tw-color-red-400);
+  --colors-destructive-foreground-light: var(--tw-color-white);
+  --colors-destructive-foreground-dark: var(--tw-color-red-950);
+
+  --colors-border-light: var(--tw-color-neutral-200);
+  --colors-border-dark: rgba(255, 255, 255, 0.1);
+
+  --colors-input-light: var(--tw-color-neutral-200);
+  --colors-input-dark: rgba(255, 255, 255, 0.15);
+
+  --colors-ring-light: var(--tw-color-neutral-900);
+  --colors-ring-dark: var(--tw-color-neutral-300);
+
+  /* Sidebar Tokens (Light / Dark) */
+  --colors-sidebar-light: var(--tw-color-neutral-50);
+  --colors-sidebar-dark: var(--tw-color-neutral-900);
+  --colors-sidebar-foreground-light: var(--tw-color-neutral-950);
+  --colors-sidebar-foreground-dark: var(--tw-color-neutral-50);
+
+  --colors-sidebar-primary-light: var(--tw-color-neutral-900);
+  --colors-sidebar-primary-dark: var(--tw-color-blue-700);
+  --colors-sidebar-primary-foreground-light: var(--tw-color-neutral-50);
+  --colors-sidebar-primary-foreground-dark: var(--tw-color-neutral-50);
+
+  --colors-sidebar-accent-light: var(--tw-color-neutral-100);
+  --colors-sidebar-accent-dark: var(--tw-color-neutral-800);
+  --colors-sidebar-accent-foreground-light: var(--tw-color-neutral-900);
+  --colors-sidebar-accent-foreground-dark: var(--tw-color-neutral-50);
+
+  --colors-sidebar-border-light: var(--tw-color-neutral-200);
+  --colors-sidebar-border-dark: rgba(255, 255, 255, 0.1);
+
+  --colors-sidebar-ring-light: var(--tw-color-neutral-400);
+  --colors-sidebar-ring-dark: var(--tw-color-neutral-600);
+
+  /* Chart & Data Visualization (Light / Dark) */
+  --colors-chart-1-light: var(--tw-color-orange-600);
+  --colors-chart-1-dark: var(--tw-color-blue-700);
+
+  --colors-chart-2-light: var(--tw-color-teal-600);
+  --colors-chart-2-dark: var(--tw-color-emerald-500);
+
+  --colors-chart-3-light: var(--tw-color-cyan-900);
+  --colors-chart-3-dark: var(--tw-color-amber-500);
+
+  --colors-chart-4-light: var(--tw-color-amber-400);
+  --colors-chart-4-dark: var(--tw-color-purple-500);
+
+  --colors-chart-5-light: var(--tw-color-amber-500);
+  --colors-chart-5-dark: var(--tw-color-rose-500);
+
+  /* Status Tokens (Feedback & System States - Light / Dark) */
+  --colors-success-light: var(--tw-color-emerald-700);
+  --colors-success-dark: var(--tw-color-emerald-400);
+  --colors-success-foreground-light: var(--tw-color-white);
+  --colors-success-foreground-dark: var(--tw-color-emerald-950);
+
+  --colors-warning-light: var(--tw-color-amber-700);
+  --colors-warning-dark: var(--tw-color-amber-400);
+  --colors-warning-foreground-light: var(--tw-color-white);
+  --colors-warning-foreground-dark: var(--tw-color-amber-950);
+
+  --colors-info-light: var(--tw-color-sky-700);
+  --colors-info-dark: var(--tw-color-sky-400);
+  --colors-info-foreground-light: var(--tw-color-white);
+  --colors-info-foreground-dark: var(--tw-color-sky-950);
+
+  /* ==========================================================================
+     2. TIPOGRAFIA (Font Families, Weights & Sizes)
+     ========================================================================== */
+  --font-sans: var(--tw-font-sans);
+  --font-serif: var(--tw-font-serif);
+  --font-mono: var(--tw-font-mono);
+
+  --font-weight-thin: var(--tw-font-weight-thin);
+  --font-weight-extralight: var(--tw-font-weight-extralight);
+  --font-weight-light: var(--tw-font-weight-light);
+  --font-weight-normal: var(--tw-font-weight-normal);
+  --font-weight-medium: var(--tw-font-weight-medium);
+  --font-weight-semibold: var(--tw-font-weight-semibold);
+  --font-weight-bold: var(--tw-font-weight-bold);
+  --font-weight-extrabold: var(--tw-font-weight-extrabold);
+  --font-weight-black: var(--tw-font-weight-black);
+
+  --text-xs: var(--tw-text-xs-size);
+  --text-sm: var(--tw-text-sm-size);
+  --text-base: var(--tw-text-base-size);
+  --text-lg: var(--tw-text-lg-size);
+  --text-xl: var(--tw-text-xl-size);
+  --text-2xl: var(--tw-text-2xl-size);
+  --text-3xl: var(--tw-text-3xl-size);
+  --text-4xl: var(--tw-text-4xl-size);
+  --text-5xl: var(--tw-text-5xl-size);
+  --text-6xl: var(--tw-text-6xl-size);
+  --text-7xl: var(--tw-text-7xl-size);
+  --text-8xl: var(--tw-text-8xl-size);
+  --text-9xl: var(--tw-text-9xl-size);
+
+  /* ==========================================================================
+     3. RAGGI DI CURVATURA (Radius Semantic Aliases)
+     ========================================================================== */
+  --radius-none: var(--tw-radius-none);
+  --radius-xs: var(--tw-radius-xs);
+  --radius-sm: var(--tw-radius-sm);
+  --radius-md: var(--tw-radius-md);
+  --radius-lg: var(--tw-radius-lg);
+  --radius-xl: var(--tw-radius-xl);
+  --radius-2xl: var(--tw-radius-2xl);
+  --radius-3xl: var(--tw-radius-3xl);
+  --radius-4xl: var(--tw-radius-4xl);
+  --radius-full: var(--tw-radius-full);
+
+  /* Radius applicato ai componenti per default */
+  --radius: var(--radius-md);
+
+  /* ==========================================================================
+     4. BREAKPOINTS & CONTAINERS
+     ========================================================================== */
+  --breakpoint-sm: var(--tw-breakpoint-sm);
+  --breakpoint-md: var(--tw-breakpoint-md);
+  --breakpoint-lg: var(--tw-breakpoint-lg);
+  --breakpoint-xl: var(--tw-breakpoint-xl);
+  --breakpoint-2xl: var(--tw-breakpoint-2xl);
+
+  --container-3xs: var(--tw-container-3xs);
+  --container-2xs: var(--tw-container-2xs);
+  --container-xs: var(--tw-container-xs);
+  --container-sm: var(--tw-container-sm);
+  --container-md: var(--tw-container-md);
+  --container-lg: var(--tw-container-lg);
+  --container-xl: var(--tw-container-xl);
+  --container-2xl: var(--tw-container-2xl);
+  --container-3xl: var(--tw-container-3xl);
+  --container-4xl: var(--tw-container-4xl);
+  --container-5xl: var(--tw-container-5xl);
+  --container-6xl: var(--tw-container-6xl);
+  --container-7xl: var(--tw-container-7xl);
+
+  /* ==========================================================================
+     5. OMBRE (Box Shadow Styles da Style Guide Figma)
+     ========================================================================== */
+  --shadow-2xs: 0 1px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px -1px rgba(0, 0, 0, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px -2px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 8px 10px -6px rgba(0, 0, 0, 0.1), 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  /* Drop Shadows */
+  --drop-shadow-xs: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+  --drop-shadow-sm: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+  --drop-shadow-md: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.12));
+  --drop-shadow-lg: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.15));
+  --drop-shadow-xl: drop-shadow(0 9px 7px rgba(0, 0, 0, 0.1));
+  --drop-shadow-2xl: drop-shadow(0 25px 25px rgba(0, 0, 0, 0.15));
+
+  /* Inset Shadows */
+  --inset-shadow-2xs: inset 0 1px 0 rgba(0, 0, 0, 0.05);
+  --inset-shadow-xs: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  --inset-shadow-sm: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  /* ==========================================================================
+     6. BLUR & BACKDROP BLUR
+     ========================================================================== */
+  --blur-none: var(--tw-blur-none);
+  --blur-xs: var(--tw-blur-xs);
+  --blur-sm: var(--tw-blur-sm);
+  --blur-md: var(--tw-blur-md);
+  --blur-lg: var(--tw-blur-lg);
+  --blur-xl: var(--tw-blur-xl);
+  --blur-2xl: var(--tw-blur-2xl);
+  --blur-3xl: var(--tw-blur-3xl);
+
+  --backdrop-blur-none: var(--tw-blur-none);
+  --backdrop-blur-xs: var(--tw-blur-xs);
+  --backdrop-blur-sm: var(--tw-blur-sm);
+  --backdrop-blur-md: var(--tw-blur-md);
+  --backdrop-blur-lg: var(--tw-blur-lg);
+  --backdrop-blur-xl: var(--tw-blur-xl);
+  --backdrop-blur-2xl: var(--tw-blur-2xl);
+  --backdrop-blur-3xl: var(--tw-blur-3xl);
+
+  /* Filter & Backdrop Filter Aliases */
+  --filter-blur-none: blur(var(--blur-none));
+  --filter-blur-xs: blur(var(--blur-xs));
+  --filter-blur-sm: blur(var(--blur-sm));
+  --filter-blur-md: blur(var(--blur-md));
+  --filter-blur-lg: blur(var(--blur-lg));
+  --filter-blur-xl: blur(var(--blur-xl));
+  --filter-blur-2xl: blur(var(--blur-2xl));
+  --filter-blur-3xl: blur(var(--blur-3xl));
+
+  --backdrop-filter-none: blur(var(--backdrop-blur-none));
+  --backdrop-filter-xs: blur(var(--backdrop-blur-xs));
+  --backdrop-filter-sm: blur(var(--backdrop-blur-sm));
+  --backdrop-filter-md: blur(var(--backdrop-blur-md));
+  --backdrop-filter-lg: blur(var(--backdrop-blur-lg));
+  --backdrop-filter-xl: blur(var(--backdrop-blur-xl));
+  --backdrop-filter-2xl: blur(var(--backdrop-blur-2xl));
+  --backdrop-filter-3xl: blur(var(--backdrop-blur-3xl));
+
+  /* ==========================================================================
+     7. FOCUS RINGS (Figma: focus/default, focus/destructive, input focus/error)
+     ========================================================================== */
+  --shadow-focus: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+  --shadow-focus-destructive: 0 0 0 2px var(--background), 0 0 0 4px var(--destructive);
+  --shadow-focus-input: 0 0 0 3px color-mix(in oklch, var(--ring) 25%, transparent);
+  --shadow-focus-input-destructive: 0 0 0 3px
+    color-mix(in oklch, var(--destructive) 25%, transparent);
+}
+
+/* ==========================================================================
+   EFFECT UTILITY CLASSES
+   ========================================================================== */
+.shadow-2xs {
+  box-shadow: var(--shadow-2xs);
+}
+.shadow-xs {
+  box-shadow: var(--shadow-xs);
+}
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+.shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+.shadow-2xl {
+  box-shadow: var(--shadow-2xl);
+}
+
+.inset-shadow-2xs {
+  box-shadow: var(--inset-shadow-2xs);
+}
+.inset-shadow-xs {
+  box-shadow: var(--inset-shadow-xs);
+}
+.inset-shadow-sm {
+  box-shadow: var(--inset-shadow-sm);
+}
+
+.drop-shadow-xs {
+  filter: var(--drop-shadow-xs);
+}
+.drop-shadow-sm {
+  filter: var(--drop-shadow-sm);
+}
+.drop-shadow-md {
+  filter: var(--drop-shadow-md);
+}
+.drop-shadow-lg {
+  filter: var(--drop-shadow-lg);
+}
+.drop-shadow-xl {
+  filter: var(--drop-shadow-xl);
+}
+.drop-shadow-2xl {
+  filter: var(--drop-shadow-2xl);
+}
+
+.blur-none {
+  filter: var(--filter-blur-none);
+}
+.blur-xs {
+  filter: var(--filter-blur-xs);
+}
+.blur-sm {
+  filter: var(--filter-blur-sm);
+}
+.blur-md {
+  filter: var(--filter-blur-md);
+}
+.blur-lg {
+  filter: var(--filter-blur-lg);
+}
+.blur-xl {
+  filter: var(--filter-blur-xl);
+}
+.blur-2xl {
+  filter: var(--filter-blur-2xl);
+}
+.blur-3xl {
+  filter: var(--filter-blur-3xl);
+}
+
+.backdrop-blur-none {
+  -webkit-backdrop-filter: var(--backdrop-filter-none);
+  backdrop-filter: var(--backdrop-filter-none);
+}
+.backdrop-blur-xs {
+  -webkit-backdrop-filter: var(--backdrop-filter-xs);
+  backdrop-filter: var(--backdrop-filter-xs);
+}
+.backdrop-blur-sm {
+  -webkit-backdrop-filter: var(--backdrop-filter-sm);
+  backdrop-filter: var(--backdrop-filter-sm);
+}
+.backdrop-blur-md {
+  -webkit-backdrop-filter: var(--backdrop-filter-md);
+  backdrop-filter: var(--backdrop-filter-md);
+}
+.backdrop-blur-lg {
+  -webkit-backdrop-filter: var(--backdrop-filter-lg);
+  backdrop-filter: var(--backdrop-filter-lg);
+}
+.backdrop-blur-xl {
+  -webkit-backdrop-filter: var(--backdrop-filter-xl);
+  backdrop-filter: var(--backdrop-filter-xl);
+}
+.backdrop-blur-2xl {
+  -webkit-backdrop-filter: var(--backdrop-filter-2xl);
+  backdrop-filter: var(--backdrop-filter-2xl);
+}
+.backdrop-blur-3xl {
+  -webkit-backdrop-filter: var(--backdrop-filter-3xl);
+  backdrop-filter: var(--backdrop-filter-3xl);
+}
+
+.focus-ring {
+  box-shadow: var(--shadow-focus);
+}
+.focus-ring-destructive {
+  box-shadow: var(--shadow-focus-destructive);
+}

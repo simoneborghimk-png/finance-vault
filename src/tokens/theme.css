@@ -1,0 +1,219 @@
+/**
+ * ============================================================================
+ * DESIGN TOKENS - LAYER 3: MODE-SWITCHING TOKENS
+ * Collection Figma: "Mode" (Light / Dark Modes)
+ * Ruolo: Risolve i token semantici del Layer 2 nei valori attivi consumati
+ *        direttamente dai componenti dell'interfaccia.
+ * ============================================================================
+ */
+
+/* ==========================================================================
+   1. LIGHT MODE (DEFAULT / :root & [data-theme="light"])
+   ========================================================================== */
+:root,
+[data-theme='light'] {
+  /* Core UI Colors */
+  --background: var(--colors-background-light);
+  --foreground: var(--colors-foreground-light);
+
+  --card: var(--colors-card-light);
+  --card-foreground: var(--colors-card-foreground-light);
+
+  --popover: var(--colors-popover-light);
+  --popover-foreground: var(--colors-popover-foreground-light);
+
+  --primary: var(--colors-primary-light);
+  --primary-foreground: var(--colors-primary-foreground-light);
+
+  --secondary: var(--colors-secondary-light);
+  --secondary-foreground: var(--colors-secondary-foreground-light);
+
+  --muted: var(--colors-muted-light);
+  --muted-foreground: var(--colors-muted-foreground-light);
+
+  --accent: var(--colors-accent-light);
+  --accent-foreground: var(--colors-accent-foreground-light);
+
+  --destructive: var(--colors-destructive-light);
+  --destructive-foreground: var(--colors-destructive-foreground-light);
+
+  --border: var(--colors-border-light);
+  --input: var(--colors-input-light);
+  --ring: var(--colors-ring-light);
+
+  /* Sidebar Tokens */
+  --sidebar: var(--colors-sidebar-light);
+  --sidebar-foreground: var(--colors-sidebar-foreground-light);
+  --sidebar-primary: var(--colors-sidebar-primary-light);
+  --sidebar-primary-foreground: var(--colors-sidebar-primary-foreground-light);
+  --sidebar-accent: var(--colors-sidebar-accent-light);
+  --sidebar-accent-foreground: var(--colors-sidebar-accent-foreground-light);
+  --sidebar-border: var(--colors-sidebar-border-light);
+  --sidebar-ring: var(--colors-sidebar-ring-light);
+
+  /* Chart & Data Visualization */
+  --chart-1: var(--colors-chart-1-light);
+  --chart-2: var(--colors-chart-2-light);
+  --chart-3: var(--colors-chart-3-light);
+  --chart-4: var(--colors-chart-4-light);
+  --chart-5: var(--colors-chart-5-light);
+
+  /* Status Tokens (Feedback & System States) */
+  --success: var(--colors-success-light);
+  --success-foreground: var(--colors-success-foreground-light);
+
+  --warning: var(--colors-warning-light);
+  --warning-foreground: var(--colors-warning-foreground-light);
+
+  --info: var(--colors-info-light);
+  --info-foreground: var(--colors-info-foreground-light);
+
+  /* Alpha Opacity Overlays */
+  --alpha-5: color-mix(in oklab, var(--foreground) 5%, transparent);
+  --alpha-10: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --alpha-15: color-mix(in oklab, var(--foreground) 15%, transparent);
+  --alpha-20: color-mix(in oklab, var(--foreground) 20%, transparent);
+  --alpha-30: color-mix(in oklab, var(--foreground) 30%, transparent);
+  --alpha-40: color-mix(in oklab, var(--foreground) 40%, transparent);
+  --alpha-50: color-mix(in oklab, var(--foreground) 50%, transparent);
+  --alpha-60: color-mix(in oklab, var(--foreground) 60%, transparent);
+  --alpha-80: color-mix(in oklab, var(--foreground) 80%, transparent);
+  --alpha-90: color-mix(in oklab, var(--foreground) 90%, transparent);
+}
+
+/* ==========================================================================
+   2. DARK MODE ([data-theme="dark"] & .dark)
+   ========================================================================== */
+[data-theme='dark'],
+.dark {
+  /* Core UI Colors */
+  --background: var(--colors-background-dark);
+  --foreground: var(--colors-foreground-dark);
+
+  --card: var(--colors-card-dark);
+  --card-foreground: var(--colors-card-foreground-dark);
+
+  --popover: var(--colors-popover-dark);
+  --popover-foreground: var(--colors-popover-foreground-dark);
+
+  --primary: var(--colors-primary-dark);
+  --primary-foreground: var(--colors-primary-foreground-dark);
+
+  --secondary: var(--colors-secondary-dark);
+  --secondary-foreground: var(--colors-secondary-foreground-dark);
+
+  --muted: var(--colors-muted-dark);
+  --muted-foreground: var(--colors-muted-foreground-dark);
+
+  --accent: var(--colors-accent-dark);
+  --accent-foreground: var(--colors-accent-foreground-dark);
+
+  --destructive: var(--colors-destructive-dark);
+  --destructive-foreground: var(--colors-destructive-foreground-dark);
+
+  --border: var(--colors-border-dark);
+  --input: var(--colors-input-dark);
+  --ring: var(--colors-ring-dark);
+
+  /* Sidebar Tokens */
+  --sidebar: var(--colors-sidebar-dark);
+  --sidebar-foreground: var(--colors-sidebar-foreground-dark);
+  --sidebar-primary: var(--colors-sidebar-primary-dark);
+  --sidebar-primary-foreground: var(--colors-sidebar-primary-foreground-dark);
+  --sidebar-accent: var(--colors-sidebar-accent-dark);
+  --sidebar-accent-foreground: var(--colors-sidebar-accent-foreground-dark);
+  --sidebar-border: var(--colors-sidebar-border-dark);
+  --sidebar-ring: var(--colors-sidebar-ring-dark);
+
+  /* Chart & Data Visualization */
+  --chart-1: var(--colors-chart-1-dark);
+  --chart-2: var(--colors-chart-2-dark);
+  --chart-3: var(--colors-chart-3-dark);
+  --chart-4: var(--colors-chart-4-dark);
+  --chart-5: var(--colors-chart-5-dark);
+
+  /* Status Tokens */
+  --success: var(--colors-success-dark);
+  --success-foreground: var(--colors-success-foreground-dark);
+
+  --warning: var(--colors-warning-dark);
+  --warning-foreground: var(--colors-warning-foreground-dark);
+
+  --info: var(--colors-info-dark);
+  --info-foreground: var(--colors-info-foreground-dark);
+
+  /* Alpha Opacity Overlays */
+  --alpha-5: color-mix(in oklab, var(--foreground) 5%, transparent);
+  --alpha-10: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --alpha-15: color-mix(in oklab, var(--foreground) 15%, transparent);
+  --alpha-20: color-mix(in oklab, var(--foreground) 20%, transparent);
+  --alpha-30: color-mix(in oklab, var(--foreground) 30%, transparent);
+  --alpha-40: color-mix(in oklab, var(--foreground) 40%, transparent);
+  --alpha-50: color-mix(in oklab, var(--foreground) 50%, transparent);
+  --alpha-60: color-mix(in oklab, var(--foreground) 60%, transparent);
+  --alpha-80: color-mix(in oklab, var(--foreground) 80%, transparent);
+  --alpha-90: color-mix(in oklab, var(--foreground) 90%, transparent);
+}
+
+/* ==========================================================================
+   3. SYSTEM PREFERENCE AUTOMATIC SWITCHING
+   Se non è forzato un tema manuale esplicito [data-theme="light"]
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --background: var(--colors-background-dark);
+    --foreground: var(--colors-foreground-dark);
+    --card: var(--colors-card-dark);
+    --card-foreground: var(--colors-card-foreground-dark);
+    --popover: var(--colors-popover-dark);
+    --popover-foreground: var(--colors-popover-foreground-dark);
+    --primary: var(--colors-primary-dark);
+    --primary-foreground: var(--colors-primary-foreground-dark);
+    --secondary: var(--colors-secondary-dark);
+    --secondary-foreground: var(--colors-secondary-foreground-dark);
+    --muted: var(--colors-muted-dark);
+    --muted-foreground: var(--colors-muted-foreground-dark);
+    --accent: var(--colors-accent-dark);
+    --accent-foreground: var(--colors-accent-foreground-dark);
+    --destructive: var(--colors-destructive-dark);
+    --destructive-foreground: var(--colors-destructive-foreground-dark);
+    --border: var(--colors-border-dark);
+    --input: var(--colors-input-dark);
+    --ring: var(--colors-ring-dark);
+
+    --sidebar: var(--colors-sidebar-dark);
+    --sidebar-foreground: var(--colors-sidebar-foreground-dark);
+    --sidebar-primary: var(--colors-sidebar-primary-dark);
+    --sidebar-primary-foreground: var(--colors-sidebar-primary-foreground-dark);
+    --sidebar-accent: var(--colors-sidebar-accent-dark);
+    --sidebar-accent-foreground: var(--colors-sidebar-accent-foreground-dark);
+    --sidebar-border: var(--colors-sidebar-border-dark);
+    --sidebar-ring: var(--colors-sidebar-ring-dark);
+
+    --chart-1: var(--colors-chart-1-dark);
+    --chart-2: var(--colors-chart-2-dark);
+    --chart-3: var(--colors-chart-3-dark);
+    --chart-4: var(--colors-chart-4-dark);
+    --chart-5: var(--colors-chart-5-dark);
+
+    --success: var(--colors-success-dark);
+    --success-foreground: var(--colors-success-foreground-dark);
+
+    --warning: var(--colors-warning-dark);
+    --warning-foreground: var(--colors-warning-foreground-dark);
+
+    --info: var(--colors-info-dark);
+    --info-foreground: var(--colors-info-foreground-dark);
+
+    --alpha-5: color-mix(in srgb, var(--foreground) 5%, transparent);
+    --alpha-10: color-mix(in srgb, var(--foreground) 10%, transparent);
+    --alpha-15: color-mix(in srgb, var(--foreground) 15%, transparent);
+    --alpha-20: color-mix(in srgb, var(--foreground) 20%, transparent);
+    --alpha-30: color-mix(in srgb, var(--foreground) 30%, transparent);
+    --alpha-40: color-mix(in srgb, var(--foreground) 40%, transparent);
+    --alpha-50: color-mix(in srgb, var(--foreground) 50%, transparent);
+    --alpha-60: color-mix(in srgb, var(--foreground) 60%, transparent);
+    --alpha-80: color-mix(in srgb, var(--foreground) 80%, transparent);
+    --alpha-90: color-mix(in srgb, var(--foreground) 90%, transparent);
+  }
+}

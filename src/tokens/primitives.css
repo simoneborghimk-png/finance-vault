@@ -1,0 +1,681 @@
+/**
+ * ============================================================================
+ * DESIGN TOKENS - LAYER 1: PRIMITIVES
+ * Collection Figma: "TailwindCSS" (Default Mode) - 496 Variabili
+ * Ruolo: Valori grezzi di base (raw palette, spacing, radii, font, layout).
+ * REGOLA: Questi valori NON devono essere esposti direttamente ai componenti.
+ * ============================================================================
+ */
+
+:root {
+  /* ==========================================================================
+     1. SPACING SCALE (35 variabili)
+     ========================================================================== */
+  --tw-space-0: 0px;
+  --tw-space-px: 1px;
+  --tw-space-0-5: 0.125rem;
+  --tw-space-1: 0.25rem;
+  --tw-space-1-5: 0.375rem;
+  --tw-space-2: 0.5rem;
+  --tw-space-2-5: 0.625rem;
+  --tw-space-3: 0.75rem;
+  --tw-space-3-5: 0.875rem;
+  --tw-space-4: 1rem;
+  --tw-space-5: 1.25rem;
+  --tw-space-6: 1.5rem;
+  --tw-space-7: 1.75rem;
+  --tw-space-8: 2rem;
+  --tw-space-9: 2.25rem;
+  --tw-space-10: 2.5rem;
+  --tw-space-11: 2.75rem;
+  --tw-space-12: 3rem;
+  --tw-space-14: 3.5rem;
+  --tw-space-16: 4rem;
+  --tw-space-20: 5rem;
+  --tw-space-24: 6rem;
+  --tw-space-28: 7rem;
+  --tw-space-32: 8rem;
+  --tw-space-36: 9rem;
+  --tw-space-40: 10rem;
+  --tw-space-44: 11rem;
+  --tw-space-48: 12rem;
+  --tw-space-52: 13rem;
+  --tw-space-56: 14rem;
+  --tw-space-60: 15rem;
+  --tw-space-64: 16rem;
+  --tw-space-72: 18rem;
+  --tw-space-80: 20rem;
+  --tw-space-96: 24rem;
+
+  /* ==========================================================================
+     2. WIDTH SCALE (33 variabili)
+     ========================================================================== */
+  --tw-width-0: 0px;
+  --tw-width-px: 1px;
+  --tw-width-0-5: 0.125rem;
+  --tw-width-1: 0.25rem;
+  --tw-width-1-5: 0.375rem;
+  --tw-width-2: 0.5rem;
+  --tw-width-2-5: 0.625rem;
+  --tw-width-3: 0.75rem;
+  --tw-width-3-5: 0.875rem;
+  --tw-width-4: 1rem;
+  --tw-width-5: 1.25rem;
+  --tw-width-6: 1.5rem;
+  --tw-width-7: 1.75rem;
+  --tw-width-8: 2rem;
+  --tw-width-9: 2.25rem;
+  --tw-width-10: 2.5rem;
+  --tw-width-11: 2.75rem;
+  --tw-width-12: 3rem;
+  --tw-width-14: 3.5rem;
+  --tw-width-16: 4rem;
+  --tw-width-20: 5rem;
+  --tw-width-24: 6rem;
+  --tw-width-28: 7rem;
+  --tw-width-32: 8rem;
+  --tw-width-36: 9rem;
+  --tw-width-40: 10rem;
+  --tw-width-44: 11rem;
+  --tw-width-48: 12rem;
+  --tw-width-52: 13rem;
+  --tw-width-56: 14rem;
+  --tw-width-60: 15rem;
+  --tw-width-64: 16rem;
+  --tw-width-auto: auto;
+
+  /* ==========================================================================
+     3. HEIGHT SCALE (33 variabili)
+     ========================================================================== */
+  --tw-height-0: 0px;
+  --tw-height-px: 1px;
+  --tw-height-0-5: 0.125rem;
+  --tw-height-1: 0.25rem;
+  --tw-height-1-5: 0.375rem;
+  --tw-height-2: 0.5rem;
+  --tw-height-2-5: 0.625rem;
+  --tw-height-3: 0.75rem;
+  --tw-height-3-5: 0.875rem;
+  --tw-height-4: 1rem;
+  --tw-height-5: 1.25rem;
+  --tw-height-6: 1.5rem;
+  --tw-height-7: 1.75rem;
+  --tw-height-8: 2rem;
+  --tw-height-9: 2.25rem;
+  --tw-height-10: 2.5rem;
+  --tw-height-11: 2.75rem;
+  --tw-height-12: 3rem;
+  --tw-height-14: 3.5rem;
+  --tw-height-16: 4rem;
+  --tw-height-20: 5rem;
+  --tw-height-24: 6rem;
+  --tw-height-28: 7rem;
+  --tw-height-32: 8rem;
+  --tw-height-36: 9rem;
+  --tw-height-40: 10rem;
+  --tw-height-44: 11rem;
+  --tw-height-48: 12rem;
+  --tw-height-52: 13rem;
+  --tw-height-56: 14rem;
+  --tw-height-60: 15rem;
+  --tw-height-64: 16rem;
+  --tw-height-auto: auto;
+
+  /* ==========================================================================
+     4. MIN-WIDTH SCALE (14 variabili)
+     ========================================================================== */
+  --tw-min-w-0: 0px;
+  --tw-min-w-full: 100%;
+  --tw-min-w-min: min-content;
+  --tw-min-w-max: max-content;
+  --tw-min-w-fit: fit-content;
+  --tw-min-w-3xs: 256px;
+  --tw-min-w-2xs: 288px;
+  --tw-min-w-xs: 320px;
+  --tw-min-w-sm: 384px;
+  --tw-min-w-md: 448px;
+  --tw-min-w-lg: 512px;
+  --tw-min-w-xl: 576px;
+  --tw-min-w-2xl: 672px;
+  --tw-min-w-3xl: 768px;
+
+  /* ==========================================================================
+     5. MAX-WIDTH SCALE (15 variabili)
+     ========================================================================== */
+  --tw-max-w-0: 0px;
+  --tw-max-w-none: none;
+  --tw-max-w-xs: 20rem;
+  --tw-max-w-sm: 24rem;
+  --tw-max-w-md: 28rem;
+  --tw-max-w-lg: 32rem;
+  --tw-max-w-xl: 36rem;
+  --tw-max-w-2xl: 42rem;
+  --tw-max-w-3xl: 48rem;
+  --tw-max-w-4xl: 56rem;
+  --tw-max-w-5xl: 64rem;
+  --tw-max-w-6xl: 72rem;
+  --tw-max-w-7xl: 80rem;
+  --tw-max-w-full: 100%;
+  --tw-max-w-prose: 65ch;
+
+  /* ==========================================================================
+     6. BREAKPOINT SCALE (5 variabili)
+     ========================================================================== */
+  --tw-breakpoint-sm: 640px;
+  --tw-breakpoint-md: 768px;
+  --tw-breakpoint-lg: 1024px;
+  --tw-breakpoint-xl: 1280px;
+  --tw-breakpoint-2xl: 1536px;
+
+  /* ==========================================================================
+     7. BORDER RADIUS SCALE (10 variabili)
+     ========================================================================== */
+  --tw-radius-none: 0px;
+  --tw-radius-xs: 2px;
+  --tw-radius-sm: 6px;
+  --tw-radius-md: 8px;
+  --tw-radius-lg: 10px;
+  --tw-radius-xl: 14px;
+  --tw-radius-2xl: 18px;
+  --tw-radius-3xl: 22px;
+  --tw-radius-4xl: 26px;
+  --tw-radius-full: 9999px;
+
+  /* ==========================================================================
+     8. BORDER WIDTH SCALE (9 variabili)
+     ========================================================================== */
+  --tw-border-w-0: 0px;
+  --tw-border-w-1: 1px;
+  --tw-border-w-2: 2px;
+  --tw-border-w-3: 3px;
+  --tw-border-w-4: 4px;
+  --tw-border-w-5: 5px;
+  --tw-border-w-6: 6px;
+  --tw-border-w-7: 7px;
+  --tw-border-w-8: 8px;
+
+  /* ==========================================================================
+     9. STROKE WIDTH SCALE (12 variabili)
+     ========================================================================== */
+  --tw-stroke-w-0: 0;
+  --tw-stroke-w-0-5: 0.5;
+  --tw-stroke-w-1: 1;
+  --tw-stroke-w-1-5: 1.5;
+  --tw-stroke-w-2: 2;
+  --tw-stroke-w-2-5: 2.5;
+  --tw-stroke-w-3: 3;
+  --tw-stroke-w-3-5: 3.5;
+  --tw-stroke-w-4: 4;
+  --tw-stroke-w-5: 5;
+  --tw-stroke-w-6: 6;
+  --tw-stroke-w-8: 8;
+
+  /* ==========================================================================
+     10. OPACITY SCALE (21 variabili)
+     ========================================================================== */
+  --tw-opacity-0: 0;
+  --tw-opacity-5: 0.05;
+  --tw-opacity-10: 0.1;
+  --tw-opacity-15: 0.15;
+  --tw-opacity-20: 0.2;
+  --tw-opacity-25: 0.25;
+  --tw-opacity-30: 0.3;
+  --tw-opacity-35: 0.35;
+  --tw-opacity-40: 0.4;
+  --tw-opacity-45: 0.45;
+  --tw-opacity-50: 0.5;
+  --tw-opacity-55: 0.55;
+  --tw-opacity-60: 0.6;
+  --tw-opacity-65: 0.65;
+  --tw-opacity-70: 0.7;
+  --tw-opacity-75: 0.75;
+  --tw-opacity-80: 0.8;
+  --tw-opacity-85: 0.85;
+  --tw-opacity-90: 0.9;
+  --tw-opacity-95: 0.95;
+  --tw-opacity-100: 1;
+
+  /* ==========================================================================
+     11. LINE HEIGHT SCALE (20 variabili)
+     ========================================================================== */
+  --tw-line-height-3: 0.75rem;
+  --tw-line-height-4: 1rem;
+  --tw-line-height-5: 1.25rem;
+  --tw-line-height-6: 1.5rem;
+  --tw-line-height-7: 1.75rem;
+  --tw-line-height-8: 2rem;
+  --tw-line-height-9: 2.25rem;
+  --tw-line-height-10: 2.5rem;
+  --tw-line-height-none: 1;
+  --tw-line-height-tight: 1.25;
+  --tw-line-height-snug: 1.375;
+  --tw-line-height-normal: 1.5;
+  --tw-line-height-relaxed: 1.625;
+  --tw-line-height-loose: 2;
+  --tw-line-height-xs: 1rem;
+  --tw-line-height-sm: 1.25rem;
+  --tw-line-height-base: 1.5rem;
+  --tw-line-height-lg: 1.75rem;
+  --tw-line-height-xl: 1.75rem;
+  --tw-line-height-2xl: 2rem;
+
+  /* ==========================================================================
+     12. TAILWIND COLOR RAMPS (289 variabili: 26 palette × 11 + 3 speciali)
+     Spazio Colore Primario: OKLCH, fallback/annotazione HEX
+     ========================================================================== */
+  /* Ramp: Slate */
+  --tw-color-slate-50: oklch(0.984 0.003 247.858); /* #f8fafc */
+  --tw-color-slate-100: oklch(0.968 0.007 247.896); /* #f1f5f9 */
+  --tw-color-slate-200: oklch(0.929 0.013 255.508); /* #e2e8f0 */
+  --tw-color-slate-300: oklch(0.869 0.022 252.894); /* #cbd5e1 */
+  --tw-color-slate-400: oklch(0.704 0.04 256.788); /* #94a3b8 */
+  --tw-color-slate-500: oklch(0.554 0.046 257.417); /* #64748b */
+  --tw-color-slate-600: oklch(0.446 0.043 257.281); /* #475569 */
+  --tw-color-slate-700: oklch(0.372 0.044 257.287); /* #334155 */
+  --tw-color-slate-800: oklch(0.279 0.041 260.031); /* #1e293b */
+  --tw-color-slate-900: oklch(0.208 0.042 265.755); /* #0f172a */
+  --tw-color-slate-950: oklch(0.129 0.042 264.695); /* #020617 */
+
+  /* Ramp: Gray */
+  --tw-color-gray-50: oklch(0.985 0.002 247.839); /* #f9fafb */
+  --tw-color-gray-100: oklch(0.967 0.003 264.542); /* #f3f4f6 */
+  --tw-color-gray-200: oklch(0.928 0.006 264.531); /* #e5e7eb */
+  --tw-color-gray-300: oklch(0.872 0.01 258.338); /* #d1d5db */
+  --tw-color-gray-400: oklch(0.707 0.022 261.325); /* #9ca3af */
+  --tw-color-gray-500: oklch(0.551 0.027 264.364); /* #6b7280 */
+  --tw-color-gray-600: oklch(0.446 0.03 256.802); /* #4b5563 */
+  --tw-color-gray-700: oklch(0.373 0.034 259.733); /* #374151 */
+  --tw-color-gray-800: oklch(0.278 0.033 256.848); /* #1f2937 */
+  --tw-color-gray-900: oklch(0.21 0.034 264.665); /* #111827 */
+  --tw-color-gray-950: oklch(0.13 0.028 261.692); /* #030712 */
+
+  /* Ramp: Zinc */
+  --tw-color-zinc-50: oklch(0.985 0.002 247.839); /* #fafafa */
+  --tw-color-zinc-100: oklch(0.967 0.003 264.542); /* #f4f4f5 */
+  --tw-color-zinc-200: oklch(0.92 0.004 286.32); /* #e4e4e7 */
+  --tw-color-zinc-300: oklch(0.871 0.006 286.286); /* #d4d4d8 */
+  --tw-color-zinc-400: oklch(0.705 0.015 286.067); /* #a1a1aa */
+  --tw-color-zinc-500: oklch(0.552 0.016 285.938); /* #71717a */
+  --tw-color-zinc-600: oklch(0.442 0.017 285.786); /* #52525b */
+  --tw-color-zinc-700: oklch(0.37 0.013 285.805); /* #3f3f46 */
+  --tw-color-zinc-800: oklch(0.274 0.006 286.033); /* #27272a */
+  --tw-color-zinc-900: oklch(0.21 0.006 285.885); /* #18181b */
+  --tw-color-zinc-950: oklch(0.141 0.005 285.823); /* #09090b */
+
+  /* Ramp: Neutral */
+  --tw-color-neutral-50: oklch(0.985 0.002 247.839); /* #fafafa */
+  --tw-color-neutral-100: oklch(0.967 0.003 264.542); /* #f5f5f5 */
+  --tw-color-neutral-200: oklch(0.92 0.004 286.32); /* #e5e5e5 */
+  --tw-color-neutral-300: oklch(0.869 0.005 56.366); /* #d4d4d4 */
+  --tw-color-neutral-400: oklch(0.707 0.022 261.325); /* #a3a3a3 */
+  --tw-color-neutral-500: oklch(0.551 0.027 264.364); /* #737373 */
+  --tw-color-neutral-600: oklch(0.439 0.027 264.364); /* #525252 */
+  --tw-color-neutral-700: oklch(0.368 0.027 264.364); /* #404040 */
+  --tw-color-neutral-800: oklch(0.278 0.033 256.848); /* #262626 */
+  --tw-color-neutral-900: oklch(0.21 0.034 264.665); /* #171717 */
+  --tw-color-neutral-950: oklch(0.13 0.028 261.692); /* #0a0a0a */
+
+  /* Ramp: Stone */
+  --tw-color-stone-50: oklch(0.985 0.001 106.423); /* #fafaf9 */
+  --tw-color-stone-100: oklch(0.967 0.003 106.424); /* #f5f5f4 */
+  --tw-color-stone-200: oklch(0.923 0.006 87.42); /* #e7e5e4 */
+  --tw-color-stone-300: oklch(0.869 0.008 56.366); /* #d6d3d1 */
+  --tw-color-stone-400: oklch(0.709 0.01 56.259); /* #a8a29e */
+  --tw-color-stone-500: oklch(0.553 0.013 58.071); /* #78716c */
+  --tw-color-stone-600: oklch(0.444 0.011 73.639); /* #57534e */
+  --tw-color-stone-700: oklch(0.374 0.01 67.558); /* #44403c */
+  --tw-color-stone-800: oklch(0.268 0.007 34.298); /* #292524 */
+  --tw-color-stone-900: oklch(0.216 0.006 56.043); /* #1c1917 */
+  --tw-color-stone-950: oklch(0.147 0.004 49.25); /* #0c0a09 */
+
+  /* Ramp: Red */
+  --tw-color-red-50: oklch(0.971 0.013 17.38); /* #fef2f2 */
+  --tw-color-red-100: oklch(0.936 0.032 17.717); /* #fee2e2 */
+  --tw-color-red-200: oklch(0.885 0.062 18.334); /* #fecaca */
+  --tw-color-red-300: oklch(0.808 0.114 19.571); /* #fca5a5 */
+  --tw-color-red-400: oklch(0.704 0.191 22.216); /* #f87171 */
+  --tw-color-red-500: oklch(0.637 0.237 25.331); /* #ef4444 */
+  --tw-color-red-600: oklch(0.577 0.245 27.325); /* #dc2626 */
+  --tw-color-red-700: oklch(0.505 0.213 27.518); /* #b91c1c */
+  --tw-color-red-800: oklch(0.444 0.177 26.899); /* #991b1b */
+  --tw-color-red-900: oklch(0.396 0.141 25.723); /* #7f1d1d */
+  --tw-color-red-950: oklch(0.258 0.092 26.042); /* #450a0a */
+
+  /* Ramp: Orange */
+  --tw-color-orange-50: oklch(0.98 0.016 73.684); /* #fff7ed */
+  --tw-color-orange-100: oklch(0.954 0.038 75.164); /* #ffedd5 */
+  --tw-color-orange-200: oklch(0.901 0.076 70.697); /* #fed7aa */
+  --tw-color-orange-300: oklch(0.837 0.128 66.29); /* #fdba74 */
+  --tw-color-orange-400: oklch(0.75 0.176 55.934); /* #fb923c */
+  --tw-color-orange-500: oklch(0.705 0.213 47.604); /* #f97316 */
+  --tw-color-orange-600: oklch(0.646 0.222 41.116); /* #ea580c */
+  --tw-color-orange-700: oklch(0.553 0.195 38.402); /* #c2410c */
+  --tw-color-orange-800: oklch(0.47 0.157 37.304); /* #9a3412 */
+  --tw-color-orange-900: oklch(0.408 0.123 38.172); /* #7c2d12 */
+  --tw-color-orange-950: oklch(0.266 0.079 36.259); /* #431407 */
+
+  /* Ramp: Amber */
+  --tw-color-amber-50: oklch(0.987 0.022 95.277); /* #fffbeb */
+  --tw-color-amber-100: oklch(0.962 0.059 95.617); /* #fef3c7 */
+  --tw-color-amber-200: oklch(0.924 0.12 95.746); /* #fde68a */
+  --tw-color-amber-300: oklch(0.879 0.169 91.605); /* #fcd34d */
+  --tw-color-amber-400: oklch(0.828 0.189 84.429); /* #fbbf24 */
+  --tw-color-amber-500: oklch(0.769 0.188 70.08); /* #f59e0b */
+  --tw-color-amber-600: oklch(0.666 0.179 58.318); /* #d97706 */
+  --tw-color-amber-700: oklch(0.555 0.163 54.293); /* #b45309 */
+  --tw-color-amber-800: oklch(0.473 0.137 53.076); /* #92400e */
+  --tw-color-amber-900: oklch(0.414 0.112 51.523); /* #78350f */
+  --tw-color-amber-950: oklch(0.279 0.077 45.635); /* #451a03 */
+
+  /* Ramp: Yellow */
+  --tw-color-yellow-50: oklch(0.99 0.028 106.368); /* #fefce8 */
+  --tw-color-yellow-100: oklch(0.974 0.073 106.666); /* #fef9c3 */
+  --tw-color-yellow-200: oklch(0.945 0.129 101.54); /* #fef08a */
+  --tw-color-yellow-300: oklch(0.905 0.182 98.111); /* #fde047 */
+  --tw-color-yellow-400: oklch(0.852 0.199 91.936); /* #facc15 */
+  --tw-color-yellow-500: oklch(0.795 0.184 86.047); /* #eab308 */
+  --tw-color-yellow-600: oklch(0.681 0.162 75.834); /* #ca8a04 */
+  --tw-color-yellow-700: oklch(0.554 0.135 66.442); /* #a16207 */
+  --tw-color-yellow-800: oklch(0.473 0.111 62.062); /* #854d0e */
+  --tw-color-yellow-900: oklch(0.418 0.092 57.55); /* #713f12 */
+  --tw-color-yellow-950: oklch(0.286 0.066 53.813); /* #422006 */
+
+  /* Ramp: Lime */
+  --tw-color-lime-50: oklch(0.991 0.031 126.96); /* #f7fee7 */
+  --tw-color-lime-100: oklch(0.972 0.081 126.79); /* #ecfccb */
+  --tw-color-lime-200: oklch(0.94 0.145 125.76); /* #d9f99d */
+  --tw-color-lime-300: oklch(0.897 0.196 126.665); /* #bef264 */
+  --tw-color-lime-400: oklch(0.841 0.238 128.85); /* #a3e635 */
+  --tw-color-lime-500: oklch(0.768 0.233 130.85); /* #84cc16 */
+  --tw-color-lime-600: oklch(0.648 0.2 131.684); /* #65a30d */
+  --tw-color-lime-700: oklch(0.532 0.157 131.589); /* #4d7c0f */
+  --tw-color-lime-800: oklch(0.453 0.124 132.887); /* #3f6212 */
+  --tw-color-lime-900: oklch(0.405 0.101 133.006); /* #365314 */
+  --tw-color-lime-950: oklch(0.274 0.072 132.109); /* #1a2e05 */
+
+  /* Ramp: Green */
+  --tw-color-green-50: oklch(0.982 0.018 155.826); /* #f0fdf4 */
+  --tw-color-green-100: oklch(0.962 0.044 156.743); /* #dcfce7 */
+  --tw-color-green-200: oklch(0.925 0.084 155.995); /* #bbf7d0 */
+  --tw-color-green-300: oklch(0.871 0.15 154.449); /* #86efac */
+  --tw-color-green-400: oklch(0.792 0.209 151.711); /* #4ade80 */
+  --tw-color-green-500: oklch(0.723 0.219 149.579); /* #22c55e */
+  --tw-color-green-600: oklch(0.627 0.194 149.214); /* #16a34a */
+  --tw-color-green-700: oklch(0.527 0.154 150.069); /* #15803d */
+  --tw-color-green-800: oklch(0.448 0.119 151.328); /* #166534 */
+  --tw-color-green-900: oklch(0.393 0.095 152.535); /* #14532d */
+  --tw-color-green-950: oklch(0.266 0.065 152.934); /* #052e16 */
+
+  /* Ramp: Emerald */
+  --tw-color-emerald-50: oklch(0.979 0.021 166.113); /* #ecfdf5 */
+  --tw-color-emerald-100: oklch(0.95 0.052 163.051); /* #d1fae5 */
+  --tw-color-emerald-200: oklch(0.905 0.093 164.15); /* #a7f3d0 */
+  --tw-color-emerald-300: oklch(0.845 0.143 164.978); /* #6ee7b7 */
+  --tw-color-emerald-400: oklch(0.765 0.177 163.223); /* #34d399 */
+  --tw-color-emerald-500: oklch(0.696 0.17 162.48); /* #10b981 */
+  --tw-color-emerald-600: oklch(0.596 0.145 163.225); /* #059669 */
+  --tw-color-emerald-700: oklch(0.508 0.118 165.612); /* #047857 */
+  --tw-color-emerald-800: oklch(0.432 0.095 166.913); /* #065f46 */
+  --tw-color-emerald-900: oklch(0.378 0.077 168.94); /* #064e3b */
+  --tw-color-emerald-950: oklch(0.262 0.051 172.552); /* #022c22 */
+
+  /* Ramp: Teal */
+  --tw-color-teal-50: oklch(0.984 0.014 180.72); /* #f0fdfa */
+  --tw-color-teal-100: oklch(0.953 0.051 180.801); /* #ccfbf1 */
+  --tw-color-teal-200: oklch(0.91 0.096 180.426); /* #99f6e4 */
+  --tw-color-teal-300: oklch(0.855 0.138 181.071); /* #5eead4 */
+  --tw-color-teal-400: oklch(0.777 0.152 181.912); /* #2dd4bf */
+  --tw-color-teal-500: oklch(0.704 0.14 182.503); /* #14b8a6 */
+  --tw-color-teal-600: oklch(0.6 0.118 184.704); /* #0d9488 */
+  --tw-color-teal-700: oklch(0.511 0.096 186.391); /* #0f766e */
+  --tw-color-teal-800: oklch(0.439 0.078 189.51); /* #115e59 */
+  --tw-color-teal-900: oklch(0.386 0.063 188.416); /* #134e4a */
+  --tw-color-teal-950: oklch(0.277 0.046 192.524); /* #042f2e */
+
+  /* Ramp: Cyan */
+  --tw-color-cyan-50: oklch(0.984 0.019 200.873); /* #ecfeff */
+  --tw-color-cyan-100: oklch(0.956 0.045 203.388); /* #cffafe */
+  --tw-color-cyan-200: oklch(0.917 0.08 205.041); /* #a5f3fc */
+  --tw-color-cyan-300: oklch(0.865 0.127 207.078); /* #67e8f9 */
+  --tw-color-cyan-400: oklch(0.789 0.154 211.53); /* #22d3ee */
+  --tw-color-cyan-500: oklch(0.715 0.143 215.221); /* #06b6d4 */
+  --tw-color-cyan-600: oklch(0.609 0.126 221.723); /* #0891b2 */
+  --tw-color-cyan-700: oklch(0.52 0.105 223.128); /* #0e7490 */
+  --tw-color-cyan-800: oklch(0.45 0.085 224.283); /* #155e75 */
+  --tw-color-cyan-900: oklch(0.378 0.077 215.42); /* #164e63 */
+  --tw-color-cyan-950: oklch(0.292 0.058 221.849); /* #083344 */
+
+  /* Ramp: Sky */
+  --tw-color-sky-50: oklch(0.977 0.013 236.62); /* #f0f9ff */
+  --tw-color-sky-100: oklch(0.951 0.026 236.824); /* #e0f2fe */
+  --tw-color-sky-200: oklch(0.901 0.058 230.902); /* #bae6fd */
+  --tw-color-sky-300: oklch(0.828 0.111 230.318); /* #7dd3fc */
+  --tw-color-sky-400: oklch(0.746 0.16 232.661); /* #38bdf8 */
+  --tw-color-sky-500: oklch(0.667 0.182 238.411); /* #0ea5e9 */
+  --tw-color-sky-600: oklch(0.588 0.158 241.966); /* #0284c7 */
+  --tw-color-sky-700: oklch(0.5 0.134 242.749); /* #0369a1 */
+  --tw-color-sky-800: oklch(0.443 0.11 240.79); /* #075985 */
+  --tw-color-sky-900: oklch(0.38 0.083 241.139); /* #0c4a6e */
+  --tw-color-sky-950: oklch(0.293 0.066 243.157); /* #082f49 */
+
+  /* Ramp: Blue */
+  --tw-color-blue-50: oklch(0.97 0.014 254.604); /* #eff6ff */
+  --tw-color-blue-100: oklch(0.932 0.032 255.585); /* #dbeafe */
+  --tw-color-blue-200: oklch(0.882 0.059 254.128); /* #bfdbfe */
+  --tw-color-blue-300: oklch(0.809 0.105 251.813); /* #93c5fd */
+  --tw-color-blue-400: oklch(0.707 0.165 254.624); /* #60a5fa */
+  --tw-color-blue-500: oklch(0.623 0.214 259.815); /* #3b82f6 */
+  --tw-color-blue-600: oklch(0.546 0.245 262.881); /* #2563eb */
+  --tw-color-blue-700: oklch(0.488 0.243 264.376); /* #1d4ed8 */
+  --tw-color-blue-800: oklch(0.424 0.199 265.638); /* #1e40af */
+  --tw-color-blue-900: oklch(0.379 0.146 265.522); /* #1e3a8a */
+  --tw-color-blue-950: oklch(0.282 0.091 267.935); /* #172554 */
+
+  /* Ramp: Indigo */
+  --tw-color-indigo-50: oklch(0.962 0.018 272.314); /* #eef2ff */
+  --tw-color-indigo-100: oklch(0.927 0.037 271.841); /* #e0e7ff */
+  --tw-color-indigo-200: oklch(0.865 0.076 273.208); /* #c7d2fe */
+  --tw-color-indigo-300: oklch(0.785 0.131 274.721); /* #a5b4fc */
+  --tw-color-indigo-400: oklch(0.673 0.182 277.323); /* #818cf8 */
+  --tw-color-indigo-500: oklch(0.585 0.233 277.117); /* #6366f1 */
+  --tw-color-indigo-600: oklch(0.511 0.262 276.966); /* #4f46e5 */
+  --tw-color-indigo-700: oklch(0.457 0.24 277.023); /* #4338ca */
+  --tw-color-indigo-800: oklch(0.398 0.195 277.366); /* #3730a3 */
+  --tw-color-indigo-900: oklch(0.359 0.144 278.697); /* #312e81 */
+  --tw-color-indigo-950: oklch(0.257 0.09 281.288); /* #1e1b4b */
+
+  /* Ramp: Violet */
+  --tw-color-violet-50: oklch(0.969 0.016 293.756); /* #f5f3ff */
+  --tw-color-violet-100: oklch(0.934 0.034 293.639); /* #ede9fe */
+  --tw-color-violet-200: oklch(0.875 0.07 293.655); /* #ddd6fe */
+  --tw-color-violet-300: oklch(0.796 0.12 294.629); /* #c4b5fd */
+  --tw-color-violet-400: oklch(0.697 0.17 297.029); /* #a78bfa */
+  --tw-color-violet-500: oklch(0.606 0.25 292.717); /* #8b5cf6 */
+  --tw-color-violet-600: oklch(0.541 0.281 293.009); /* #7c3aed */
+  --tw-color-violet-700: oklch(0.491 0.27 292.581); /* #6d28d9 */
+  --tw-color-violet-800: oklch(0.432 0.232 292.759); /* #5b21b6 */
+  --tw-color-violet-900: oklch(0.381 0.189 293.744); /* #4c1d95 */
+  --tw-color-violet-950: oklch(0.283 0.141 291.089); /* #2e1065 */
+
+  /* Ramp: Purple */
+  --tw-color-purple-50: oklch(0.977 0.014 308.299); /* #faf5ff */
+  --tw-color-purple-100: oklch(0.946 0.033 307.174); /* #f3e8ff */
+  --tw-color-purple-200: oklch(0.894 0.067 307.728); /* #e9d5ff */
+  --tw-color-purple-300: oklch(0.82 0.117 308.761); /* #d8b4fe */
+  --tw-color-purple-400: oklch(0.714 0.186 310.432); /* #c084fc */
+  --tw-color-purple-500: oklch(0.627 0.265 303.9); /* #a855f7 */
+  --tw-color-purple-600: oklch(0.558 0.288 302.321); /* #9333ea */
+  --tw-color-purple-700: oklch(0.498 0.267 302.946); /* #7e22ce */
+  --tw-color-purple-800: oklch(0.438 0.218 303.724); /* #6b21a8 */
+  --tw-color-purple-900: oklch(0.381 0.176 304.987); /* #581c87 */
+  --tw-color-purple-950: oklch(0.291 0.149 302.717); /* #3b0764 */
+
+  /* Ramp: Fuchsia */
+  --tw-color-fuchsia-50: oklch(0.977 0.017 320.058); /* #fdf4ff */
+  --tw-color-fuchsia-100: oklch(0.947 0.04 320.17); /* #fae8ff */
+  --tw-color-fuchsia-200: oklch(0.893 0.084 321.428); /* #f5d0fe */
+  --tw-color-fuchsia-300: oklch(0.814 0.146 323.25); /* #f0abfc */
+  --tw-color-fuchsia-400: oklch(0.716 0.224 325.688); /* #e879f9 */
+  --tw-color-fuchsia-500: oklch(0.63 0.28 327.301); /* #d946ef */
+  --tw-color-fuchsia-600: oklch(0.557 0.279 328.79); /* #c026d3 */
+  --tw-color-fuchsia-700: oklch(0.49 0.245 330.276); /* #a21caf */
+  --tw-color-fuchsia-800: oklch(0.435 0.203 331.066); /* #86198f */
+  --tw-color-fuchsia-900: oklch(0.387 0.16 331.423); /* #701a75 */
+  --tw-color-fuchsia-950: oklch(0.293 0.136 331.876); /* #4a044e */
+
+  /* Ramp: Pink */
+  --tw-color-pink-50: oklch(0.971 0.014 343.198); /* #fdf2f8 */
+  --tw-color-pink-100: oklch(0.939 0.036 343.828); /* #fce7f3 */
+  --tw-color-pink-200: oklch(0.88 0.076 345.06); /* #fbcfe8 */
+  --tw-color-pink-300: oklch(0.798 0.136 347.273); /* #f9a8d4 */
+  --tw-color-pink-400: oklch(0.697 0.208 349.882); /* #f472b6 */
+  --tw-color-pink-500: oklch(0.619 0.252 352.551); /* #ec4899 */
+  --tw-color-pink-600: oklch(0.552 0.246 354.308); /* #db2777 */
+  --tw-color-pink-700: oklch(0.485 0.218 355.979); /* #be185d */
+  --tw-color-pink-800: oklch(0.431 0.18 357.284); /* #9d174d */
+  --tw-color-pink-900: oklch(0.384 0.144 358.337); /* #831843 */
+  --tw-color-pink-950: oklch(0.284 0.109 358.826); /* #500724 */
+
+  /* Ramp: Rose */
+  --tw-color-rose-50: oklch(0.969 0.015 12.422); /* #fff1f2 */
+  --tw-color-rose-100: oklch(0.935 0.036 14.154); /* #ffe4e6 */
+  --tw-color-rose-200: oklch(0.875 0.072 15.659); /* #fecdd3 */
+  --tw-color-rose-300: oklch(0.787 0.131 16.92); /* #fda4af */
+  --tw-color-rose-400: oklch(0.69 0.198 17.584); /* #fb7185 */
+  --tw-color-rose-500: oklch(0.645 0.246 16.439); /* #f43f5e */
+  --tw-color-rose-600: oklch(0.568 0.239 17.652); /* #e11d48 */
+  --tw-color-rose-700: oklch(0.495 0.211 18.277); /* #be123c */
+  --tw-color-rose-800: oklch(0.437 0.174 18.312); /* #9f1239 */
+  --tw-color-rose-900: oklch(0.387 0.139 18.257); /* #881337 */
+  --tw-color-rose-950: oklch(0.271 0.105 18.52); /* #4c0519 */
+
+  /* Ramp: Warm-gray */
+  --tw-color-warm-gray-50: oklch(0.985 0.001 106.423); /* #fafaf9 */
+  --tw-color-warm-gray-100: oklch(0.967 0.003 106.424); /* #f5f5f4 */
+  --tw-color-warm-gray-200: oklch(0.923 0.006 87.42); /* #e7e5e4 */
+  --tw-color-warm-gray-300: oklch(0.869 0.008 56.366); /* #d6d3d1 */
+  --tw-color-warm-gray-400: oklch(0.709 0.01 56.259); /* #a8a29e */
+  --tw-color-warm-gray-500: oklch(0.553 0.013 58.071); /* #78716c */
+  --tw-color-warm-gray-600: oklch(0.444 0.011 73.639); /* #57534e */
+  --tw-color-warm-gray-700: oklch(0.374 0.01 67.558); /* #44403c */
+  --tw-color-warm-gray-800: oklch(0.268 0.007 34.298); /* #292524 */
+  --tw-color-warm-gray-900: oklch(0.216 0.006 56.043); /* #1c1917 */
+  --tw-color-warm-gray-950: oklch(0.147 0.004 49.25); /* #0c0a09 */
+
+  /* Ramp: True-gray */
+  --tw-color-true-gray-50: oklch(0.985 0.002 247.839); /* #fafafa */
+  --tw-color-true-gray-100: oklch(0.967 0.003 264.542); /* #f5f5f5 */
+  --tw-color-true-gray-200: oklch(0.92 0.004 286.32); /* #e5e5e5 */
+  --tw-color-true-gray-300: oklch(0.869 0.005 56.366); /* #d4d4d4 */
+  --tw-color-true-gray-400: oklch(0.707 0.022 261.325); /* #a3a3a3 */
+  --tw-color-true-gray-500: oklch(0.551 0.027 264.364); /* #737373 */
+  --tw-color-true-gray-600: oklch(0.439 0.027 264.364); /* #525252 */
+  --tw-color-true-gray-700: oklch(0.368 0.027 264.364); /* #404040 */
+  --tw-color-true-gray-800: oklch(0.278 0.033 256.848); /* #262626 */
+  --tw-color-true-gray-900: oklch(0.21 0.034 264.665); /* #171717 */
+  --tw-color-true-gray-950: oklch(0.13 0.028 261.692); /* #0a0a0a */
+
+  /* Ramp: Cool-gray */
+  --tw-color-cool-gray-50: oklch(0.985 0.002 247.839); /* #f9fafb */
+  --tw-color-cool-gray-100: oklch(0.967 0.003 264.542); /* #f3f4f6 */
+  --tw-color-cool-gray-200: oklch(0.928 0.006 264.531); /* #e5e7eb */
+  --tw-color-cool-gray-300: oklch(0.872 0.01 258.338); /* #d1d5db */
+  --tw-color-cool-gray-400: oklch(0.707 0.022 261.325); /* #9ca3af */
+  --tw-color-cool-gray-500: oklch(0.551 0.027 264.364); /* #6b7280 */
+  --tw-color-cool-gray-600: oklch(0.446 0.03 256.802); /* #4b5563 */
+  --tw-color-cool-gray-700: oklch(0.373 0.034 259.733); /* #374151 */
+  --tw-color-cool-gray-800: oklch(0.278 0.033 256.848); /* #1f2937 */
+  --tw-color-cool-gray-900: oklch(0.21 0.034 264.665); /* #111827 */
+  --tw-color-cool-gray-950: oklch(0.13 0.028 261.692); /* #030712 */
+
+  /* Ramp: Blue-gray */
+  --tw-color-blue-gray-50: oklch(0.984 0.003 247.858); /* #f8fafc */
+  --tw-color-blue-gray-100: oklch(0.968 0.007 247.896); /* #f1f5f9 */
+  --tw-color-blue-gray-200: oklch(0.929 0.013 255.508); /* #e2e8f0 */
+  --tw-color-blue-gray-300: oklch(0.869 0.022 252.894); /* #cbd5e1 */
+  --tw-color-blue-gray-400: oklch(0.704 0.04 256.788); /* #94a3b8 */
+  --tw-color-blue-gray-500: oklch(0.554 0.046 257.417); /* #64748b */
+  --tw-color-blue-gray-600: oklch(0.446 0.043 257.281); /* #475569 */
+  --tw-color-blue-gray-700: oklch(0.372 0.044 257.287); /* #334155 */
+  --tw-color-blue-gray-800: oklch(0.279 0.041 260.031); /* #1e293b */
+  --tw-color-blue-gray-900: oklch(0.208 0.042 265.755); /* #0f172a */
+  --tw-color-blue-gray-950: oklch(0.129 0.042 264.695); /* #020617 */
+
+  /* Monochromes & Special */
+  --tw-color-white: #ffffff;
+  --tw-color-black: #000000;
+  --tw-color-transparent: transparent;
+
+  /* ==========================================================================
+     13. COMPONENT FOUNDATION ALIASES (Fonts, Containers & Blur)
+     Supporto per semantic.css
+     ========================================================================== */
+  /* Font Families */
+  --tw-font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --tw-font-serif: 'Georgia', serif;
+  --tw-font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Font Weights */
+  --tw-font-weight-thin: 100;
+  --tw-font-weight-extralight: 200;
+  --tw-font-weight-light: 300;
+  --tw-font-weight-normal: 400;
+  --tw-font-weight-medium: 500;
+  --tw-font-weight-semibold: 600;
+  --tw-font-weight-bold: 700;
+  --tw-font-weight-extrabold: 800;
+  --tw-font-weight-black: 900;
+
+  /* Text Sizes & Default Line Heights */
+  --tw-text-xs-size: 0.75rem; /* 12px */
+  --tw-text-xs-lh: 1rem; /* 16px */
+  --tw-text-sm-size: 0.875rem; /* 14px */
+  --tw-text-sm-lh: 1.25rem; /* 20px */
+  --tw-text-base-size: 1rem; /* 16px */
+  --tw-text-base-lh: 1.5rem; /* 24px */
+  --tw-text-lg-size: 1.125rem; /* 18px */
+  --tw-text-lg-lh: 1.75rem; /* 28px */
+  --tw-text-xl-size: 1.25rem; /* 20px */
+  --tw-text-xl-lh: 1.75rem; /* 28px */
+  --tw-text-2xl-size: 1.5rem; /* 24px */
+  --tw-text-2xl-lh: 2rem; /* 32px */
+  --tw-text-3xl-size: 1.875rem; /* 30px */
+  --tw-text-3xl-lh: 2.25rem; /* 36px */
+  --tw-text-4xl-size: 2.25rem; /* 36px */
+  --tw-text-4xl-lh: 2.5rem; /* 40px */
+  --tw-text-5xl-size: 3rem; /* 48px */
+  --tw-text-5xl-lh: 3rem; /* 48px */
+  --tw-text-6xl-size: 3.75rem; /* 60px */
+  --tw-text-6xl-lh: 3.75rem; /* 60px */
+  --tw-text-7xl-size: 4.5rem; /* 72px */
+  --tw-text-7xl-lh: 4.5rem; /* 72px */
+  --tw-text-8xl-size: 6rem; /* 96px */
+  --tw-text-8xl-lh: 6rem; /* 96px */
+  --tw-text-9xl-size: 8rem; /* 128px */
+  --tw-text-9xl-lh: 8rem; /* 128px */
+
+  /* Blur Scale */
+  --tw-blur-none: 0px;
+  --tw-blur-xs: 4px;
+  --tw-blur-sm: 8px;
+  --tw-blur-md: 12px;
+  --tw-blur-lg: 16px;
+  --tw-blur-xl: 24px;
+  --tw-blur-2xl: 40px;
+  --tw-blur-3xl: 64px;
+
+  /* Container Sizes */
+  --tw-container-3xs: 256px;
+  --tw-container-2xs: 288px;
+  --tw-container-xs: 320px;
+  --tw-container-sm: 384px;
+  --tw-container-md: 448px;
+  --tw-container-lg: 512px;
+  --tw-container-xl: 576px;
+  --tw-container-2xl: 672px;
+  --tw-container-3xl: 768px;
+  --tw-container-4xl: 896px;
+  --tw-container-5xl: 1024px;
+  --tw-container-6xl: 1152px;
+  --tw-container-7xl: 1280px;
+}

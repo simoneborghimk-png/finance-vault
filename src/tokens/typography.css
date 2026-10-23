@@ -1,0 +1,151 @@
+/**
+ * ============================================================================
+ * DESIGN TOKENS - TEXT STYLES (Figma Native Styles)
+ * Source: 309 Text Styles (13 sizes × 2 leadings × 12 weights/styles)
+ * Naming convention: text-{size}/leading-{type}/{weight}
+ * Famiglia tipografica: Geist (tutti gli stili)
+ *
+ * NOTA ARCHITETTURALE (ADR-050):
+ * Le classi che duplicavano le utility native di Tailwind (.text-*, .font-*,
+ * .leading-*, .underline) sono state rimosse per evitare conflitti di
+ * specificità CSS fuori dai layer. Le variabili vivono in @layer base e le
+ * classi composite Figma sono incapsulate in @layer utilities.
+ * ============================================================================
+ */
+
+@layer base {
+  :root {
+    /* ==========================================================================
+       1. SCALE TIPOGRAFICHE COMPOSITE (Font Size + Line Height + Letter Spacing)
+       ========================================================================== */
+    /* text-xs: 12px / 16px */
+    --text-xs-font-size: var(--tw-text-xs-size);
+    --text-xs-line-height: var(--tw-text-xs-lh);
+    --text-xs-lh-none: 1;
+    --text-xs-tracking: 0px;
+
+    /* text-sm: 14px / 20px */
+    --text-sm-font-size: var(--tw-text-sm-size);
+    --text-sm-line-height: var(--tw-text-sm-lh);
+    --text-sm-lh-none: 1;
+    --text-sm-tracking: 0px;
+
+    /* text-base: 16px / 24px */
+    --text-base-font-size: var(--tw-text-base-size);
+    --text-base-line-height: var(--tw-text-base-lh);
+    --text-base-lh-none: 1;
+    --text-base-tracking: 0px;
+
+    /* text-lg: 18px / 28px */
+    --text-lg-font-size: var(--tw-text-lg-size);
+    --text-lg-line-height: var(--tw-text-lg-lh);
+    --text-lg-lh-none: 1;
+    --text-lg-tracking: 0px;
+
+    /* text-xl: 20px / 28px */
+    --text-xl-font-size: var(--tw-text-xl-size);
+    --text-xl-line-height: var(--tw-text-xl-lh);
+    --text-xl-lh-none: 1;
+    --text-xl-tracking: 0px;
+
+    /* text-2xl: 24px / 32px */
+    --text-2xl-font-size: var(--tw-text-2xl-size);
+    --text-2xl-line-height: var(--tw-text-2xl-lh);
+    --text-2xl-lh-none: 1;
+    --text-2xl-tracking: 0px;
+
+    /* text-3xl: 30px / 36px */
+    --text-3xl-font-size: var(--tw-text-3xl-size);
+    --text-3xl-line-height: var(--tw-text-3xl-lh);
+    --text-3xl-lh-none: 1;
+    --text-3xl-tracking: 0px;
+
+    /* text-4xl: 36px / 40px */
+    --text-4xl-font-size: var(--tw-text-4xl-size);
+    --text-4xl-line-height: var(--tw-text-4xl-lh);
+    --text-4xl-lh-none: 1;
+    --text-4xl-tracking: 0px;
+
+    /* text-5xl: 48px / 48px */
+    --text-5xl-font-size: var(--tw-text-5xl-size);
+    --text-5xl-line-height: var(--tw-text-5xl-lh);
+    --text-5xl-lh-none: 1;
+    --text-5xl-tracking: 0px;
+
+    /* text-6xl: 60px / 60px */
+    --text-6xl-font-size: var(--tw-text-6xl-size);
+    --text-6xl-line-height: var(--tw-text-6xl-lh);
+    --text-6xl-lh-none: 1;
+    --text-6xl-tracking: 0px;
+
+    /* text-7xl: 72px / 72px */
+    --text-7xl-font-size: var(--tw-text-7xl-size);
+    --text-7xl-line-height: var(--tw-text-7xl-lh);
+    --text-7xl-lh-none: 1;
+    --text-7xl-tracking: 0px;
+
+    /* text-8xl: 96px / 96px */
+    --text-8xl-font-size: var(--tw-text-8xl-size);
+    --text-8xl-line-height: var(--tw-text-8xl-lh);
+    --text-8xl-lh-none: 1;
+    --text-8xl-tracking: 0px;
+
+    /* text-9xl: 128px / 128px */
+    --text-9xl-font-size: var(--tw-text-9xl-size);
+    --text-9xl-line-height: var(--tw-text-9xl-lh);
+    --text-9xl-lh-none: 1;
+    --text-9xl-tracking: 0px;
+  }
+}
+
+/* ==========================================================================
+   2. COMPOSITE SHORTCUTS (Pattern Figma: text-{size}-{weight})
+   Incapsulate in @layer utilities per preservare il corretto cascading
+   ========================================================================== */
+@layer utilities {
+  .text-xs-medium {
+    font-size: var(--text-xs-font-size);
+    line-height: var(--text-xs-line-height);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-xs-semibold {
+    font-size: var(--text-xs-font-size);
+    line-height: var(--text-xs-line-height);
+    font-weight: var(--font-weight-semibold);
+  }
+  .text-sm-medium {
+    font-size: var(--text-sm-font-size);
+    line-height: var(--text-sm-line-height);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-sm-semibold {
+    font-size: var(--text-sm-font-size);
+    line-height: var(--text-sm-line-height);
+    font-weight: var(--font-weight-semibold);
+  }
+  .text-base-medium {
+    font-size: var(--text-base-font-size);
+    line-height: var(--text-base-line-height);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-base-semibold {
+    font-size: var(--text-base-font-size);
+    line-height: var(--text-base-line-height);
+    font-weight: var(--font-weight-semibold);
+  }
+  .text-lg-semibold {
+    font-size: var(--text-lg-font-size);
+    line-height: var(--text-lg-line-height);
+    font-weight: var(--font-weight-semibold);
+  }
+  .text-xl-semibold {
+    font-size: var(--text-xl-font-size);
+    line-height: var(--text-xl-line-height);
+    font-weight: var(--font-weight-semibold);
+  }
+  .text-2xl-semibold {
+    font-size: var(--text-2xl-font-size);
+    line-height: var(--text-2xl-line-height);
+    font-weight: var(--font-weight-semibold);
+  }
+}
