@@ -15,76 +15,76 @@
 
   /* Base Semantic Roles */
   --colors-background-light: var(--tw-color-white);
-  --colors-background-dark: var(--tw-color-neutral-950);
+  --colors-background-dark: var(--tw-color-slate-950);
 
   --colors-foreground-light: var(--tw-color-neutral-950);
-  --colors-foreground-dark: var(--tw-color-neutral-50);
+  --colors-foreground-dark: var(--tw-color-slate-100);
 
   --colors-card-light: var(--tw-color-white);
-  --colors-card-dark: var(--tw-color-neutral-900);
+  --colors-card-dark: var(--tw-color-slate-900);
   --colors-card-foreground-light: var(--tw-color-neutral-950);
-  --colors-card-foreground-dark: var(--tw-color-neutral-50);
+  --colors-card-foreground-dark: var(--tw-color-slate-100);
 
   --colors-popover-light: var(--tw-color-white);
-  --colors-popover-dark: var(--tw-color-neutral-800);
+  --colors-popover-dark: var(--tw-color-slate-900);
   --colors-popover-foreground-light: var(--tw-color-neutral-950);
-  --colors-popover-foreground-dark: var(--tw-color-neutral-50);
+  --colors-popover-foreground-dark: var(--tw-color-slate-100);
 
-  --colors-primary-light: var(--tw-color-sky-700);
-  --colors-primary-dark: var(--tw-color-sky-400);
+  --colors-primary-light: var(--tw-color-emerald-700);
+  --colors-primary-dark: var(--tw-color-emerald-500);
   --colors-primary-foreground-light: var(--tw-color-white);
-  --colors-primary-foreground-dark: var(--tw-color-sky-950);
+  --colors-primary-foreground-dark: var(--tw-color-white);
 
   --colors-secondary-light: var(--tw-color-neutral-100);
-  --colors-secondary-dark: var(--tw-color-neutral-800);
+  --colors-secondary-dark: var(--tw-color-slate-800);
   --colors-secondary-foreground-light: var(--tw-color-neutral-900);
-  --colors-secondary-foreground-dark: var(--tw-color-neutral-50);
+  --colors-secondary-foreground-dark: var(--tw-color-slate-100);
 
   --colors-muted-light: var(--tw-color-neutral-100);
-  --colors-muted-dark: var(--tw-color-neutral-800);
+  --colors-muted-dark: var(--tw-color-slate-800);
   --colors-muted-foreground-light: var(--tw-color-neutral-600);
-  --colors-muted-foreground-dark: var(--tw-color-neutral-400);
+  --colors-muted-foreground-dark: var(--tw-color-slate-400);
 
   --colors-accent-light: var(--tw-color-neutral-100);
-  --colors-accent-dark: var(--tw-color-neutral-700);
+  --colors-accent-dark: var(--tw-color-slate-800);
   --colors-accent-foreground-light: var(--tw-color-neutral-900);
-  --colors-accent-foreground-dark: var(--tw-color-neutral-50);
+  --colors-accent-foreground-dark: var(--tw-color-slate-100);
 
   --colors-destructive-light: var(--tw-color-red-600);
-  --colors-destructive-dark: var(--tw-color-red-400);
+  --colors-destructive-dark: var(--tw-color-red-500);
   --colors-destructive-foreground-light: var(--tw-color-white);
-  --colors-destructive-foreground-dark: var(--tw-color-red-950);
+  --colors-destructive-foreground-dark: var(--tw-color-white);
 
   --colors-border-light: var(--tw-color-neutral-200);
-  --colors-border-dark: rgba(255, 255, 255, 0.1);
+  --colors-border-dark: var(--tw-color-slate-800);
 
   --colors-input-light: var(--tw-color-neutral-200);
-  --colors-input-dark: rgba(255, 255, 255, 0.15);
+  --colors-input-dark: var(--tw-color-slate-800);
 
-  --colors-ring-light: var(--tw-color-neutral-900);
-  --colors-ring-dark: var(--tw-color-neutral-300);
+  --colors-ring-light: var(--tw-color-emerald-700);
+  --colors-ring-dark: var(--tw-color-emerald-500);
 
   /* Sidebar Tokens (Light / Dark) */
   --colors-sidebar-light: var(--tw-color-neutral-50);
-  --colors-sidebar-dark: var(--tw-color-neutral-900);
+  --colors-sidebar-dark: var(--tw-color-slate-900);
   --colors-sidebar-foreground-light: var(--tw-color-neutral-950);
-  --colors-sidebar-foreground-dark: var(--tw-color-neutral-50);
+  --colors-sidebar-foreground-dark: var(--tw-color-slate-100);
 
   --colors-sidebar-primary-light: var(--tw-color-neutral-900);
-  --colors-sidebar-primary-dark: var(--tw-color-blue-700);
+  --colors-sidebar-primary-dark: var(--tw-color-emerald-500);
   --colors-sidebar-primary-foreground-light: var(--tw-color-neutral-50);
-  --colors-sidebar-primary-foreground-dark: var(--tw-color-neutral-50);
+  --colors-sidebar-primary-foreground-dark: var(--tw-color-white);
 
   --colors-sidebar-accent-light: var(--tw-color-neutral-100);
-  --colors-sidebar-accent-dark: var(--tw-color-neutral-800);
+  --colors-sidebar-accent-dark: var(--tw-color-slate-800);
   --colors-sidebar-accent-foreground-light: var(--tw-color-neutral-900);
-  --colors-sidebar-accent-foreground-dark: var(--tw-color-neutral-50);
+  --colors-sidebar-accent-foreground-dark: var(--tw-color-slate-100);
 
   --colors-sidebar-border-light: var(--tw-color-neutral-200);
-  --colors-sidebar-border-dark: rgba(255, 255, 255, 0.1);
+  --colors-sidebar-border-dark: var(--tw-color-slate-800);
 
   --colors-sidebar-ring-light: var(--tw-color-neutral-400);
-  --colors-sidebar-ring-dark: var(--tw-color-neutral-600);
+  --colors-sidebar-ring-dark: var(--tw-color-emerald-500);
 
   /* Chart & Data Visualization (Light / Dark) */
   --colors-chart-1-light: var(--tw-color-orange-600);

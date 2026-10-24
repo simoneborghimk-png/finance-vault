@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Cloud, CloudCheck, Key, Lock, Download, Upload, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
-import { googleDrive } from '@/lib/googleDrive';
+import { Cloud, Download, Upload, AlertCircle, FileText, AlertTriangle } from 'lucide-react';
+import { googleDrive, checkMissingPreviousMonthPayslip } from '@/lib/googleDrive';
 import { Button, Input, Badge, Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, Tooltip, Label } from './ui';
+import { PayslipSyncDialog } from './PayslipSyncDialog';
 
 interface DriveSyncBarProps {
   onSync: () => Promise<void>;
   onExportLocalEncrypted: () => void;
   onImportLocalEncrypted: (e: React.ChangeEvent<HTMLInputElement>) => void;
   lastSyncTime?: string;
+  currentSalary?: number;
+  onApplySalary?: (netSalary: number, isExtra?: '13th' | '14th' | null) => void;
 }
 
 export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
@@ -15,11 +18,29 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
   onExportLocalEncrypted,
   onImportLocalEncrypted,
   lastSyncTime,
+  currentSalary,
+  onApplySalary,
 }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [clientId, setClientId] = useState(() => localStorage.getItem('gdrive_client_id') || '');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPayslipModalOpen, setIsPayslipModalOpen] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [missingPayslip, setMissingPayslip] = useState<{ isMissing: boolean; targetMonthLabel: string }>({
+    isMissing: false,
+    targetMonthLabel: '',
+  });
+
+  const checkPayslipsAlert = async () => {
+    if (!googleDrive.isConnected()) return;
+    try {
+      const items = await googleDrive.listPayslips();
+      const res = checkMissingPreviousMonthPayslip(items);
+      setMissingPayslip(res);
+    } catch {
+      // Ignora silenziosamente errori di scan in background
+    }
+  };
 
   useEffect(() => {
     // Se il Client ID è già memorizzato, tenta l'auto-connessione silenziosa
@@ -27,9 +48,16 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
     if (savedClientId) {
       googleDrive.autoConnect().then((connected) => {
         setIsConnected(connected);
+        if (connected) {
+          checkPayslipsAlert();
+        }
       });
     } else {
-      setIsConnected(googleDrive.isConnected());
+      const conn = googleDrive.isConnected();
+      setIsConnected(conn);
+      if (conn) {
+        checkPayslipsAlert();
+      }
     }
   }, []);
 
@@ -39,6 +67,7 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
     googleDrive.logout();
     setIsConnected(false);
     setIsModalOpen(false);
+    setMissingPayslip({ isMissing: false, targetMonthLabel: '' });
   };
 
   const handleConnectGoogle = async () => {
@@ -61,6 +90,7 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
       setIsConnected(true);
       setIsModalOpen(false);
       await onSync();
+      await checkPayslipsAlert();
     } catch (err: any) {
       setAuthError(err.message || 'Errore di connessione a Google Drive');
     } finally {
@@ -86,31 +116,6 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Local Backup Export / Import con Tooltip accessibili */}
-        <Tooltip content="Scarica file cifrato di backup (vault_finanze.enc)">
-          <Button
-            variant="outline"
-            onClick={onExportLocalEncrypted}
-            className="h-8 border-border text-foreground hover:bg-accent hover:text-accent-foreground text-[11px] px-2.5 flex items-center gap-1.5"
-          >
-            <Download className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="hidden md:inline">Scarica</span> .enc
-          </Button>
-        </Tooltip>
-
-        <Tooltip content="Carica e ripristina un file di backup cifrato (.enc o .json)">
-          <label className="h-8 border border-border hover:border-border/80 rounded-md px-2.5 flex items-center gap-1.5 cursor-pointer text-foreground hover:bg-accent hover:text-accent-foreground text-[11px] bg-transparent">
-            <Upload className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="hidden md:inline">Ripristina</span>
-            <input
-              type="file"
-              accept=".enc,.json"
-              className="hidden"
-              onChange={onImportLocalEncrypted}
-            />
-          </label>
-        </Tooltip>
-
         {/* Google Drive Status & Connection */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
@@ -131,10 +136,10 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
             <DialogHeader>
               <DialogTitle className="text-base text-foreground flex items-center gap-2">
                 <Cloud className="w-5 h-5 text-primary" />
-                Configurazione Google Drive (drive.file)
+                Configurazione Google Drive
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-xs mt-1">
-                L'applicazione accede con scope ristretto <code className="text-primary font-mono">drive.file</code> unicamente al file cifrato da essa creato (<code className="text-primary font-mono">vault_finanze.enc</code>).
+                Sincronizzazione crittografata del vault (<code className="text-primary font-mono">vault_finanze.enc</code>) e lettura cedolini in <code className="text-primary font-mono">Lavoro &gt; Buste paga</code>.
               </DialogDescription>
             </DialogHeader>
 
@@ -187,9 +192,81 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
                   </Button>
                 )}
               </div>
+
+              {/* Sezione Backup Manuale Offline (.enc) spostata qui (Opzione A) */}
+              <div className="pt-3 border-t border-border space-y-2">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[11px] font-semibold text-foreground">Backup Manuale Offline (.enc)</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    Salva o ripristina manualmente il file cifrato in locale in alternativa a Google Drive.
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onExportLocalEncrypted}
+                    className="h-8 border-border text-foreground hover:bg-accent text-[11px] px-2.5 flex items-center justify-center gap-1.5 flex-1"
+                  >
+                    <Download className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>Scarica backup</span>
+                  </Button>
+                  <label className="h-8 border border-border hover:border-border/80 rounded-md px-2.5 flex items-center justify-center gap-1.5 cursor-pointer text-foreground hover:bg-accent text-[11px] bg-transparent flex-1">
+                    <Upload className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>Ripristina file</span>
+                    <input
+                      type="file"
+                      accept=".enc,.json"
+                      className="hidden"
+                      onChange={onImportLocalEncrypted}
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Pulsante Sincronizzazione Buste Paga Drive con Alert Promemoria oltre il 15 */}
+        <Tooltip content={
+          missingPayslip.isMissing
+            ? `Attenzione: dopo il 15 del mese manca il cedolino di ${missingPayslip.targetMonthLabel} su Drive!`
+            : 'Verifica e aggiorna lo stipendio scansionando i cedolini da Drive'
+        }>
+          <Button
+            variant="outline"
+            onClick={() => setIsPayslipModalOpen(true)}
+            className={`h-8 text-[11px] px-2.5 flex items-center gap-1.5 transition-colors ${
+              missingPayslip.isMissing
+                ? 'border-amber-500/50 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20'
+                : 'border-border hover:bg-accent text-foreground'
+            }`}
+          >
+            {missingPayslip.isMissing ? (
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+            ) : (
+              <FileText className="w-3.5 h-3.5 text-primary" />
+            )}
+            <span className="hidden sm:inline">Buste Paga Drive</span>
+            {missingPayslip.isMissing && (
+              <span className="px-1.5 py-0.2 rounded-full bg-amber-500/25 text-amber-300 text-[10px] font-medium border border-amber-500/40">
+                Manca {missingPayslip.targetMonthLabel.split(' ')[0]}
+              </span>
+            )}
+          </Button>
+        </Tooltip>
+
+        <PayslipSyncDialog
+          open={isPayslipModalOpen}
+          onOpenChange={(open) => {
+            setIsPayslipModalOpen(open);
+            if (!open) {
+              checkPayslipsAlert();
+            }
+          }}
+          currentSalary={currentSalary || 1953}
+          onApplySalary={onApplySalary || (() => {})}
+        />
       </div>
     </div>
   );

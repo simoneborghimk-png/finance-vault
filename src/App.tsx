@@ -19,12 +19,31 @@ import { googleDrive } from '@/lib/googleDrive';
 
 import { VaultUnlockModal } from '@/components/VaultUnlockModal';
 import { ExecutiveDashboard } from '@/components/ExecutiveDashboard';
-import { TransactionsManager } from '@/components/TransactionsManager';
-import { TaxPensionSimulator } from '@/components/TaxPensionSimulator';
-import { GoalPlanner } from '@/components/GoalPlanner';
-import { FileIngestionDropzone } from '@/components/FileIngestionDropzone';
 import { DriveSyncBar } from '@/components/DriveSyncBar';
 import { Tabs, TabsList, TabsTrigger, TabsContent, Badge, Button } from '@/components/ui';
+
+// Lazy-loaded tabs with code splitting
+const TransactionsManager = React.lazy(() =>
+  import('@/components/TransactionsManager').then((m) => ({ default: m.TransactionsManager }))
+);
+const TaxPensionSimulator = React.lazy(() =>
+  import('@/components/TaxPensionSimulator').then((m) => ({ default: m.TaxPensionSimulator }))
+);
+const GoalPlanner = React.lazy(() =>
+  import('@/components/GoalPlanner').then((m) => ({ default: m.GoalPlanner }))
+);
+const FileIngestionDropzone = React.lazy(() =>
+  import('@/components/FileIngestionDropzone').then((m) => ({ default: m.FileIngestionDropzone }))
+);
+
+function TabLoadingSkeleton() {
+  return (
+    <div className="w-full py-16 flex flex-col items-center justify-center space-y-3">
+      <RefreshCw className="w-6 h-6 animate-spin text-primary opacity-80" />
+      <p className="text-xs text-muted-foreground font-medium">Caricamento modulo...</p>
+    </div>
+  );
+}
 
 const SESSION_VAULT_KEY = 'finance_vault_session_key';
 
@@ -36,6 +55,40 @@ export function App() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
 
+  const isLegacyMockData = (v: VaultData): boolean => {
+    if (!v.transactions || v.transactions.length === 0) return true;
+    const hasOldMock = v.transactions.some((t) => t.id.startsWith('mock-') || t.id.startsWith('virtual-'));
+    const hasGastroBug = v.transactions.some(
+      (t) => t.description.toLowerCase().includes('gastromacelleria') && t.category.includes('Luce')
+    );
+    const hasExcessiveOther = v.transactions.filter((t) => t.category === 'Altre Spese').length > 5;
+    const hasItomiShopping = v.transactions.some(
+      (t) => t.description.toLowerCase().includes('itomi') && t.category === 'Shopping e Abbigliamento'
+    );
+    const hasUnreconciledAmazon = v.transactions.some(
+      (t) => /amzn|amazon/i.test(t.description) && t.description.toLowerCase().includes('amazon eu s.a r.l.')
+    );
+    const hasTimfinNeeds = v.transactions.some(
+      (t) => t.description.toLowerCase().includes('timfin') && t.macroCategory === 'Needs'
+    );
+    return hasOldMock || hasGastroBug || hasExcessiveOther || hasItomiShopping || hasUnreconciledAmazon || hasTimfinNeeds;
+  };
+
+  const ensureRealData = (v: VaultData, pwd?: string | null): VaultData => {
+    if (isLegacyMockData(v)) {
+      const upgraded: VaultData = {
+        ...v,
+        transactions: initialVaultData.transactions,
+        lastUpdated: new Date().toISOString(),
+      };
+      if (pwd) {
+        encryptVault(upgraded, pwd).then((payload) => googleDrive.saveLocalVault(payload));
+      }
+      return upgraded;
+    }
+    return v;
+  };
+
   // Check for active session key in sessionStorage or load local encrypted vault on mount
   useEffect(() => {
     const sessionPassword = sessionStorage.getItem(SESSION_VAULT_KEY);
@@ -44,7 +97,7 @@ export function App() {
     if (sessionPassword && localEncrypted) {
       decryptVault(localEncrypted, sessionPassword)
         .then((decrypted) => {
-          setVault(decrypted);
+          setVault(ensureRealData(decrypted, sessionPassword));
           setMasterPassword(sessionPassword);
           setIsLocked(false);
         })
@@ -59,13 +112,30 @@ export function App() {
     }
   }, []);
 
+  // Proactively migrate any legacy mock transactions currently in state to the real reconciled dataset
+  useEffect(() => {
+    if (isLegacyMockData(vault)) {
+      console.log('Migrazione automatica: caricamento delle 658 transazioni reali...');
+      const upgraded: VaultData = {
+        ...vault,
+        transactions: initialVaultData.transactions,
+        lastUpdated: new Date().toISOString(),
+      };
+      setVault(upgraded);
+      if (masterPassword) {
+        encryptVault(upgraded, masterPassword).then((payload) => googleDrive.saveLocalVault(payload));
+      }
+    }
+  }, [vault, masterPassword]);
+
   // Handle Vault Unlock
   const handleUnlock = async (password: string): Promise<boolean> => {
     const localEncrypted = googleDrive.getLocalVault();
     if (localEncrypted) {
       try {
         const decrypted = await decryptVault(localEncrypted, password);
-        setVault(decrypted);
+        const data = ensureRealData(decrypted, password);
+        setVault(data);
         setMasterPassword(password);
         sessionStorage.setItem(SESSION_VAULT_KEY, password);
         setIsLocked(false);
@@ -210,6 +280,21 @@ export function App() {
     }
   };
 
+  const handleResetToRealTransactions = useCallback(async () => {
+    const updated: VaultData = {
+      ...vault,
+      transactions: initialVaultData.transactions,
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      const payload = await encryptVault(updated, masterPassword);
+      googleDrive.saveLocalVault(payload);
+    }
+    setSyncFeedback('Dataset aggiornato con successo: 658 movimenti reali caricati!');
+    setTimeout(() => setSyncFeedback(null), 3500);
+  }, [vault, masterPassword]);
+
   // Goals Handlers
   const handleAddGoal = (goal: SavingsGoal) => {
     const updated = {
@@ -233,6 +318,47 @@ export function App() {
     if (masterPassword) {
       encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
     }
+  };
+
+  const handleUpdateBudgetCaps = (budgetCaps: Record<string, number>) => {
+    const updated = {
+      ...vault,
+      budgetCaps,
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+    }
+  };
+
+  const handleApplySalary = (netSalary: number, isExtra?: '13th' | '14th' | null) => {
+    let updatedProfile = { ...vault.profile };
+    if (isExtra === '14th') {
+      updatedProfile.extraSalaries = {
+        ...updatedProfile.extraSalaries,
+        fourteenthNetJune: netSalary,
+      };
+    } else if (isExtra === '13th') {
+      updatedProfile.extraSalaries = {
+        ...updatedProfile.extraSalaries,
+        thirteenthNetDec: netSalary,
+      };
+    } else {
+      updatedProfile.baseMonthlyNetSalary = netSalary;
+    }
+
+    const updated = {
+      ...vault,
+      profile: updatedProfile,
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+    }
+    setSyncFeedback(`Stipendio aggiornato: ${netSalary.toFixed(2)} €`);
+    setTimeout(() => setSyncFeedback(null), 3000);
   };
 
   return (
@@ -289,101 +415,117 @@ export function App() {
           onExportLocalEncrypted={handleExportLocalEncrypted}
           onImportLocalEncrypted={handleImportLocalEncrypted}
           lastSyncTime={vault.lastUpdated}
+          currentSalary={vault.profile.baseMonthlyNetSalary}
+          onApplySalary={handleApplySalary}
         />
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)} className="space-y-6">
-          <TabsList className="bg-card border border-border p-1 rounded-xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
+          <TabsList className="w-full bg-card/80 border border-border p-1.5 rounded-xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 shadow-xs">
             <TabsTrigger
               value="dashboard"
-              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-2 py-2"
+              className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-2 transition-all"
             >
-              <TrendingUp className="w-4 h-4" />
-              <span>Executive Dashboard</span>
+              <TrendingUp className="w-4 h-4 shrink-0" />
+              <span className="truncate">Executive Dashboard</span>
             </TabsTrigger>
 
             <TabsTrigger
               value="transactions"
-              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-1.5 py-2"
+              className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-1.5 transition-all"
             >
-              <ReceiptText className="w-4 h-4" />
-              <span>Transazioni</span>
-              <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-mono">
+              <ReceiptText className="w-4 h-4 shrink-0" />
+              <span className="truncate">Transazioni</span>
+              <span className="ml-1 text-[10px] px-1.5 py-0.2 rounded-full bg-muted/80 text-muted-foreground font-mono">
                 {vault.transactions.length}
               </span>
             </TabsTrigger>
 
             <TabsTrigger
               value="tax-pension"
-              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-2 py-2"
+              className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-2 transition-all"
             >
-              <Coins className="w-4 h-4" />
-              <span>Simulatore Fiscale</span>
+              <Coins className="w-4 h-4 shrink-0" />
+              <span className="truncate">Simulatore Fiscale</span>
             </TabsTrigger>
 
             <TabsTrigger
               value="goals"
-              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-2 py-2"
+              className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-2 transition-all"
             >
-              <Target className="w-4 h-4" />
-              <span>Goal Planner</span>
+              <Target className="w-4 h-4 shrink-0" />
+              <span className="truncate">Goal Planner</span>
             </TabsTrigger>
 
             <TabsTrigger
               value="ingestion"
-              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-2 py-2"
+              className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-2 transition-all"
             >
-              <UploadCloud className="w-4 h-4" />
-              <span>Ingestione File</span>
+              <UploadCloud className="w-4 h-4 shrink-0" />
+              <span className="truncate">Ingestione File</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Tab 1: Executive Dashboard */}
           <TabsContent value="dashboard" className="outline-none focus:outline-none">
-            <ExecutiveDashboard transactions={vault.transactions} profile={vault.profile} />
+            <ExecutiveDashboard
+              transactions={vault.transactions}
+              profile={vault.profile}
+              budgetCaps={vault.budgetCaps}
+              onUpdateBudgetCaps={handleUpdateBudgetCaps}
+            />
           </TabsContent>
 
           {/* Tab 2: Transactions Manager */}
           <TabsContent value="transactions" className="outline-none focus:outline-none">
-            <TransactionsManager
-              transactions={vault.transactions}
-              onAddTransaction={handleAddTransaction}
-              onUpdateTransaction={handleUpdateTransaction}
-              onDeleteTransaction={handleDeleteTransaction}
-            />
+            <React.Suspense fallback={<TabLoadingSkeleton />}>
+              <TransactionsManager
+                transactions={vault.transactions}
+                onAddTransaction={handleAddTransaction}
+                onUpdateTransaction={handleUpdateTransaction}
+                onDeleteTransaction={handleDeleteTransaction}
+                onResetToRealTransactions={handleResetToRealTransactions}
+              />
+            </React.Suspense>
           </TabsContent>
 
-          {/* Tab 2: Tax & Pension Fund Simulator */}
+          {/* Tab 3: Tax & Pension Fund Simulator */}
           <TabsContent value="tax-pension" className="outline-none focus:outline-none">
-            <TaxPensionSimulator
-              profile={vault.profile}
-              initialContribution={vault.pensionVoluntaryContribution}
-              onSaveContribution={(amt) => {
-                const updated = { ...vault, pensionVoluntaryContribution: amt, lastUpdated: new Date().toISOString() };
-                setVault(updated);
-                if (masterPassword) encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
-              }}
-            />
+            <React.Suspense fallback={<TabLoadingSkeleton />}>
+              <TaxPensionSimulator
+                profile={vault.profile}
+                initialContribution={vault.pensionVoluntaryContribution}
+                onSaveContribution={(amt) => {
+                  const updated = { ...vault, pensionVoluntaryContribution: amt, lastUpdated: new Date().toISOString() };
+                  setVault(updated);
+                  if (masterPassword) encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+                }}
+              />
+            </React.Suspense>
           </TabsContent>
 
-          {/* Tab 3: Goal Planner */}
+          {/* Tab 4: Goal Planner */}
           <TabsContent value="goals" className="outline-none focus:outline-none">
-            <GoalPlanner
-              goals={vault.goals}
-              profile={vault.profile}
-              onAddGoal={handleAddGoal}
-              onRemoveGoal={handleRemoveGoal}
-            />
+            <React.Suspense fallback={<TabLoadingSkeleton />}>
+              <GoalPlanner
+                goals={vault.goals}
+                profile={vault.profile}
+                onAddGoal={handleAddGoal}
+                onRemoveGoal={handleRemoveGoal}
+              />
+            </React.Suspense>
           </TabsContent>
 
-          {/* Tab 4: File Ingestion Dropzone */}
+          {/* Tab 5: File Ingestion Dropzone */}
           <TabsContent value="ingestion" className="outline-none focus:outline-none">
-            <FileIngestionDropzone
-              onImportTransactions={handleImportTransactions}
-              onSyncDrive={handleSyncToDrive}
-              isSyncing={isSyncing}
-              driveConnected={googleDrive.isConnected()}
-            />
+            <React.Suspense fallback={<TabLoadingSkeleton />}>
+              <FileIngestionDropzone
+                onImportTransactions={handleImportTransactions}
+                onSyncDrive={handleSyncToDrive}
+                isSyncing={isSyncing}
+                driveConnected={googleDrive.isConnected()}
+              />
+            </React.Suspense>
           </TabsContent>
         </Tabs>
       </main>

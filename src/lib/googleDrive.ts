@@ -7,7 +7,7 @@
 import { EncryptedVaultPayload } from '@/types/finance';
 
 const DRIVE_FILE_NAME = 'vault_finanze.enc';
-const SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const SCOPE = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly';
 const LOCAL_STORAGE_KEY = 'finance_vault_encrypted_local';
 const STORAGE_KEY_TOKEN = 'gdrive_access_token';
 const STORAGE_KEY_EXPIRES_AT = 'gdrive_token_expires_at';
@@ -278,6 +278,215 @@ class GoogleDriveService {
   }
 
   /**
+   * Scans Google Drive for payslips specifically exploring:
+   * "Lavoro > Buste paga > [Anno]"
+   * with fallback to global name query if the folder tree is different.
+   */
+  public async listPayslips(): Promise<PayslipInfo[]> {
+    let token = this.accessToken;
+    if (!token || this.isTokenExpired()) {
+      try {
+        token = await this.ensureValidToken();
+      } catch {
+        token = null;
+      }
+    }
+
+    if (!token) {
+      // Fallback virtual payslips for offline / demo preview
+      return [
+        {
+          id: 'mock-payslip-2026-10',
+          name: 'Busta_Paga_2026_10_Cloudfire.pdf',
+          month: '2026-10',
+          netSalary: 1953.00,
+          modifiedTime: '2026-10-20T10:00:00Z',
+          isExtraordinaryMonth: null,
+        },
+        {
+          id: 'mock-payslip-2026-06',
+          name: 'Cedolino_14esima_2026_06.pdf',
+          month: '2026-06',
+          netSalary: 1848.00,
+          modifiedTime: '2026-06-25T14:30:00Z',
+          isExtraordinaryMonth: '14th',
+        },
+      ];
+    }
+
+    try {
+      const driveHeaders = { Authorization: `Bearer ${token}` };
+      const foundFiles: Array<{ id: string; name: string; modifiedTime: string; size?: string; parentYear?: string }> = [];
+
+      // Step 1: Search for root/subfolder named "Lavoro"
+      const lavoroQuery = encodeURIComponent("mimeType = 'application/vnd.google-apps.folder' and (name = 'Lavoro' or name = 'lavoro') and trashed = false");
+      const lavoroRes = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=${lavoroQuery}&fields=files(id,name)`,
+        { headers: driveHeaders }
+      );
+      const lavoroData = lavoroRes.ok ? await lavoroRes.json() : { files: [] };
+      const lavoroFolders: Array<{ id: string; name: string }> = lavoroData.files || [];
+
+      const targetFolderIds: Array<{ id: string; yearName?: string }> = [];
+
+      // Step 2: Search for "Buste paga" folder inside "Lavoro" (or at root if Lavoro not found)
+      let bustePagaFolders: Array<{ id: string; name: string }> = [];
+      if (lavoroFolders.length > 0) {
+        for (const lf of lavoroFolders) {
+          const bpQuery = encodeURIComponent(`mimeType = 'application/vnd.google-apps.folder' and (name contains 'Buste' or name contains 'buste') and '${lf.id}' in parents and trashed = false`);
+          const bpRes = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q=${bpQuery}&fields=files(id,name)`,
+            { headers: driveHeaders }
+          );
+          if (bpRes.ok) {
+            const bpData = await bpRes.json();
+            bustePagaFolders.push(...(bpData.files || []));
+          }
+        }
+      }
+
+      if (bustePagaFolders.length === 0) {
+        // Check if "Buste paga" is directly at Drive root
+        const rootBpQuery = encodeURIComponent("mimeType = 'application/vnd.google-apps.folder' and (name contains 'Buste' or name contains 'buste') and trashed = false");
+        const rootBpRes = await fetch(
+          `https://www.googleapis.com/drive/v3/files?q=${rootBpQuery}&fields=files(id,name)`,
+          { headers: driveHeaders }
+        );
+        if (rootBpRes.ok) {
+          const rootBpData = await rootBpRes.json();
+          bustePagaFolders = rootBpData.files || [];
+        }
+      }
+
+      // Step 3: For each "Buste paga" folder, look for year subfolders (e.g. 2024, 2025, 2026)
+      for (const bpf of bustePagaFolders) {
+        targetFolderIds.push({ id: bpf.id });
+        const yearQuery = encodeURIComponent(`mimeType = 'application/vnd.google-apps.folder' and '${bpf.id}' in parents and trashed = false`);
+        const yearRes = await fetch(
+          `https://www.googleapis.com/drive/v3/files?q=${yearQuery}&fields=files(id,name)`,
+          { headers: driveHeaders }
+        );
+        if (yearRes.ok) {
+          const yearData = await yearRes.json();
+          for (const yf of (yearData.files || [])) {
+            targetFolderIds.push({ id: yf.id, yearName: yf.name });
+          }
+        }
+      }
+
+      // Step 4: Extract files inside all target folders
+      for (const tf of targetFolderIds) {
+        const fileQuery = encodeURIComponent(`'${tf.id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false`);
+        const fileRes = await fetch(
+          `https://www.googleapis.com/drive/v3/files?q=${fileQuery}&fields=files(id,name,modifiedTime,size)&pageSize=50`,
+          { headers: driveHeaders }
+        );
+        if (fileRes.ok) {
+          const fileData = await fileRes.json();
+          for (const f of (fileData.files || [])) {
+            foundFiles.push({ ...f, parentYear: tf.yearName });
+          }
+        }
+      }
+
+      // Step 5: Fallback global query if the folder tree did not yield files
+      if (foundFiles.length === 0) {
+        const fallbackQuery = encodeURIComponent("trashed = false and (name contains 'busta' or name contains 'Busta' or name contains 'cedolino' or name contains 'Cedolino')");
+        const fbRes = await fetch(
+          `https://www.googleapis.com/drive/v3/files?q=${fallbackQuery}&fields=files(id,name,modifiedTime,size)&pageSize=30`,
+          { headers: driveHeaders }
+        );
+        if (fbRes.ok) {
+          const fbData = await fbRes.json();
+          foundFiles.push(...(fbData.files || []));
+        }
+      }
+
+      const italianMonths: Record<string, string> = {
+        gennaio: '01', febbraio: '02', marzo: '03', aprile: '04',
+        maggio: '05', giugno: '06', luglio: '07', agosto: '08',
+        settembre: '09', ottobre: '10', novembre: '11', dicembre: '12',
+        gen: '01', feb: '02', mar: '03', apr: '04', mag: '05', giu: '06',
+        lug: '07', ago: '08', set: '09', ott: '10', nov: '11', dic: '12'
+      };
+
+      return foundFiles.map((f) => {
+        const name = f.name;
+        const lowerName = name.toLowerCase();
+
+        // 1. Year determination
+        let year = '';
+        const yearMatch = name.match(/\b(202\d)\b/) || (f.parentYear ? f.parentYear.match(/\b(202\d)\b/) : null);
+        if (yearMatch) {
+          year = yearMatch[1];
+        } else {
+          year = new Date(f.modifiedTime).getFullYear().toString();
+        }
+
+        // 2. Month determination
+        let monthNum = '';
+        const isoMatch = name.match(/(202\d)[-_](0[1-9]|1[0-2])/) || name.match(/(0[1-9]|1[0-2])[-_](202\d)/);
+        if (isoMatch) {
+          monthNum = isoMatch[1].length === 4 ? isoMatch[2] : isoMatch[1];
+          year = isoMatch[1].length === 4 ? isoMatch[1] : isoMatch[2];
+        } else {
+          for (const [itMonth, itNum] of Object.entries(italianMonths)) {
+            const regex = new RegExp(`\\b${itMonth}\\b`, 'i');
+            if (regex.test(lowerName)) {
+              monthNum = itNum;
+              break;
+            }
+          }
+          if (!monthNum) {
+            const numMatch = name.match(/[-_\s](0[1-9]|1[0-2])[-_\s.]/) || name.match(/^(0[1-9]|1[0-2])[-_\s.]/);
+            if (numMatch) {
+              monthNum = numMatch[1];
+            }
+          }
+        }
+
+        if (!monthNum) {
+          const modDate = new Date(f.modifiedTime);
+          monthNum = String(modDate.getMonth() + 1).padStart(2, '0');
+        }
+
+        const fullMonth = `${year}-${monthNum}`;
+
+        // 3. 13th / 14th detection
+        let isExtraordinaryMonth: '13th' | '14th' | null = null;
+        if (lowerName.includes('14') || lowerName.includes('quattordicesima')) {
+          isExtraordinaryMonth = '14th';
+        } else if (lowerName.includes('13') || lowerName.includes('tredicesima')) {
+          isExtraordinaryMonth = '13th';
+        }
+
+        // 4. Net salary detection or default fallback
+        let netSalary = 1953.00;
+        const matchAmount = name.match(/(\d{3,4})[.,](\d{2})/);
+        if (matchAmount) {
+          netSalary = parseFloat(`${matchAmount[1]}.${matchAmount[2]}`);
+        } else if (isExtraordinaryMonth === '14th') {
+          netSalary = 1848.00;
+        } else if (isExtraordinaryMonth === '13th') {
+          netSalary = 1850.00;
+        }
+
+        return {
+          id: f.id,
+          name: f.name,
+          month: fullMonth,
+          netSalary,
+          modifiedTime: f.modifiedTime,
+          isExtraordinaryMonth,
+        };
+      }).sort((a, b) => b.month.localeCompare(a.month));
+    } catch (err) {
+      console.warn('Errore scansione cartella buste paga da Google Drive:', err);
+      return [];
+    }
+  }
+
+  /**
    * Local storage fallback
    */
   public saveLocalVault(payload: EncryptedVaultPayload): void {
@@ -293,6 +502,52 @@ class GoogleDriveService {
       return null;
     }
   }
+}
+
+export interface PayslipInfo {
+  id: string;
+  name: string;
+  month: string;
+  netSalary: number;
+  modifiedTime: string;
+  isExtraordinaryMonth?: '13th' | '14th' | null;
+}
+
+/**
+ * Checks if current date is on or after the 15th of the month
+ * and verifies if the payslip of the previous month is missing.
+ */
+export function checkMissingPreviousMonthPayslip(
+  payslips: PayslipInfo[],
+  referenceDate: Date = new Date()
+): {
+  isMissing: boolean;
+  targetMonth: string;
+  targetMonthLabel: string;
+} {
+  const day = referenceDate.getDate();
+  if (day < 15) {
+    return { isMissing: false, targetMonth: '', targetMonthLabel: '' };
+  }
+
+  // Previous month calculation
+  const prevDate = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - 1, 1);
+  const year = prevDate.getFullYear();
+  const monthNum = String(prevDate.getMonth() + 1).padStart(2, '0');
+  const targetMonth = `${year}-${monthNum}`;
+
+  const monthNames = [
+    'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+    'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+  ];
+  const targetMonthLabel = `${monthNames[prevDate.getMonth()]} ${year}`;
+
+  const hasPayslip = payslips.some((p) => p.month === targetMonth);
+  return {
+    isMissing: !hasPayslip,
+    targetMonth,
+    targetMonthLabel,
+  };
 }
 
 export const googleDrive = new GoogleDriveService();

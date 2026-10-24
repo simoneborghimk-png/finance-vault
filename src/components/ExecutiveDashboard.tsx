@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Transaction, UserFinancialProfile } from '@/types/finance';
+import { Transaction, UserFinancialProfile, MACRO_CATEGORY_LABELS } from '@/types/finance';
 import {
   TrendingUp,
   Wallet,
@@ -27,11 +27,16 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { Card, CardHeader, CardTitle, CardContent, Badge, Switch } from './ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, Switch, DateRangePicker } from './ui';
+import { DateRange } from 'react-day-picker';
+import { format } from 'date-fns';
+import { BudgetCapManager } from './BudgetCapManager';
 
 interface ExecutiveDashboardProps {
   transactions: Transaction[];
   profile: UserFinancialProfile;
+  budgetCaps?: Record<string, number>;
+  onUpdateBudgetCaps?: (caps: Record<string, number>) => void;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -50,14 +55,31 @@ const formatEuro = (amount: number): string => {
   }).format(amount);
 };
 
-export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ transactions, profile }) => {
+export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
+  transactions,
+  profile,
+  budgetCaps,
+  onUpdateBudgetCaps,
+}) => {
   const [excludeExtraordinary, setExcludeExtraordinary] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   // Filter transactions
   const filteredTransactions = useMemo(() => {
-    if (!excludeExtraordinary) return transactions;
-    return transactions.filter((t) => !t.isExtraordinary && t.macroCategory !== 'Extraordinary');
-  }, [transactions, excludeExtraordinary]);
+    let result = transactions;
+    if (excludeExtraordinary) {
+      result = result.filter((t) => !t.isExtraordinary && t.macroCategory !== 'Extraordinary');
+    }
+    if (dateRange?.from) {
+      const fromIso = format(dateRange.from, 'yyyy-MM-dd');
+      result = result.filter((t) => t.date >= fromIso);
+    }
+    if (dateRange?.to) {
+      const toIso = format(dateRange.to, 'yyyy-MM-dd');
+      result = result.filter((t) => t.date <= toIso);
+    }
+    return result;
+  }, [transactions, excludeExtraordinary, dateRange]);
 
   // Monthly Aggregations
   const monthlyMetrics = useMemo(() => {
@@ -167,16 +189,8 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ transact
       }
     });
 
-    const labels: Record<string, string> = {
-      Needs: 'Bisogni Primari & Casa',
-      Commitments: 'Rate & Finanziamenti',
-      Wants: 'Stile di Vita & Shopping',
-      Savings: 'Risparmio & Previdenza',
-      Extraordinary: 'Spese Straordinarie',
-    };
-
     return Object.keys(macroTotals).map((key) => ({
-      name: labels[key] || key,
+      name: (MACRO_CATEGORY_LABELS as any)[key] || key,
       categoryKey: key,
       value: Math.round(macroTotals[key]),
       color: CATEGORY_COLORS[key] || '#94a3b8',
@@ -208,8 +222,8 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ transact
 
   return (
     <div className="space-y-6">
-      {/* Top Bar with Filter Toggle */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-card border border-border">
+      {/* Top Bar with Filter Toggle & DateRangePicker */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-card border border-border">
         <div>
           <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-primary" />
@@ -220,13 +234,19 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ transact
           </p>
         </div>
 
-        <div className="flex items-center gap-3 bg-background px-3.5 py-2 rounded-lg border border-border">
-          <Filter className="w-4 h-4 text-primary" />
-          <span className="text-xs text-foreground font-medium">Escludi Spese Straordinarie</span>
-          <Switch
-            checked={excludeExtraordinary}
-            onCheckedChange={setExcludeExtraordinary}
+        <div className="flex flex-wrap items-center gap-3">
+          <DateRangePicker
+            value={dateRange}
+            onChange={setDateRange}
           />
+          <div className="flex items-center gap-3 bg-background px-3.5 py-2 rounded-lg border border-border">
+            <Filter className="w-4 h-4 text-primary" />
+            <span className="text-xs text-foreground font-medium">Escludi Spese Straordinarie</span>
+            <Switch
+              checked={excludeExtraordinary}
+              onCheckedChange={setExcludeExtraordinary}
+            />
+          </div>
         </div>
       </div>
 
@@ -416,13 +436,20 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ transact
                     formatter={(val: any) => [formatEuro(Number(val)), 'Media Mensile']}
                     contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: 'var(--card-foreground)', fontSize: '12px' }}
                   />
-                  <Bar dataKey="monthlyAvg" fill="var(--primary)" radius={[0, 6, 6, 0]} />
+                  <Bar dataKey="monthlyAvg" fill="var(--info)" radius={[0, 6, 6, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Budget Caps & Monthly Thresholds Monitoring */}
+      <BudgetCapManager
+        transactions={filteredTransactions}
+        budgetCaps={budgetCaps}
+        onUpdateBudgetCaps={onUpdateBudgetCaps}
+      />
 
       {/* Historical 12-Month Area Timeline */}
       <Card className="bg-card border-border">

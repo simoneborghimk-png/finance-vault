@@ -5,10 +5,26 @@ export type MacroCategory =
   | 'Savings'       // Accantonamento liquidità, fondo emergenza, previdenza
   | 'Extraordinary';// Lavori casa, spese eccezionali una tantum
 
+export const MACRO_CATEGORY_LABELS: Record<MacroCategory, string> = {
+  Needs: 'Bisogni Primari & Casa',
+  Commitments: 'Rate & Finanziamenti',
+  Wants: 'Stile di Vita & Shopping',
+  Savings: 'Risparmio & Previdenza',
+  Extraordinary: 'Spese Straordinarie',
+};
+
+export const MACRO_CATEGORY_SHORT_LABELS: Record<MacroCategory, string> = {
+  Needs: 'Bisogni Primari',
+  Commitments: 'Rate & Fissi',
+  Wants: 'Stile di Vita',
+  Savings: 'Risparmio',
+  Extraordinary: 'Straordinarie',
+};
+
 export interface Transaction {
   id: string;
   date: string; // ISO YYYY-MM-DD
-  channel: 'BancoBPM' | 'Numia' | 'PayPal' | 'Satispay' | 'Contanti';
+  channel: 'BancoBPM' | 'Numia' | 'Nexi' | 'PayPal' | 'Satispay' | 'Contanti';
   amount: number; // Negativo per uscite, positivo per entrate
   macroCategory: MacroCategory;
   category: string; // es. "Utenze Luce/Gas", "Supermercato", "Rate Finanziamenti", "Shopping Amazon"
@@ -68,12 +84,19 @@ export interface EncryptedVaultPayload {
   timestamp: string;
 }
 
+export interface CategoryBudgetCap {
+  category: string;
+  monthlyLimit: number;
+  macroCategory?: MacroCategory;
+}
+
 export interface VaultData {
   version: number;
   profile: UserFinancialProfile;
   transactions: Transaction[];
   rules: BudgetRule[];
   goals: SavingsGoal[];
+  budgetCaps?: Record<string, number>;
   pensionVoluntaryContribution: number;
   lastUpdated: string;
 }

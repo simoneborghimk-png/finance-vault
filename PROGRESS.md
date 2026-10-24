@@ -24,7 +24,7 @@
 | **Tab 2: Transazioni (Manager)**|   ✅  | Tabella interattiva, ricerca full-text, filtri, editing e inserimento manuale |
 | **Tab 3: Simulatore Fiscale**   |   ✅  | Slider 0-5.164,57 €, deducibilità 730 IRPEF 35-43%, timeline    |
 | **Tab 4: Goal Planner**         |   ✅  | Assorbimento prioritario 14ª Giugno e 730 Luglio               |
-| **Tab 5: Ingestione File**      |   ✅  | Dropzone Excel/CSV Banco BPM (`movimentiConto`), Numia         |
+| **Tab 5: Ingestione File**      |   ✅  | Dropzone Excel/CSV Banco BPM, Carta Nexi, Numia, PayPal, Satispay |
 | **Drive Sync & Backup**         |   ✅  | Download/Upload `vault_finanze.enc` + Export/Import locale     |
 
 ## 3. Indice Decisioni Architetturali (ADR)
@@ -46,9 +46,18 @@
 - [x] Tabella Transazioni Interattiva (ricerca, filtri, editing categoria/tag, aggiunta manuale)
 - [x] Allineamento token system DTCG e importazione catalogo Shadcn UI (46 componenti) da `agent-core-knowledge`
 - [x] Adozione standard UX/UI/A11y Tier 0: `.agents/rules/ux-ui-accessibility-standards.md`, table expansion rows, zero `title` nativi, form resilienti
-- [ ] Budget Cap & Monitoraggio Soglie Spesa mensili
-- [ ] Ottimizzazione bundle: Code Splitting dinamico (Lazy loading SheetJS / Dropzone)
-- [ ] Lettura automatica buste paga aggiornate da cartella su Google Drive
+- [x] Budget Cap & Monitoraggio Soglie Spesa mensili
+- [x] Ottimizzazione bundle: Code Splitting dinamico (Lazy loading SheetJS / Dropzone)
+- [x] Lettura automatica buste paga da cartella Google Drive (`Lavoro > Buste paga > [Anno]`)
+- [x] Alert intelligente promemoria busta paga mancante dopo il 15 del mese
+- [x] Riposizionamento backup manuale `.enc` all'interno del modale Google Drive
+- [x] Riconciliazione & categorizzazione a grana fine (588 movimenti reali verificati, 0 residui in Altre Spese, zero doppi addebiti SDD)
+- [x] Paginazione avanzata tabella transazioni con selettore righe per pagina (10, 20, 50, 100, 250)
+- [x] Riconciliazione ordini Amazon reali (86 ordini estratti, 79 movimenti carte/banca riclassificati al centesimo: cibo, libri, tech, farmacia, cura persona, casa, brico, rate)
+- [x] Riclassificazione rate finanziamenti TIMFIN (21 movimenti spostati da Fibra a Rate Finanziamenti / Commitments)
+- [x] Restyling modale sincronizzazione buste paga Drive (risoluzione collisioni header, zero clipping lista, trigger primario nel footer)
+- [x] Blindatura privacy & portabilità git: esclusione data/, scripts/ e realTransactions.json con fallback demo resiliente
+- [ ] Export sintetico del bilancio annuale in PDF / CSV formattato
 
 ## 5. Riferimenti Rapidi & Comandi
 

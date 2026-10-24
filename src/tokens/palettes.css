@@ -46,12 +46,12 @@
 [data-theme='dark'][data-palette='emerald'],
 .dark[data-palette='emerald'],
 .dark [data-palette='emerald'] {
-  --primary: var(--tw-color-emerald-400);
-  --primary-foreground: var(--tw-color-emerald-950);
-  --ring: var(--tw-color-emerald-400);
-  --sidebar-primary: var(--tw-color-emerald-400);
-  --sidebar-primary-foreground: var(--tw-color-emerald-950);
-  --sidebar-ring: var(--tw-color-emerald-400);
+  --primary: var(--tw-color-emerald-500);
+  --primary-foreground: var(--tw-color-white);
+  --ring: var(--tw-color-emerald-500);
+  --sidebar-primary: var(--tw-color-emerald-500);
+  --sidebar-primary-foreground: var(--tw-color-white);
+  --sidebar-ring: var(--tw-color-emerald-500);
 }
 
 /* ==========================================================================

@@ -12,6 +12,9 @@ dist-ssr
 .env
 .env.*
 !.env.example
+data/
+scripts/
+src/lib/realTransactions.json
 
 # Logs
 logs

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { UploadCloud, FileSpreadsheet, Check, AlertCircle, CheckCircle2, CloudUpload, ArrowRight, RefreshCw } from 'lucide-react';
-import { Transaction, MacroCategory } from '@/types/finance';
+import { Transaction, MacroCategory, MACRO_CATEGORY_SHORT_LABELS } from '@/types/finance';
 import { parseFinancialFile } from '@/lib/parsers/bankParsers';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, Button, Badge, Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from './ui';
 
@@ -136,10 +136,10 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
           <FileSpreadsheet className="w-8 h-8 text-primary" />
         </div>
         <h3 className="text-sm font-semibold text-foreground">
-          Trascina qui il file Excel (.xlsx) o CSV del conto / carta
+          Trascina qui il file Excel (.xlsx) o CSV del conto, carta o wallet
         </h3>
-        <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
-          Supporto nativo per <span className="text-foreground font-medium">movimentiConto.xlsx</span> (Banco BPM) e <span className="text-foreground font-medium">movimenti (2).xlsx</span> (Carta Numia)
+        <p className="text-xs text-muted-foreground mt-1 max-w-lg mx-auto">
+          Supporto nativo: <span className="text-foreground font-medium">Banco BPM</span>, <span className="text-foreground font-medium">Carta Nexi</span>, <span className="text-foreground font-medium">Carta Numia</span>, <span className="text-foreground font-medium">PayPal (CSV)</span> e <span className="text-foreground font-medium">Satispay</span>
         </p>
         <p className="text-[11px] text-primary/90 mt-2">
           Nessun file viene caricato su server esterni: il parsing avviene in 15 millisecondi nel browser.
@@ -224,7 +224,7 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
                           item.macroCategory === 'Extraordinary' ? 'bg-rose-950 text-rose-300 border border-rose-800/40' :
                           'bg-emerald-950 text-emerald-300 border border-emerald-800/40'
                         }`}>
-                          {item.macroCategory}
+                          {MACRO_CATEGORY_SHORT_LABELS[item.macroCategory] || item.macroCategory}
                         </span>
                       </TableCell>
                       <TableCell className="text-foreground align-middle">{item.category}</TableCell>

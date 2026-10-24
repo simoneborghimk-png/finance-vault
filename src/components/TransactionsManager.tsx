@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Transaction, MacroCategory } from '@/types/finance';
+import { Transaction, MacroCategory, MACRO_CATEGORY_LABELS, MACRO_CATEGORY_SHORT_LABELS } from '@/types/finance';
 import {
   Search,
   Plus,
@@ -16,11 +16,18 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
+  ChevronsLeft,
+  ChevronsRight,
   TrendingUp,
   TrendingDown,
   Sparkles,
-  Check
+  Check,
+  ReceiptText,
+  ArrowUpRight,
+  ArrowDownRight,
+  RefreshCw,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import {
   Card,
@@ -45,14 +52,23 @@ import {
   DialogFooter,
   Tooltip,
   Label,
-  Checkbox
+  Checkbox,
+  DateRangePicker,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
 } from './ui';
+import { DateRange } from 'react-day-picker';
+import { format } from 'date-fns';
 
 interface TransactionsManagerProps {
   transactions: Transaction[];
   onAddTransaction: (transaction: Transaction) => void;
   onUpdateTransaction: (transaction: Transaction) => void;
   onDeleteTransaction: (id: string) => void;
+  onResetToRealTransactions?: () => void;
 }
 
 const MACRO_COLORS: Record<MacroCategory, { bg: string; text: string; border: string }> = {
@@ -66,6 +82,7 @@ const MACRO_COLORS: Record<MacroCategory, { bg: string; text: string; border: st
 const CHANNEL_ICONS: Record<Transaction['channel'], React.ReactNode> = {
   BancoBPM: <Building2 className="w-3.5 h-3.5 text-sky-400" />,
   Numia: <CreditCard className="w-3.5 h-3.5 text-amber-400" />,
+  Nexi: <CreditCard className="w-3.5 h-3.5 text-indigo-400" />,
   PayPal: <Wallet className="w-3.5 h-3.5 text-blue-400" />,
   Satispay: <Wallet className="w-3.5 h-3.5 text-red-400" />,
   Contanti: <Wallet className="w-3.5 h-3.5 text-emerald-400" />,
@@ -84,17 +101,30 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
   onAddTransaction,
   onUpdateTransaction,
   onDeleteTransaction,
+  onResetToRealTransactions,
 }) => {
   // Filtering & Search states
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMacro, setSelectedMacro] = useState<string>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedChannel, setSelectedChannel] = useState<string>('ALL');
-  const [selectedMonth, setSelectedMonth] = useState<string>('ALL');
-  const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc'>('date-desc');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [sortField, setSortField] = useState<'date' | 'channel' | 'description' | 'category' | 'amount'>('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 20;
+  const [pageSize, setPageSize] = useState<number>(() => {
+    const saved = localStorage.getItem('finance_vault_tx_page_size');
+    return saved ? parseInt(saved, 10) || 20 : 20;
+  });
+
+  const handlePageSizeChange = (val: string) => {
+    const size = parseInt(val, 10) || 20;
+    setPageSize(size);
+    localStorage.setItem('finance_vault_tx_page_size', String(size));
+    setCurrentPage(1);
+  };
 
   // Modals states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -113,16 +143,51 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
   const [formTags, setFormTags] = useState('');
   const [formIsExtraordinary, setFormIsExtraordinary] = useState(false);
 
-  // Distinct months list
-  const availableMonths = useMemo(() => {
-    const set = new Set<string>();
+  // Dynamically compute available categories, optionally scoped by selected macro
+  const availableCategories = useMemo(() => {
+    const cats = new Set<string>();
     transactions.forEach((t) => {
-      if (t.date && t.date.length >= 7) {
-        set.add(t.date.substring(0, 7));
+      if (t.category && t.category.trim()) {
+        if (selectedMacro === 'ALL' || t.macroCategory === selectedMacro) {
+          cats.add(t.category.trim());
+        }
       }
     });
-    return Array.from(set).sort().reverse();
-  }, [transactions]);
+    return Array.from(cats).sort((a, b) => a.localeCompare(b, 'it'));
+  }, [transactions, selectedMacro]);
+
+  const handleMacroChange = (val: string) => {
+    setSelectedMacro(val);
+    setSelectedCategory('ALL');
+    setCurrentPage(1);
+  };
+
+  const handleHeaderSort = (field: 'date' | 'channel' | 'description' | 'category' | 'amount') => {
+    if (sortField === field) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDirection(field === 'date' || field === 'amount' ? 'desc' : 'asc');
+    }
+    setCurrentPage(1);
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setSelectedMacro('ALL');
+    setSelectedCategory('ALL');
+    setSelectedChannel('ALL');
+    setDateRange(undefined);
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters = Boolean(
+    searchTerm.trim() ||
+    selectedMacro !== 'ALL' ||
+    selectedCategory !== 'ALL' ||
+    selectedChannel !== 'ALL' ||
+    dateRange
+  );
 
   // Filtered & Sorted Transactions
   const filteredTransactions = useMemo(() => {
@@ -144,30 +209,43 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
         return false;
       }
 
+      // Specific Category
+      if (selectedCategory !== 'ALL' && t.category !== selectedCategory) {
+        return false;
+      }
+
       // Channel
       if (selectedChannel !== 'ALL' && t.channel !== selectedChannel) {
         return false;
       }
 
-      // Month
-      if (selectedMonth !== 'ALL' && !t.date.startsWith(selectedMonth)) {
-        return false;
+      // Date Range Filter
+      if (dateRange?.from) {
+        const fromIso = format(dateRange.from, 'yyyy-MM-dd');
+        if (t.date < fromIso) return false;
+      }
+      if (dateRange?.to) {
+        const toIso = format(dateRange.to, 'yyyy-MM-dd');
+        if (t.date > toIso) return false;
       }
 
       return true;
     });
 
-    // Sorting
+    // Sorting by column header
     result.sort((a, b) => {
-      if (sortBy === 'date-desc') return b.date.localeCompare(a.date);
-      if (sortBy === 'date-asc') return a.date.localeCompare(b.date);
-      if (sortBy === 'amount-desc') return b.amount - a.amount;
-      if (sortBy === 'amount-asc') return a.amount - b.amount;
-      return 0;
+      let cmp = 0;
+      if (sortField === 'date') cmp = a.date.localeCompare(b.date);
+      else if (sortField === 'amount') cmp = a.amount - b.amount;
+      else if (sortField === 'channel') cmp = a.channel.localeCompare(b.channel);
+      else if (sortField === 'description') cmp = a.description.localeCompare(b.description);
+      else if (sortField === 'category') cmp = a.category.localeCompare(b.category);
+
+      return sortDirection === 'asc' ? cmp : -cmp;
     });
 
     return result;
-  }, [transactions, searchTerm, selectedMacro, selectedChannel, selectedMonth, sortBy]);
+  }, [transactions, searchTerm, selectedMacro, selectedCategory, selectedChannel, dateRange, sortField, sortDirection]);
 
   // Summary stats for filtered results
   const stats = useMemo(() => {
@@ -294,38 +372,123 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             Consulta, ricerca, correggi categorie o aggiungi nuove uscite/entrate nel Vault cifrato
           </p>
         </div>
-        <Button
-          onClick={handleOpenAdd}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-2 px-3.5 flex items-center gap-1.5 shrink-0 shadow-lg"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Nuova Transazione</span>
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          {onResetToRealTransactions && (
+            <Button
+              variant="outline"
+              onClick={onResetToRealTransactions}
+              className="border-border text-foreground hover:bg-accent hover:text-accent-foreground text-xs py-2 px-3 flex items-center gap-1.5 shrink-0"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-primary" />
+              <span>Ricarica 658 Dati Reali</span>
+            </Button>
+          )}
+          <Button
+            onClick={handleOpenAdd}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-2 px-3.5 flex items-center gap-1.5 shrink-0 shadow-lg"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nuova Transazione</span>
+          </Button>
+        </div>
       </div>
 
-      {/* KPI Stats pills */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card className="bg-card border-border p-3">
-          <p className="text-[11px] text-muted-foreground font-medium">Movimenti Filtrati</p>
-          <p className="text-lg font-bold text-foreground mt-0.5">{stats.count}</p>
+      {/* KPI Stats cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Movimenti Filtrati */}
+        <Card className="bg-card border-border relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
+          <CardHeader className="pb-1 pt-4 px-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">Movimenti Filtrati</span>
+              <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                <ReceiptText className="w-4 h-4" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-foreground mt-1">
+              {stats.count}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-1">
+            <p className="text-[11px] text-muted-foreground">
+              Transazioni visibili nel periodo
+            </p>
+          </CardContent>
         </Card>
-        <Card className="bg-card border-border p-3">
-          <p className="text-[11px] text-primary font-medium flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" /> Totale Entrate
-          </p>
-          <p className="text-lg font-bold text-primary mt-0.5">{formatEuro(stats.income)}</p>
+
+        {/* Totale Entrate */}
+        <Card className="bg-card border-border relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
+          <CardHeader className="pb-1 pt-4 px-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">Totale Entrate</span>
+              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <TrendingUp className="w-4 h-4" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-emerald-400 mt-1">
+              {formatEuro(stats.income)}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-1">
+            <div className="flex items-center text-[11px] text-emerald-400 font-medium">
+              <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" />
+              <span>Accrediti & stipendi</span>
+            </div>
+          </CardContent>
         </Card>
-        <Card className="bg-card border-border p-3">
-          <p className="text-[11px] text-destructive font-medium flex items-center gap-1">
-            <TrendingDown className="w-3 h-3" /> Totale Uscite
-          </p>
-          <p className="text-lg font-bold text-destructive mt-0.5">{formatEuro(stats.expenses)}</p>
+
+        {/* Totale Uscite */}
+        <Card className="bg-card border-border relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/5 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
+          <CardHeader className="pb-1 pt-4 px-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">Totale Uscite</span>
+              <div className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400">
+                <TrendingDown className="w-4 h-4" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-rose-400 mt-1">
+              {formatEuro(stats.expenses)}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-1">
+            <div className="flex items-center text-[11px] text-rose-400 font-medium">
+              <ArrowDownRight className="w-3.5 h-3.5 mr-0.5" />
+              <span>Spese e addebiti</span>
+            </div>
+          </CardContent>
         </Card>
-        <Card className="bg-card border-border p-3">
-          <p className="text-[11px] text-foreground font-medium">Saldo Netto Periodo</p>
-          <p className={`text-lg font-bold mt-0.5 ${stats.balance >= 0 ? 'text-primary' : 'text-destructive'}`}>
-            {formatEuro(stats.balance)}
-          </p>
+
+        {/* Saldo Netto Periodo */}
+        <Card className="bg-card border-border relative overflow-hidden">
+          <div className={`absolute top-0 right-0 w-24 h-24 ${stats.balance >= 0 ? 'bg-primary/5' : 'bg-rose-500/5'} rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none`} />
+          <CardHeader className="pb-1 pt-4 px-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">Saldo Netto Periodo</span>
+              <div className={`p-1.5 rounded-lg ${stats.balance >= 0 ? 'bg-primary/10 text-primary' : 'bg-rose-500/10 text-rose-400'}`}>
+                <Wallet className="w-4 h-4" />
+              </div>
+            </div>
+            <CardTitle className={`text-2xl font-bold mt-1 ${stats.balance >= 0 ? 'text-primary' : 'text-rose-400'}`}>
+              {formatEuro(stats.balance)}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 pt-1">
+            <div className={`flex items-center text-[11px] font-medium ${stats.balance >= 0 ? 'text-primary' : 'text-rose-400'}`}>
+              {stats.balance >= 0 ? (
+                <>
+                  <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" />
+                  <span>Surplus di cassa</span>
+                </>
+              ) : (
+                <>
+                  <ArrowDownRight className="w-3.5 h-3.5 mr-0.5" />
+                  <span>Deficit nel periodo</span>
+                </>
+              )}
+            </div>
+          </CardContent>
         </Card>
       </div>
 
@@ -354,58 +517,81 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
           {/* Quick Selects */}
           <div className="flex flex-wrap items-center gap-2">
             {/* Macro Category Filter */}
-            <select
+            <Select
               value={selectedMacro}
-              onChange={(e) => handleFilterChange(setSelectedMacro, e.target.value)}
-              className="bg-background border border-input rounded-md text-xs text-foreground px-2.5 py-2 focus:ring-1 focus:ring-ring outline-none"
+              onValueChange={handleMacroChange}
             >
-              <option value="ALL">Tutte le Macro-Categorie</option>
-              <option value="Needs">Needs (Bisogni Primari)</option>
-              <option value="Commitments">Commitments (Rate & Fissi)</option>
-              <option value="Wants">Wants (Stile di Vita)</option>
-              <option value="Savings">Savings (Risparmio)</option>
-              <option value="Extraordinary">Extraordinary (Straordinarie)</option>
-            </select>
+              <SelectTrigger className="w-[195px] h-9 text-xs">
+                <SelectValue placeholder="Macro-Categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Tutte le Macro-Categorie</SelectItem>
+                <SelectItem value="Needs">Bisogni Primari & Casa</SelectItem>
+                <SelectItem value="Commitments">Rate & Finanziamenti</SelectItem>
+                <SelectItem value="Wants">Stile di Vita & Shopping</SelectItem>
+                <SelectItem value="Savings">Risparmio & Previdenza</SelectItem>
+                <SelectItem value="Extraordinary">Spese Straordinarie</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Specific Category Filter */}
+            <Select
+              value={selectedCategory}
+              onValueChange={(val) => handleFilterChange(setSelectedCategory, val)}
+            >
+              <SelectTrigger className="w-[195px] h-9 text-xs">
+                <SelectValue placeholder="Categoria Specifica" />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                <SelectItem value="ALL">Tutte le Categorie ({availableCategories.length})</SelectItem>
+                {availableCategories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* Channel Filter */}
-            <select
+            <Select
               value={selectedChannel}
-              onChange={(e) => handleFilterChange(setSelectedChannel, e.target.value)}
-              className="bg-background border border-input rounded-md text-xs text-foreground px-2.5 py-2 focus:ring-1 focus:ring-ring outline-none"
+              onValueChange={(val) => handleFilterChange(setSelectedChannel, val)}
             >
-              <option value="ALL">Tutti i Canali</option>
-              <option value="BancoBPM">Banco BPM</option>
-              <option value="Numia">Carta Numia</option>
-              <option value="PayPal">PayPal</option>
-              <option value="Satispay">Satispay</option>
-              <option value="Contanti">Contanti</option>
-            </select>
+              <SelectTrigger className="w-[145px] h-9 text-xs">
+                <SelectValue placeholder="Canale" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Tutti i Canali</SelectItem>
+                <SelectItem value="BancoBPM">Banco BPM</SelectItem>
+                <SelectItem value="Numia">Carta Numia</SelectItem>
+                <SelectItem value="Nexi">Carta Nexi</SelectItem>
+                <SelectItem value="PayPal">PayPal</SelectItem>
+                <SelectItem value="Satispay">Satispay</SelectItem>
+                <SelectItem value="Contanti">Contanti</SelectItem>
+              </SelectContent>
+            </Select>
 
-            {/* Month Filter */}
-            <select
-              value={selectedMonth}
-              onChange={(e) => handleFilterChange(setSelectedMonth, e.target.value)}
-              className="bg-background border border-input rounded-md text-xs text-foreground px-2.5 py-2 focus:ring-1 focus:ring-ring outline-none"
-            >
-              <option value="ALL">Tutti i Mesi</option>
-              {availableMonths.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
+            {/* Date Range Picker with Presets & Calendar */}
+            <DateRangePicker
+              value={dateRange}
+              onChange={(range) => {
+                setDateRange(range);
+                setCurrentPage(1);
+              }}
+            />
 
-            {/* Sort Filter */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-background border border-input rounded-md text-xs text-foreground px-2.5 py-2 focus:ring-1 focus:ring-ring outline-none"
-            >
-              <option value="date-desc">Data più recente</option>
-              <option value="date-asc">Data meno recente</option>
-              <option value="amount-desc">Importo più alto</option>
-              <option value="amount-asc">Importo più basso</option>
-            </select>
+            {/* Clear filters button if active */}
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetFilters}
+                className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground hover:bg-accent flex items-center gap-1"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>Azzera filtri</span>
+              </Button>
+            )}
           </div>
         </div>
       </Card>
@@ -416,11 +602,91 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
           <Table>
             <TableHeader className="bg-muted/40">
               <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="text-muted-foreground font-semibold text-xs w-28">Data</TableHead>
-                <TableHead className="text-muted-foreground font-semibold text-xs w-28">Canale</TableHead>
-                <TableHead className="text-muted-foreground font-semibold text-xs">Descrizione & Tag</TableHead>
-                <TableHead className="text-muted-foreground font-semibold text-xs w-44">Macro / Categoria</TableHead>
-                <TableHead className="text-muted-foreground font-semibold text-xs text-right w-32">Importo</TableHead>
+                <TableHead
+                  onClick={() => handleHeaderSort('date')}
+                  className="text-muted-foreground font-semibold text-xs w-28 cursor-pointer select-none hover:text-foreground transition-colors group"
+                >
+                  <div className="flex items-center">
+                    <span>Data</span>
+                    {sortField === 'date' ? (
+                      sortDirection === 'asc' ? (
+                        <ArrowUp className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      ) : (
+                        <ArrowDown className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="w-3 h-3 text-muted-foreground/30 group-hover:text-muted-foreground ml-1 inline-block shrink-0 transition-opacity" />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead
+                  onClick={() => handleHeaderSort('channel')}
+                  className="text-muted-foreground font-semibold text-xs w-28 cursor-pointer select-none hover:text-foreground transition-colors group"
+                >
+                  <div className="flex items-center">
+                    <span>Canale</span>
+                    {sortField === 'channel' ? (
+                      sortDirection === 'asc' ? (
+                        <ArrowUp className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      ) : (
+                        <ArrowDown className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="w-3 h-3 text-muted-foreground/30 group-hover:text-muted-foreground ml-1 inline-block shrink-0 transition-opacity" />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead
+                  onClick={() => handleHeaderSort('description')}
+                  className="text-muted-foreground font-semibold text-xs cursor-pointer select-none hover:text-foreground transition-colors group"
+                >
+                  <div className="flex items-center">
+                    <span>Descrizione & Tag</span>
+                    {sortField === 'description' ? (
+                      sortDirection === 'asc' ? (
+                        <ArrowUp className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      ) : (
+                        <ArrowDown className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="w-3 h-3 text-muted-foreground/30 group-hover:text-muted-foreground ml-1 inline-block shrink-0 transition-opacity" />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead
+                  onClick={() => handleHeaderSort('category')}
+                  className="text-muted-foreground font-semibold text-xs w-48 cursor-pointer select-none hover:text-foreground transition-colors group"
+                >
+                  <div className="flex items-center">
+                    <span>Macro / Categoria</span>
+                    {sortField === 'category' ? (
+                      sortDirection === 'asc' ? (
+                        <ArrowUp className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      ) : (
+                        <ArrowDown className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="w-3 h-3 text-muted-foreground/30 group-hover:text-muted-foreground ml-1 inline-block shrink-0 transition-opacity" />
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead
+                  onClick={() => handleHeaderSort('amount')}
+                  className="text-muted-foreground font-semibold text-xs text-right w-32 cursor-pointer select-none hover:text-foreground transition-colors group"
+                >
+                  <div className="flex items-center justify-end">
+                    <span>Importo</span>
+                    {sortField === 'amount' ? (
+                      sortDirection === 'asc' ? (
+                        <ArrowUp className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      ) : (
+                        <ArrowDown className="w-3.5 h-3.5 text-primary ml-1 inline-block shrink-0" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="w-3 h-3 text-muted-foreground/30 group-hover:text-muted-foreground ml-1 inline-block shrink-0 transition-opacity" />
+                    )}
+                  </div>
+                </TableHead>
                 <TableHead className="text-muted-foreground font-semibold text-xs text-center w-20">Azioni</TableHead>
               </TableRow>
             </TableHeader>
@@ -444,15 +710,8 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
                         }`}
                       >
                         {/* Date */}
-                        <TableCell className="font-mono text-xs text-foreground align-middle">
-                          <div className="flex items-center gap-1.5">
-                            <ChevronDown
-                              className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${
-                                isExpanded ? 'rotate-180 text-primary' : ''
-                              }`}
-                            />
-                            <span>{tx.date}</span>
-                          </div>
+                        <TableCell className="font-mono text-xs text-foreground font-medium align-middle whitespace-nowrap">
+                          {tx.date}
                         </TableCell>
 
                         {/* Channel */}
@@ -463,32 +722,54 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
                           </div>
                         </TableCell>
 
-                        {/* Description */}
+                        {/* Description & Tags */}
                         <TableCell className="max-w-md align-middle">
-                          <Tooltip content={tx.description}>
-                            <p className="text-xs font-medium text-foreground truncate max-w-sm">
-                              {tx.description}
-                            </p>
-                          </Tooltip>
+                          <div className="space-y-1">
+                            <Tooltip content={tx.description}>
+                              <p className="text-xs font-medium text-foreground truncate max-w-sm">
+                                {tx.description}
+                              </p>
+                            </Tooltip>
+                            {((tx.tags && tx.tags.length > 0) || tx.isExtraordinary) && (
+                              <div className="flex flex-wrap items-center gap-1">
+                                {tx.isExtraordinary && (
+                                  <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-rose-500/30 bg-rose-950/40 text-rose-300 font-normal">
+                                    Straordinaria
+                                  </Badge>
+                                )}
+                                {tx.tags?.map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
+                                  >
+                                    #{tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </TableCell>
 
-                        {/* Category & Macro */}
+                        {/* Category & Macro Badges */}
                         <TableCell className="align-middle">
-                          <div className="space-y-0.5">
+                          <div className="flex flex-col gap-1 items-start">
                             <Badge
                               variant="outline"
-                              className={`text-[10px] px-1.5 py-0.5 border ${style.border} ${style.bg} ${style.text}`}
+                              className={`text-[10px] px-1.5 py-0.5 border ${style.border} ${style.bg} ${style.text} font-medium`}
                             >
-                              {tx.macroCategory}
+                              {MACRO_CATEGORY_SHORT_LABELS[tx.macroCategory] || tx.macroCategory}
                             </Badge>
-                            <p className="text-[11px] text-muted-foreground truncate max-w-[150px]">
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] font-normal px-1.5 py-0.5 bg-muted/70 text-muted-foreground border border-border/70 max-w-[170px] truncate"
+                            >
                               {tx.category}
-                            </p>
+                            </Badge>
                           </div>
                         </TableCell>
 
                         {/* Amount */}
-                        <TableCell className={`text-right font-mono text-xs font-semibold align-middle ${tx.amount > 0 ? 'text-primary' : 'text-foreground'}`}>
+                        <TableCell className={`text-right font-mono text-xs font-semibold align-middle whitespace-nowrap ${tx.amount > 0 ? 'text-emerald-400' : 'text-foreground'}`}>
                           {tx.amount > 0 ? `+${formatEuro(tx.amount)}` : formatEuro(tx.amount)}
                         </TableCell>
 
@@ -568,37 +849,109 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
           </Table>
         </div>
 
-        {/* Pagination bar */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-border text-xs text-muted-foreground">
-            <div>
-              Mostrando pagina <span className="font-semibold text-foreground">{currentPage}</span> di{' '}
-              <span className="font-semibold text-foreground">{totalPages}</span> ({filteredTransactions.length} movimenti)
+        {/* Pagination bar with Rows-Per-Page Selector */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-border bg-card/60 text-xs text-muted-foreground">
+          {/* Left: Rows Per Page Selector & Results Count */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground font-medium text-xs">Righe per pagina:</span>
+              <Select value={String(pageSize)} onValueChange={handlePageSizeChange}>
+                <SelectTrigger className="h-8 w-[76px] bg-background border-border text-foreground text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                  <SelectItem value="250">250</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="h-7 border-border text-foreground disabled:opacity-40"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" />
-                <span>Precedente</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="h-7 border-border text-foreground disabled:opacity-40"
-              >
-                <span>Successiva</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Button>
+
+            <div className="text-muted-foreground text-xs">
+              {filteredTransactions.length === 0 ? (
+                <span>0 movimenti trovati</span>
+              ) : (
+                <span>
+                  Mostrando{' '}
+                  <span className="font-semibold text-foreground">
+                    {(currentPage - 1) * pageSize + 1}
+                  </span>
+                  -
+                  <span className="font-semibold text-foreground">
+                    {Math.min(currentPage * pageSize, filteredTransactions.length)}
+                  </span>{' '}
+                  di <span className="font-semibold text-foreground">{filteredTransactions.length}</span> movimenti
+                </span>
+              )}
             </div>
           </div>
-        )}
+
+          {/* Right: Page Navigation Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1.5 ml-auto">
+              {/* First Page */}
+              <Tooltip content="Prima pagina">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 p-0 border-border text-foreground disabled:opacity-30"
+                >
+                  <ChevronsLeft className="w-3.5 h-3.5" />
+                </Button>
+              </Tooltip>
+
+              {/* Prev Page */}
+              <Tooltip content="Pagina precedente">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 px-2.5 border-border text-foreground disabled:opacity-30 flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline text-xs">Prec</span>
+                </Button>
+              </Tooltip>
+
+              {/* Current Page Indicator */}
+              <div className="px-2 text-xs font-medium text-foreground">
+                <span className="text-primary font-semibold">{currentPage}</span> / {totalPages}
+              </div>
+
+              {/* Next Page */}
+              <Tooltip content="Pagina successiva">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="h-8 px-2.5 border-border text-foreground disabled:opacity-30 flex items-center gap-1"
+                >
+                  <span className="hidden sm:inline text-xs">Succ</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Button>
+              </Tooltip>
+
+              {/* Last Page */}
+              <Tooltip content="Ultima pagina">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8 p-0 border-border text-foreground disabled:opacity-30"
+                >
+                  <ChevronsRight className="w-3.5 h-3.5" />
+                </Button>
+              </Tooltip>
+            </div>
+          )}
+        </div>
       </Card>
 
       {/* Modal Add / Edit Transaction */}
@@ -652,10 +1005,11 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             </div>
 
             {/* Date, Channel & Amount */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-start">
               <div className="space-y-1">
-                <Label htmlFor="tx-form-date" className="text-foreground font-medium">
-                  Data (AAAA-MM-GG) <span className="text-destructive">*</span>
+                <Label htmlFor="tx-form-date" className="text-xs text-foreground font-medium flex items-center gap-1 h-5">
+                  <span>Data</span>
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="tx-form-date"
@@ -668,26 +1022,32 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="tx-form-channel" className="text-foreground font-medium">
-                  Canale <span className="text-destructive">*</span>
+                <Label htmlFor="tx-form-channel" className="text-xs text-foreground font-medium flex items-center gap-1 h-5">
+                  <span>Canale</span>
+                  <span className="text-destructive">*</span>
                 </Label>
-                <select
-                  id="tx-form-channel"
+                <Select
                   value={formChannel}
-                  onChange={(e) => setFormChannel(e.target.value as any)}
-                  className="w-full bg-background border border-input rounded-md text-xs text-foreground px-2.5 h-9 focus:ring-1 focus:ring-ring outline-none"
+                  onValueChange={(val) => setFormChannel(val as any)}
                 >
-                  <option value="BancoBPM">Banco BPM</option>
-                  <option value="Numia">Carta Numia</option>
-                  <option value="PayPal">PayPal</option>
-                  <option value="Satispay">Satispay</option>
-                  <option value="Contanti">Contanti</option>
-                </select>
+                  <SelectTrigger id="tx-form-channel" className="h-9 text-xs w-full">
+                    <SelectValue placeholder="Seleziona Canale" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="BancoBPM">Banco BPM</SelectItem>
+                    <SelectItem value="Numia">Carta Numia</SelectItem>
+                    <SelectItem value="Nexi">Carta Nexi</SelectItem>
+                    <SelectItem value="PayPal">PayPal</SelectItem>
+                    <SelectItem value="Satispay">Satispay</SelectItem>
+                    <SelectItem value="Contanti">Contanti</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="tx-form-amount" className="text-foreground font-medium">
-                  Importo (€) <span className="text-destructive">*</span>
+                <Label htmlFor="tx-form-amount" className="text-xs text-foreground font-medium flex items-center gap-1 h-5">
+                  <span>Importo (€)</span>
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="tx-form-amount"
@@ -702,27 +1062,33 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             </div>
 
             {/* Macro-Category & Category */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
               <div className="space-y-1">
-                <Label htmlFor="tx-form-macro" className="text-foreground font-medium">
-                  Macro Categoria <span className="text-destructive">*</span>
+                <Label htmlFor="tx-form-macro" className="text-xs text-foreground font-medium flex items-center gap-1 h-5">
+                  <span>Macro Categoria</span>
+                  <span className="text-destructive">*</span>
                 </Label>
-                <select
-                  id="tx-form-macro"
+                <Select
                   value={formMacroCategory}
-                  onChange={(e) => setFormMacroCategory(e.target.value as any)}
-                  className="w-full bg-background border border-input rounded-md text-xs text-foreground px-2.5 h-9 focus:ring-1 focus:ring-ring outline-none"
+                  onValueChange={(val) => setFormMacroCategory(val as any)}
                 >
-                  <option value="Needs">Needs (Bisogni Primari & Casa)</option>
-                  <option value="Commitments">Commitments (Rate & Fissi)</option>
-                  <option value="Wants">Wants (Stile di Vita & Tempo Libero)</option>
-                  <option value="Savings">Savings (Risparmio & Investimento)</option>
-                  <option value="Extraordinary">Extraordinary (Spesa Straordinaria)</option>
-                </select>
+                  <SelectTrigger id="tx-form-macro" className="h-9 text-xs w-full">
+                    <SelectValue placeholder="Seleziona Macro Categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Needs">Bisogni Primari & Casa</SelectItem>
+                    <SelectItem value="Commitments">Rate & Finanziamenti</SelectItem>
+                    <SelectItem value="Wants">Stile di Vita & Shopping</SelectItem>
+                    <SelectItem value="Savings">Risparmio & Previdenza</SelectItem>
+                    <SelectItem value="Extraordinary">Spese Straordinarie</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="tx-form-category" className="text-foreground font-medium">Categoria Specifica</Label>
+                <Label htmlFor="tx-form-category" className="text-xs text-foreground font-medium flex items-center gap-1 h-5">
+                  <span>Categoria Specifica</span>
+                </Label>
                 <Input
                   id="tx-form-category"
                   placeholder="es. Supermercato, Utenze Luce, Ristorante..."
@@ -735,8 +1101,9 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
 
             {/* Description */}
             <div className="space-y-1">
-              <Label htmlFor="tx-form-desc" className="text-foreground font-medium">
-                Descrizione / Merchant / Causale <span className="text-destructive">*</span>
+              <Label htmlFor="tx-form-desc" className="text-xs text-foreground font-medium flex items-center gap-1 h-5">
+                <span>Descrizione / Merchant / Causale</span>
+                <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="tx-form-desc"
@@ -749,9 +1116,11 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             </div>
 
             {/* Tags & Extraordinary Toggle */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
               <div className="space-y-1">
-                <Label htmlFor="tx-form-tags" className="text-foreground font-medium">Tag (separati da virgola)</Label>
+                <Label htmlFor="tx-form-tags" className="text-xs text-foreground font-medium flex items-center gap-1 h-5">
+                  <span>Tag (separati da virgola)</span>
+                </Label>
                 <Input
                   id="tx-form-tags"
                   placeholder="#spesa, #weekend, #utenze"
@@ -761,13 +1130,13 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-6">
+              <div className="h-9 flex items-center gap-2.5 px-3 rounded-md border border-input/60 bg-muted/20 hover:bg-muted/30 transition-colors">
                 <Checkbox
                   id="extraordinary_chk"
                   checked={formIsExtraordinary}
                   onCheckedChange={(checked) => setFormIsExtraordinary(Boolean(checked))}
                 />
-                <Label htmlFor="extraordinary_chk" className="text-foreground text-xs cursor-pointer font-normal">
+                <Label htmlFor="extraordinary_chk" className="text-foreground text-xs cursor-pointer font-normal select-none truncate">
                   Escludi dal cash flow ordinario (Straordinaria)
                 </Label>
               </div>

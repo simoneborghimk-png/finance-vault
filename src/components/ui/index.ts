@@ -44,3 +44,4 @@ export * from './calendar';
 export * from './input-otp';
 export * from './form';
 export * from './label';
+export * from './date-range-picker';

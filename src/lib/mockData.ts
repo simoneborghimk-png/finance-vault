@@ -1,5 +1,10 @@
 import { UserFinancialProfile, VaultData, Transaction, SavingsGoal, BudgetRule } from '@/types/finance';
 import { generatePresetVirtualTransactions } from './parsers/bankParsers';
+// Caricamento resiliente per Zero-Knowledge & Portabilità:
+// In ambiente locale con dataset reale (escluso da git), carica i movimenti verificati.
+// Su un nuovo clone pubblico o in assenza del file, effettua il fallback automatico sui dati demo.
+const realDataModules = import.meta.glob<any>('./realTransactions.json', { eager: true });
+const localTransactions = (realDataModules['./realTransactions.json']?.default as Transaction[]) || null;
 
 export const initialProfile: UserFinancialProfile = {
   baseMonthlyNetSalary: 1953.00,
@@ -395,12 +400,22 @@ export function generate12MonthsMockTransactions(): Transaction[] {
   return transactions.sort((a, b) => b.date.localeCompare(a.date));
 }
 
+export const defaultBudgetCaps: Record<string, number> = {
+  'Supermercato & Alimentari': 450,
+  'Ristorazione e Bar': 180,
+  'Shopping Amazon & Abbigliamento': 150,
+  'Utenze Luce e Gas': 160,
+  'Carburante & Trasporti': 120,
+  'Abbonamenti Streaming & Software': 45,
+};
+
 export const initialVaultData: VaultData = {
   version: 1,
   profile: initialProfile,
-  transactions: generate12MonthsMockTransactions(),
+  transactions: localTransactions || generate12MonthsMockTransactions(),
   rules: initialBudgetRules,
   goals: initialGoals,
+  budgetCaps: defaultBudgetCaps,
   pensionVoluntaryContribution: 2500.00,
   lastUpdated: new Date().toISOString(),
 };
