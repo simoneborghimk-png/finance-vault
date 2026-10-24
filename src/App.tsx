@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   ShieldCheck,
   TrendingUp,
+  ReceiptText,
   Coins,
   Target,
   UploadCloud,
@@ -18,24 +19,41 @@ import { googleDrive } from '@/lib/googleDrive';
 
 import { VaultUnlockModal } from '@/components/VaultUnlockModal';
 import { ExecutiveDashboard } from '@/components/ExecutiveDashboard';
+import { TransactionsManager } from '@/components/TransactionsManager';
 import { TaxPensionSimulator } from '@/components/TaxPensionSimulator';
 import { GoalPlanner } from '@/components/GoalPlanner';
 import { FileIngestionDropzone } from '@/components/FileIngestionDropzone';
 import { DriveSyncBar } from '@/components/DriveSyncBar';
 import { Tabs, TabsList, TabsTrigger, TabsContent, Badge, Button } from '@/components/ui';
 
+const SESSION_VAULT_KEY = 'finance_vault_session_key';
+
 export function App() {
   const [isLocked, setIsLocked] = useState(true);
   const [masterPassword, setMasterPassword] = useState<string | null>(null);
   const [vault, setVault] = useState<VaultData>(initialVaultData);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'tax-pension' | 'goals' | 'ingestion'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'transactions' | 'tax-pension' | 'goals' | 'ingestion'>('dashboard');
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
 
-  // Load local encrypted vault on mount if present
+  // Check for active session key in sessionStorage or load local encrypted vault on mount
   useEffect(() => {
+    const sessionPassword = sessionStorage.getItem(SESSION_VAULT_KEY);
     const localEncrypted = googleDrive.getLocalVault();
-    if (!localEncrypted) {
+
+    if (sessionPassword && localEncrypted) {
+      decryptVault(localEncrypted, sessionPassword)
+        .then((decrypted) => {
+          setVault(decrypted);
+          setMasterPassword(sessionPassword);
+          setIsLocked(false);
+        })
+        .catch((err) => {
+          console.warn('Session auto-unlock fallito, ripulitura sessione:', err);
+          sessionStorage.removeItem(SESSION_VAULT_KEY);
+          setIsLocked(true);
+        });
+    } else if (!localEncrypted) {
       // First setup: pre-load mock data in memory
       setVault(initialVaultData);
     }
@@ -49,6 +67,7 @@ export function App() {
         const decrypted = await decryptVault(localEncrypted, password);
         setVault(decrypted);
         setMasterPassword(password);
+        sessionStorage.setItem(SESSION_VAULT_KEY, password);
         setIsLocked(false);
         return true;
       } catch (err) {
@@ -62,6 +81,7 @@ export function App() {
         googleDrive.saveLocalVault(payload);
         setVault(initialVaultData);
         setMasterPassword(password);
+        sessionStorage.setItem(SESSION_VAULT_KEY, password);
         setIsLocked(false);
         return true;
       } catch (err) {
@@ -72,6 +92,7 @@ export function App() {
   };
 
   const handleLock = () => {
+    sessionStorage.removeItem(SESSION_VAULT_KEY);
     setMasterPassword(null);
     setIsLocked(true);
   };
@@ -149,6 +170,43 @@ export function App() {
       encryptVault(updated, masterPassword).then((payload) => {
         googleDrive.saveLocalVault(payload);
       });
+    }
+  };
+
+  // Single Transaction CRUD Handlers
+  const handleAddTransaction = (newTx: Transaction) => {
+    const updated = {
+      ...vault,
+      transactions: [newTx, ...vault.transactions].sort((a, b) => b.date.localeCompare(a.date)),
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+    }
+  };
+
+  const handleUpdateTransaction = (updatedTx: Transaction) => {
+    const updated = {
+      ...vault,
+      transactions: vault.transactions.map((t) => (t.id === updatedTx.id ? updatedTx : t)),
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+    }
+  };
+
+  const handleDeleteTransaction = (id: string) => {
+    const updated = {
+      ...vault,
+      transactions: vault.transactions.filter((t) => t.id !== id),
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
     }
   };
 
@@ -235,13 +293,24 @@ export function App() {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)} className="space-y-6">
-          <TabsList className="bg-slate-900/80 border border-slate-800 p-1 rounded-xl grid grid-cols-2 sm:grid-cols-4 gap-1">
+          <TabsList className="bg-slate-900/80 border border-slate-800 p-1 rounded-xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
             <TabsTrigger
               value="dashboard"
               className="text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white flex items-center justify-center gap-2 py-2"
             >
               <TrendingUp className="w-4 h-4" />
               <span>Executive Dashboard</span>
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="transactions"
+              className="text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white flex items-center justify-center gap-1.5 py-2"
+            >
+              <ReceiptText className="w-4 h-4" />
+              <span>Transazioni</span>
+              <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">
+                {vault.transactions.length}
+              </span>
             </TabsTrigger>
 
             <TabsTrigger
@@ -272,6 +341,16 @@ export function App() {
           {/* Tab 1: Executive Dashboard */}
           <TabsContent value="dashboard" className="outline-none focus:outline-none">
             <ExecutiveDashboard transactions={vault.transactions} profile={vault.profile} />
+          </TabsContent>
+
+          {/* Tab 2: Transactions Manager */}
+          <TabsContent value="transactions" className="outline-none focus:outline-none">
+            <TransactionsManager
+              transactions={vault.transactions}
+              onAddTransaction={handleAddTransaction}
+              onUpdateTransaction={handleUpdateTransaction}
+              onDeleteTransaction={handleDeleteTransaction}
+            />
           </TabsContent>
 
           {/* Tab 2: Tax & Pension Fund Simulator */}

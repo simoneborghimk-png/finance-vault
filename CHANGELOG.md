@@ -9,6 +9,7 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/)
 
 ### Added / Changed
 - **Sincronizzazione Google Drive Trasparente:** Persistenza del token di accesso in `localStorage` con TTL e scadenza automatica; adozione del flusso *Silent Authentication* (`prompt: ''`) per evitare la richiesta ripetuta del consenso ad ogni apertura; auto-connessione all'avvio dell'app se il Client ID è configurato.
+- **Persistenza di Sessione del Vault (Zero-Knowledge Session Cache):** Salvataggio della chiave di sessione in `sessionStorage` per evitare il ri-blocco del Vault durante i refresh di pagina (`F5`) nella medesima scheda; pulizia automatica alla chiusura del browser/scheda o al click esplicito su *"Blocca Vault"*.
 
 ### Planned
 - Export sintetico del bilancio annuale in PDF / CSV formattato.

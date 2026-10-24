@@ -21,9 +21,10 @@
 | ------------------------------- | :---: | -------------------------------------------------------------- |
 | **Vault Unlock & Biometrics**   |   ✅  | Master Password + WebAuthn Passkey (Face ID/Touch ID)          |
 | **Tab 1: Executive Dashboard**  |   ✅  | KPI (Entrate, Needs, Wants, Cash Flow, Savings Rate) + Recharts |
-| **Tab 2: Simulatore Fiscale**   |   ✅  | Slider 0-5.164,57 €, deducibilità 730 IRPEF 35-43%, timeline    |
-| **Tab 3: Goal Planner**         |   ✅  | Assorbimento prioritario 14ª Giugno e 730 Luglio               |
-| **Tab 4: Ingestione File**      |   ✅  | Dropzone Excel/CSV Banco BPM (`movimentiConto`), Numia         |
+| **Tab 2: Transazioni (Manager)**|   ✅  | Tabella interattiva, ricerca full-text, filtri, editing e inserimento manuale |
+| **Tab 3: Simulatore Fiscale**   |   ✅  | Slider 0-5.164,57 €, deducibilità 730 IRPEF 35-43%, timeline    |
+| **Tab 4: Goal Planner**         |   ✅  | Assorbimento prioritario 14ª Giugno e 730 Luglio               |
+| **Tab 5: Ingestione File**      |   ✅  | Dropzone Excel/CSV Banco BPM (`movimentiConto`), Numia         |
 | **Drive Sync & Backup**         |   ✅  | Download/Upload `vault_finanze.enc` + Export/Import locale     |
 
 ## 3. Indice Decisioni Architetturali (ADR)
@@ -42,7 +43,10 @@
 - [x] Executive Dashboard, Simulatore Fiscale Previdenza, Goal Planner e Ingestion Dropzone
 - [x] Eredità pratiche `agent-core-knowledge`: guardrail, regole `.agents/rules/`, memoria calda/fredda
 - [x] Portabilità cross-device, porta fissa 5180, base path GitHub Pages e CI/CD Actions
-- [ ] Predisposizione export report PDF / foglio riassuntivo cash flow annuale
+- [x] Tabella Transazioni Interattiva (ricerca, filtri, editing categoria/tag, aggiunta manuale)
+- [ ] Budget Cap & Monitoraggio Soglie Spesa mensili
+- [ ] Ottimizzazione bundle: Code Splitting dinamico (Lazy loading SheetJS / Dropzone)
+- [ ] Lettura automatica buste paga aggiornate da cartella su Google Drive
 
 ## 5. Riferimenti Rapidi & Comandi
 
