@@ -2,6 +2,10 @@
 
 > **Zero-Knowledge, Client-Side & PWA Personal Wealth Dashboard** con cifratura AES-256-GCM, simulatore fiscale/previdenziale, motore di auto-categorizzazione bancaria e sincronizzazione crittografata su Google Drive.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-2563eb?style=for-the-badge&logo=github)](https://simoneborghimk-png.github.io/finance-vault/)
+
+🌐 **Web App Live:** [https://simoneborghimk-png.github.io/finance-vault/](https://simoneborghimk-png.github.io/finance-vault/)
+
 ---
 
 ## ⚡ Quickstart per Sviluppatori & Agenti AI
