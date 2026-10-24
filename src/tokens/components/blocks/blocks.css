@@ -1,0 +1,11 @@
+/**
+ * ============================================================================
+ * COMPONENTS - LAYER 4: BLOCKS & TEMPLATES (4 Blocchi di Layout)
+ * Source of Truth: docs/FIGMA-COMPONENTS.md & Figma File pu2nlKYplmTCtTs0FVELdw
+ * ============================================================================
+ */
+
+@import './app-shell.css';
+@import './auth-blocks.css';
+@import './dashboard-blocks.css';
+@import './landing-blocks.css';

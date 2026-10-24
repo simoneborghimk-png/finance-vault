@@ -1,0 +1,290 @@
+/**
+ * ============================================================================
+ * ORGANISM 3.7: ACTIVITY FEED & AUDIT TIMELINE (.activity-feed)
+ * Source of Truth: Audit Trails, System Logs & High-Density Design System
+ * ============================================================================
+ * 
+ * Component Hierarchy:
+ * - .activity-feed: Contenitore principale a card
+ *   - .activity-feed-header: Titolo audit log, contatore eventi e filtri rapidi
+ *   - .activity-feed-list: Lista cronologica con linea connettiva verticale
+ *     - .activity-feed-group: Raggruppamento per data ("Oggi", "Ieri", ecc.)
+ *       - .activity-feed-group-label: Pillola o etichetta del giorno
+ *       - .activity-feed-item: Singolo evento di audit
+ *         - .activity-feed-node: Nodo icona sulla linea (success, warning, info, danger)
+ *         - .activity-feed-body: Dettagli evento (autore, azione, target, timestamp)
+ *         - .activity-feed-payload: Box espandibile con parametri o diff prima/dopo
+ *   - .activity-feed-footer: Tasto carica altri eventi o esporta CSV/JSON
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Feed Container
+   -------------------------------------------------------------------------- */
+.activity-feed {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   2. Feed Header & Filter Toolbar
+   -------------------------------------------------------------------------- */
+.activity-feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--tw-space-3);
+  padding: var(--tw-space-4) var(--tw-space-5);
+  border-bottom: 1px solid var(--border);
+  background-color: var(--background);
+}
+
+.activity-feed-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activity-feed-title {
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+}
+
+.activity-feed-desc {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.activity-feed-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--muted);
+  padding: 2px;
+  border-radius: var(--radius-md);
+}
+
+.activity-feed-filter-btn {
+  padding: 3px 8px;
+  font-size: 0.6875rem;
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.activity-feed-filter-btn:hover {
+  color: var(--foreground);
+}
+
+.activity-feed-filter-btn.is-active {
+  background: var(--card);
+  color: var(--foreground);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-2xs);
+}
+
+/* --------------------------------------------------------------------------
+   3. Timeline Track & Nodes
+   -------------------------------------------------------------------------- */
+.activity-feed-timeline {
+  position: relative;
+  padding: var(--tw-space-5) var(--tw-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-5);
+}
+
+/* Vertical Continuous Guideline */
+.activity-feed-timeline::before {
+  content: '';
+  position: absolute;
+  top: 2rem;
+  bottom: 2rem;
+  left: 2.75rem;
+  width: 2px;
+  background: var(--border);
+  z-index: 1;
+}
+
+/* Grouping by Date */
+.activity-feed-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-4);
+  position: relative;
+  z-index: 2;
+}
+
+.activity-feed-group-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-1-5);
+  font-size: 0.6875rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  padding: 2px 8px;
+  background: color-mix(in oklch, var(--muted) 70%, var(--card));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  width: fit-content;
+  margin-left: 0.25rem;
+}
+
+/* Individual Activity Item */
+.activity-feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tw-space-4);
+  position: relative;
+}
+
+/* Node Icon on Track */
+.activity-feed-node {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background-color: var(--card);
+  border: 2px solid var(--border);
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 4px var(--card);
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease;
+}
+
+.activity-feed-item:hover .activity-feed-node {
+  transform: scale(1.08);
+}
+
+.activity-feed-node.is-primary {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: color-mix(in oklch, var(--primary) 10%, var(--card));
+}
+
+.activity-feed-node.is-success {
+  border-color: var(--success);
+  color: var(--success);
+  background-color: color-mix(in oklch, var(--success) 10%, var(--card));
+}
+
+.activity-feed-node.is-warning {
+  border-color: var(--warning);
+  color: var(--warning);
+  background-color: color-mix(in oklch, var(--warning) 10%, var(--card));
+}
+
+.activity-feed-node.is-danger {
+  border-color: var(--destructive);
+  color: var(--destructive);
+  background-color: color-mix(in oklch, var(--destructive) 10%, var(--card));
+}
+
+/* Event Details Body */
+.activity-feed-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-1);
+  flex: 1;
+  padding-top: 2px;
+}
+
+.activity-feed-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--tw-space-2);
+}
+
+.activity-feed-text {
+  font-size: 0.8125rem;
+  color: var(--foreground);
+  line-height: 1.4;
+}
+
+.activity-feed-actor {
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+}
+
+.activity-feed-target {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 1px 5px;
+  background-color: var(--muted);
+  border-radius: var(--radius-xs);
+  color: var(--foreground);
+}
+
+.activity-feed-time {
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Expandable Contextual Payload */
+.activity-feed-payload {
+  margin-top: var(--tw-space-2);
+  padding: var(--tw-space-2-5) var(--tw-space-3);
+  background: color-mix(in oklch, var(--muted) 25%, var(--background));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+  overflow-x: auto;
+}
+
+.activity-feed-payload-diff-del {
+  color: var(--destructive);
+  text-decoration: line-through;
+}
+
+.activity-feed-payload-diff-add {
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   4. Feed Footer Actions
+   -------------------------------------------------------------------------- */
+.activity-feed-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--tw-space-3) var(--tw-space-5);
+  border-top: 1px solid var(--border);
+  background-color: var(--background);
+}

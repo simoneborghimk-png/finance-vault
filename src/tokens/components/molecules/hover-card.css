@@ -1,0 +1,100 @@
+/**
+ * ============================================================================
+ * COMPONENT: Hover Card
+ * Category: Molecule (Livello 2: Dati & Visualizzazione Contenuto)
+ * Source of Truth: Figma Component "Hover Card" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .hover-card: wrapper trigger
+ *   - .hover-card-content: scheda fluttuante con preview ricca di dettagli
+ *   - Accetta: avatar, biografia, date, link secondari
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Trigger Wrapper
+   -------------------------------------------------------------------------- */
+.hover-card {
+  position: relative;
+  display: inline-flex;
+}
+
+/* --------------------------------------------------------------------------
+   2. Hover Card Panel
+   -------------------------------------------------------------------------- */
+.hover-card-content {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 50;
+  width: 20rem; /* 320px */
+  max-width: calc(100vw - 2rem);
+  margin-top: var(--tw-space-2);
+  padding: var(--tw-space-4);
+
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  outline: none;
+  text-align: left;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-2);
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-0.25rem) scale(0.97);
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.hover-card-trigger {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* Mostra al passaggio del mouse sul wrapper o con classe is-open (default centrato) */
+.hover-card:hover .hover-card-content,
+.hover-card:focus-within .hover-card-content,
+.hover-card.is-open .hover-card-content {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Allineamento a sinistra (Start) */
+.hover-card-content.align-start {
+  left: 0;
+  right: auto;
+  transform: translateY(-0.25rem) scale(0.97);
+}
+.hover-card:hover .hover-card-content.align-start,
+.hover-card:focus-within .hover-card-content.align-start,
+.hover-card.is-open .hover-card-content.align-start {
+  transform: translateY(0) scale(1);
+}
+
+/* Allineamento a destra (End) */
+.hover-card-content.align-end {
+  left: auto;
+  right: 0;
+  transform: translateY(-0.25rem) scale(0.97);
+}
+.hover-card:hover .hover-card-content.align-end,
+.hover-card:focus-within .hover-card-content.align-end,
+.hover-card.is-open .hover-card-content.align-end {
+  transform: translateY(0) scale(1);
+}

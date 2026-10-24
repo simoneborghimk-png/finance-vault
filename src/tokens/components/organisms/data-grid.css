@@ -1,0 +1,431 @@
+/**
+ * ============================================================================
+ * ORGANISM 3.5: DATA GRID & ADVANCED MANAGEMENT TABLE (.data-grid)
+ * Source of Truth: WCAG 2.2 AA / WAI-ARIA Grid Pattern & High-Density Design System
+ * ============================================================================
+ * 
+ * Component Hierarchy:
+ * - .data-grid: Contenitore card principale con bordo e raggio
+ *   - .data-grid-toolbar: Barra superiore filtri, ricerca globale e azioni
+ *     - .data-grid-search: Input ricerca con icona e shortcut kbd
+ *     - .data-grid-filters: Gruppo pillole di filtro (Status, Ruolo, ecc.)
+ *     - .data-grid-actions: Pulsanti azione primaria ed export
+ *   - .data-grid-bulk-bar: Barra contestuale fluttuante per selezione di massa
+ *     - .data-grid-bulk-count: Contatore elementi selezionati
+ *     - .data-grid-bulk-actions: Bottoni azione rapida (Elimina, Esporta, Assegna)
+ *   - .data-grid-wrapper: Contenitore scrollabile orizzontale per la tabella
+ *     - .data-grid-table: Tabella con semantica role="grid"
+ *       - .data-grid-th: Cella intestazione con sort cliccabile
+ *       - .data-grid-tr: Riga con hover e stato selezionato
+ *       - .data-grid-td: Cella dati con tipografia tabellare
+ *   - .data-grid-footer: Paginatore avanzato integrato con conteggio record
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Container
+   -------------------------------------------------------------------------- */
+.data-grid {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border: var(--tw-border-width-1, 1px) solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   2. Grid Toolbar (Search, Quick Filters, Action Buttons)
+   -------------------------------------------------------------------------- */
+.data-grid-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--tw-space-3);
+  padding: var(--tw-space-3) var(--tw-space-4);
+  background-color: var(--background);
+  border-bottom: var(--tw-border-width-1, 1px) solid var(--border);
+}
+
+.data-grid-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+}
+
+.data-grid-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.data-grid-search .input,
+.data-grid-search-input {
+  height: 32px;
+  padding-left: 32px;
+  padding-right: 28px;
+  border-radius: var(--radius-md, 6px);
+  border: var(--tw-border-width-1, 1px) solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    width 150ms ease;
+}
+
+.data-grid-search-input:focus,
+.data-grid-search .input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 20%, transparent);
+}
+
+.data-grid-search-input::placeholder {
+  color: var(--muted-foreground);
+  opacity: 0.85;
+}
+
+.data-grid-search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  border-radius: 9999px;
+  width: 18px;
+  height: 18px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.data-grid-search-clear:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.data-grid-search-kbd {
+  position: absolute;
+  right: 0.5rem;
+  font-size: 0.625rem;
+  font-family: var(--font-mono);
+  color: var(--muted-foreground);
+  background: var(--muted);
+  border: var(--tw-border-width-1, 1px) solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 1px 4px;
+  pointer-events: none;
+}
+
+.data-grid-filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+  flex-wrap: wrap;
+}
+
+.data-grid-actions-group {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   3. Bulk Selection Floating Action Bar
+   -------------------------------------------------------------------------- */
+.data-grid-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tw-space-3);
+  padding: var(--tw-space-2-5) var(--tw-space-4);
+  background: color-mix(in oklch, var(--primary) 8%, var(--background));
+  border-bottom: var(--tw-border-width-1, 1px) solid
+    color-mix(in oklch, var(--primary) 25%, var(--border));
+  animation: dataGridSlideDown 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes dataGridSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.data-grid-bulk-info {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
+}
+
+.data-grid-bulk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 4px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.data-grid-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   4. Scrollable Table Wrapper & Table Engine
+   -------------------------------------------------------------------------- */
+.data-grid-wrapper,
+.data-grid-container {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.data-grid-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  text-align: left;
+}
+
+/* Table Header */
+.data-grid-thead,
+.data-grid-table thead {
+  background-color: color-mix(in oklch, var(--muted) 40%, var(--card));
+  border-bottom: var(--tw-border-width-1, 1px) solid var(--border);
+}
+
+.data-grid-th,
+.data-grid-table thead th {
+  padding: var(--tw-space-2-5) var(--tw-space-3);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  user-select: none;
+  border-bottom: var(--tw-border-width-1, 1px) solid var(--border);
+}
+
+.data-grid-th.is-sortable {
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.data-grid-th.is-sortable:hover {
+  color: var(--foreground);
+  background-color: color-mix(in oklch, var(--muted) 60%, var(--card));
+}
+
+.data-grid-th-content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-1);
+}
+
+.data-grid-sort-icon {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.4;
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.data-grid-th[aria-sort='ascending'] .data-grid-sort-icon,
+.data-grid-th[aria-sort='descending'] .data-grid-sort-icon {
+  opacity: 1;
+  color: var(--primary);
+}
+
+/* Table Body & Rows: Mantieni i bordi di riga sempre visibili */
+.data-grid-tr,
+.data-grid-row,
+.data-grid-table tbody tr {
+  border-bottom: var(--tw-border-width-1, 1px) solid var(--table-row-border, rgba(0, 0, 0, 0.12));
+  transition: background-color 120ms ease;
+}
+
+.data-grid-tr:hover,
+.data-grid-row:hover,
+.data-grid-table tbody tr:hover {
+  background-color: color-mix(in srgb, var(--muted) 35%, transparent);
+}
+
+.data-grid-tr.is-selected,
+.data-grid-row.is-selected,
+.data-grid-table tbody tr.is-selected {
+  background-color: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+
+.data-grid-tr.is-selected:hover,
+.data-grid-row.is-selected:hover,
+.data-grid-table tbody tr.is-selected:hover {
+  background-color: color-mix(in srgb, var(--primary) 10%, var(--card));
+}
+
+.data-grid-td,
+.data-grid-table tbody td {
+  padding: var(--tw-space-3);
+  color: var(--foreground);
+  vertical-align: middle;
+  border-bottom: var(--tw-border-width-1, 1px) solid var(--table-row-border, rgba(0, 0, 0, 0.12));
+}
+
+/* Density Modifiers */
+.data-grid--compact .data-grid-td {
+  padding: var(--tw-space-2) var(--tw-space-3);
+  font-size: 0.75rem;
+}
+
+.data-grid--relaxed .data-grid-td {
+  padding: var(--tw-space-4);
+  font-size: 0.875rem;
+}
+
+/* Selection Column Cell */
+.data-grid-cell-select {
+  width: 2.5rem;
+  text-align: center;
+  padding-left: var(--tw-space-3);
+  padding-right: var(--tw-space-1);
+}
+
+/* --------------------------------------------------------------------------
+   5. Special States: Empty State & Loading Skeletons
+   -------------------------------------------------------------------------- */
+.data-grid-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--tw-space-10) var(--tw-space-4);
+  gap: var(--tw-space-2);
+}
+
+.data-grid-empty-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--muted-foreground);
+  opacity: 0.5;
+  margin-bottom: var(--tw-space-1);
+}
+
+.data-grid-empty-title {
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+}
+
+.data-grid-empty-desc {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  max-width: 320px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Grid Integrated Footer / Pagination
+   -------------------------------------------------------------------------- */
+.data-grid-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--tw-space-3);
+  padding: var(--tw-space-2-5) var(--tw-space-4);
+  background-color: var(--background);
+  border-top: var(--tw-border-width-1, 1px) solid var(--border);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.data-grid-pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-1);
+}
+
+.data-grid-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.375rem;
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-medium);
+  border: var(--tw-border-width-1, 1px) solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--card);
+  color: var(--foreground);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.data-grid-page-btn:hover:not(:disabled) {
+  background-color: var(--accent);
+  border-color: var(--input);
+}
+
+.data-grid-page-btn.is-active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--font-weight-bold);
+}
+
+.data-grid-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

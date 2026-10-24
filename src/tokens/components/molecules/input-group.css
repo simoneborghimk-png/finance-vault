@@ -1,0 +1,133 @@
+/**
+ * ============================================================================
+ * COMPONENT: Input Group
+ * Category: Molecule (Livello 2: Controlli di Form & Input Composti)
+ * Source of Truth: Figma Component "Input Group" & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .input-group fonde un .input con elementi di supporto eliminando i doppi bordi.
+ *   - Accetta:
+ *     1. .input-group-addon / .input-group-text (prefissi/suffissi testuali come $, https://, .com)
+ *     2. .input (il campo principale)
+ *     3. .btn (pulsanti incorporati per invio, copia o azioni rapide)
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Input Group Container
+   -------------------------------------------------------------------------- */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border-radius: var(--radius);
+}
+
+/* --------------------------------------------------------------------------
+   2. Seamless Child Borders & Radius Management
+   -------------------------------------------------------------------------- */
+/* Tutti gli elementi figli diretti */
+.input-group > .input,
+.input-group > .input-group-addon,
+.input-group > .btn {
+  position: relative;
+  border-radius: 0;
+  height: 2.5rem;
+}
+
+.input-group > .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+}
+
+/* Porta in primo piano l'elemento col focus per non tagliare il focus-ring */
+.input-group > .input:focus-visible,
+.input-group > .btn:focus-visible {
+  z-index: 2;
+}
+
+/* Primo figlio (arrotonda a sinistra) */
+.input-group > :first-child {
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+
+/* Ultimo figlio (arrotonda a destra) */
+.input-group > :last-child {
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+/* Evita il raddoppio del bordo centrale da 1px a 2px */
+.input-group > :not(:first-child) {
+  margin-left: -1px;
+}
+
+/* --------------------------------------------------------------------------
+   3. Addon / Prefix / Suffix Box
+   -------------------------------------------------------------------------- */
+.input-group-addon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--tw-space-3);
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  border: 1px solid var(--input);
+  white-space: nowrap;
+  user-select: none;
+
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
+/* Taglie sincronizzate */
+.input-group-sm > .input,
+.input-group-sm > .input-group-addon,
+.input-group-sm > .btn {
+  height: 2rem;
+  font-size: var(--text-xs-font-size);
+}
+.input-group-sm > .input {
+  padding: var(--tw-space-1) var(--tw-space-2-5);
+}
+.input-group-sm > .btn {
+  padding-left: var(--tw-space-3);
+  padding-right: var(--tw-space-3);
+}
+.input-group-sm > :first-child {
+  border-top-left-radius: var(--radius-sm);
+  border-bottom-left-radius: var(--radius-sm);
+}
+.input-group-sm > :last-child {
+  border-top-right-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.input-group-lg > .input,
+.input-group-lg > .input-group-addon,
+.input-group-lg > .btn {
+  height: 3rem;
+  font-size: var(--text-base-font-size);
+}
+.input-group-lg > .input {
+  padding: var(--tw-space-3) var(--tw-space-4);
+}
+.input-group-lg > .btn {
+  padding-left: var(--tw-space-6);
+  padding-right: var(--tw-space-6);
+}
+.input-group-lg > :first-child {
+  border-top-left-radius: var(--radius-lg);
+  border-bottom-left-radius: var(--radius-lg);
+}
+.input-group-lg > :last-child {
+  border-top-right-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+}

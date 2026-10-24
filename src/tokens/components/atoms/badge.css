@@ -1,0 +1,141 @@
+/**
+ * ============================================================================
+ * COMPONENT: Badge & BadgeNumber
+ * Source of Truth: Figma Component "Badge" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Badge Class
+   -------------------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  width: fit-content;
+  line-height: 1;
+
+  /* Tipografia */
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
+
+  /* Spaziatura & Bordi */
+  padding: var(--tw-space-0-5) var(--tw-space-2-5);
+  gap: var(--tw-space-1);
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+
+  /* Transizione */
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+/* --------------------------------------------------------------------------
+   2. Semantic Variants
+   -------------------------------------------------------------------------- */
+/* Default (Primary) */
+.badge-default,
+.badge:not([class*='badge-']):not([class*='badge-number']) {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Secondary */
+.badge-secondary {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+/* Destructive */
+.badge-destructive {
+  background-color: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+/* Outline */
+.badge-outline {
+  background-color: transparent;
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+/* Success (Semantico via --success) */
+.badge-success {
+  background-color: color-mix(in oklch, var(--success) 10%, transparent);
+  color: var(--success);
+  border-color: color-mix(in oklch, var(--success) 30%, transparent);
+}
+
+/* Warning (Semantico via --warning) */
+.badge-warning {
+  background-color: color-mix(in oklch, var(--warning) 10%, transparent);
+  color: var(--warning);
+  border-color: color-mix(in oklch, var(--warning) 30%, transparent);
+}
+
+/* Info (Semantico via --info) */
+.badge-info {
+  background-color: color-mix(in oklch, var(--info) 10%, transparent);
+  color: var(--info);
+  border-color: color-mix(in oklch, var(--info) 30%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   3. Sizes & Shapes
+   -------------------------------------------------------------------------- */
+/* Small */
+.badge-sm {
+  padding: 0.125rem var(--tw-space-2);
+  font-size: 0.6875rem;
+  gap: var(--tw-space-0-5);
+}
+
+/* Large */
+.badge-lg {
+  padding: var(--tw-space-1) var(--tw-space-3);
+  font-size: var(--text-sm-font-size);
+}
+
+/* Square Shape Variant (angoli morbidi anziché pillola) */
+.badge-square {
+  border-radius: var(--radius-sm);
+}
+
+/* --------------------------------------------------------------------------
+   4. BadgeNumber (Contatore compatto o circolare)
+   -------------------------------------------------------------------------- */
+.badge-number {
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding-left: var(--tw-space-1);
+  padding-right: var(--tw-space-1);
+  border-radius: var(--radius-full);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Badge Dot (Puntino indicatore di stato) */
+.badge-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: var(--radius-full);
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+/* Badge Icon (Icona semantica prima del testo) */
+.badge-icon,
+.badge svg,
+.badge i {
+  font-size: 0.6875rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+  line-height: 1;
+}

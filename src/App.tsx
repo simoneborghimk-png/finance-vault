@@ -236,27 +236,27 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="min-h-screen bg-background text-foreground flex flex-col antialiased selection:bg-primary/30 selection:text-primary">
       {/* Vault Unlock Modal */}
       <VaultUnlockModal isLocked={isLocked} onUnlock={handleUnlock} />
 
       {/* Main App Bar */}
-      <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-950/40">
-              <ShieldCheck className="w-5 h-5 text-emerald-400" />
+            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center shadow-lg">
+              <ShieldCheck className="w-5 h-5 text-primary" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-bold text-base sm:text-lg tracking-tight text-white">
+                <h1 className="font-bold text-base sm:text-lg tracking-tight text-foreground">
                   Finance Vault
                 </h1>
-                <Badge variant="outline" className="text-[10px] border-emerald-500/40 text-emerald-400 bg-emerald-950/30 py-0.5">
+                <Badge variant="outline" className="text-[10px] border-primary/40 text-primary bg-primary/10 py-0.5">
                   PWA • Zero-Knowledge
                 </Badge>
               </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block">
+              <p className="text-[11px] text-muted-foreground hidden sm:block">
                 Cash Flow, Simulazione Fiscale & Sincronizzazione Google Drive Cifrata
               </p>
             </div>
@@ -264,7 +264,7 @@ export function App() {
 
           <div className="flex items-center gap-2">
             {syncFeedback && (
-              <span className="text-xs text-emerald-300 bg-emerald-950/40 border border-emerald-500/30 px-2.5 py-1 rounded-lg animate-fade-in hidden md:inline">
+              <span className="text-xs text-primary bg-primary/10 border border-primary/30 px-2.5 py-1 rounded-lg animate-fade-in hidden md:inline">
                 {syncFeedback}
               </span>
             )}
@@ -272,9 +272,9 @@ export function App() {
               variant="outline"
               size="sm"
               onClick={handleLock}
-              className="border-slate-800 text-slate-300 hover:text-white text-xs flex items-center gap-1.5"
+              className="border-border text-foreground hover:bg-accent hover:text-accent-foreground text-xs flex items-center gap-1.5"
             >
-              <Lock className="w-3.5 h-3.5 text-slate-400" />
+              <Lock className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="hidden sm:inline">Blocca Vault</span>
             </Button>
           </div>
@@ -293,10 +293,10 @@ export function App() {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)} className="space-y-6">
-          <TabsList className="bg-slate-900/80 border border-slate-800 p-1 rounded-xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
+          <TabsList className="bg-card border border-border p-1 rounded-xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
             <TabsTrigger
               value="dashboard"
-              className="text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white flex items-center justify-center gap-2 py-2"
+              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-2 py-2"
             >
               <TrendingUp className="w-4 h-4" />
               <span>Executive Dashboard</span>
@@ -304,18 +304,18 @@ export function App() {
 
             <TabsTrigger
               value="transactions"
-              className="text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white flex items-center justify-center gap-1.5 py-2"
+              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-1.5 py-2"
             >
               <ReceiptText className="w-4 h-4" />
               <span>Transazioni</span>
-              <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">
+              <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-mono">
                 {vault.transactions.length}
               </span>
             </TabsTrigger>
 
             <TabsTrigger
               value="tax-pension"
-              className="text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white flex items-center justify-center gap-2 py-2"
+              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-2 py-2"
             >
               <Coins className="w-4 h-4" />
               <span>Simulatore Fiscale</span>
@@ -323,7 +323,7 @@ export function App() {
 
             <TabsTrigger
               value="goals"
-              className="text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white flex items-center justify-center gap-2 py-2"
+              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-2 py-2"
             >
               <Target className="w-4 h-4" />
               <span>Goal Planner</span>
@@ -331,7 +331,7 @@ export function App() {
 
             <TabsTrigger
               value="ingestion"
-              className="text-xs data-[state=active]:bg-emerald-600 data-[state=active]:text-white flex items-center justify-center gap-2 py-2"
+              className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center justify-center gap-2 py-2"
             >
               <UploadCloud className="w-4 h-4" />
               <span>Ingestione File</span>
@@ -389,10 +389,10 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/60 py-4 text-center text-xs text-slate-500">
+      <footer className="border-t border-border bg-card/40 py-4 text-center text-xs text-muted-foreground">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>Personal Finance Vault & Dashboard • Client-Side Zero-Knowledge Architecture</span>
-          <span className="font-mono text-[11px] text-slate-600">Localhost Environment • Ready for PWA install</span>
+          <span className="font-mono text-[11px] text-muted-foreground">Localhost Environment • Ready for PWA install</span>
         </div>
       </footer>
     </div>

@@ -1,0 +1,82 @@
+/**
+ * ============================================================================
+ * COMPONENT: Empty State
+ * Category: Molecule (Livello 2: Dati & Visualizzazione Contenuto)
+ * Source of Truth: Figma Component "Empty" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .empty-state: contenitore centrato per liste vuote o schermate di onboarding
+ *   - Contiene:
+ *     1. .empty-state-media (cerchio contenitore icona o illustrazione)
+ *     2. .empty-state-title (titolo esplicativo in grassetto)
+ *     3. .empty-state-description (testo esplicativo o d'aiuto)
+ *     4. .empty-state-actions (CTA primaria .btn-primary o secondaria)
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Empty State Container
+   -------------------------------------------------------------------------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  padding: var(--tw-space-12) var(--tw-space-6);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-xl);
+  background-color: var(--card);
+}
+
+/* --------------------------------------------------------------------------
+   2. Subcomponents
+   -------------------------------------------------------------------------- */
+/* Cerchio Icona */
+.empty-state-media {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem; /* 56px */
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  margin-bottom: var(--tw-space-4);
+}
+
+.empty-state-media svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* Titolo */
+.empty-state-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg-font-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--text-lg-line-height);
+  color: var(--foreground);
+  margin: 0 0 var(--tw-space-1-5) 0;
+}
+
+/* Descrizione */
+.empty-state-description {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  max-width: 26rem; /* 416px per leggibilità ideale */
+  margin: 0 0 var(--tw-space-6) 0;
+}
+
+/* Slot Pulsanti / Azioni */
+.empty-state-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}

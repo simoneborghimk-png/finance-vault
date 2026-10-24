@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Cloud, CloudCheck, Key, Lock, Download, Upload, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
 import { googleDrive } from '@/lib/googleDrive';
-import { Button, Input, Badge, Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui';
+import { Button, Input, Badge, Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, Tooltip, Label } from './ui';
 
 interface DriveSyncBarProps {
   onSync: () => Promise<void>;
@@ -69,44 +69,47 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs">
+    <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-card border border-border text-card-foreground text-xs">
       <div className="flex items-center gap-2.5">
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="font-semibold text-slate-200">Zero-Knowledge Vault:</span>
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <span className="font-semibold text-foreground">Zero-Knowledge Vault:</span>
         </div>
-        <Badge variant="outline" className="border-emerald-500/40 text-emerald-300 bg-emerald-950/20 text-[10px]">
+        <Badge variant="outline" className="border-primary/40 text-primary bg-primary/10 text-[10px]">
           AES-256-GCM + PBKDF2
         </Badge>
         {lastSyncTime && (
-          <span className="text-slate-500 hidden sm:inline text-[11px]">
+          <span className="text-muted-foreground hidden sm:inline text-[11px]">
             Ultimo salvataggio: {new Date(lastSyncTime).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
           </span>
         )}
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Local Backup Export / Import */}
-        <Button
-          variant="outline"
-          onClick={onExportLocalEncrypted}
-          className="h-8 border-slate-700 text-slate-300 hover:text-white text-[11px] px-2.5 flex items-center gap-1.5"
-          title="Scarica file cifrato di backup (vault_finanze.enc)"
-        >
-          <Download className="w-3.5 h-3.5 text-slate-400" />
-          <span className="hidden md:inline">Scarica</span> .enc
-        </Button>
+        {/* Local Backup Export / Import con Tooltip accessibili */}
+        <Tooltip content="Scarica file cifrato di backup (vault_finanze.enc)">
+          <Button
+            variant="outline"
+            onClick={onExportLocalEncrypted}
+            className="h-8 border-border text-foreground hover:bg-accent hover:text-accent-foreground text-[11px] px-2.5 flex items-center gap-1.5"
+          >
+            <Download className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="hidden md:inline">Scarica</span> .enc
+          </Button>
+        </Tooltip>
 
-        <label className="h-8 border border-slate-700 hover:border-slate-600 rounded-md px-2.5 flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white text-[11px] bg-transparent">
-          <Upload className="w-3.5 h-3.5 text-slate-400" />
-          <span className="hidden md:inline">Ripristina</span>
-          <input
-            type="file"
-            accept=".enc,.json"
-            className="hidden"
-            onChange={onImportLocalEncrypted}
-          />
-        </label>
+        <Tooltip content="Carica e ripristina un file di backup cifrato (.enc o .json)">
+          <label className="h-8 border border-border hover:border-border/80 rounded-md px-2.5 flex items-center gap-1.5 cursor-pointer text-foreground hover:bg-accent hover:text-accent-foreground text-[11px] bg-transparent">
+            <Upload className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="hidden md:inline">Ripristina</span>
+            <input
+              type="file"
+              accept=".enc,.json"
+              className="hidden"
+              onChange={onImportLocalEncrypted}
+            />
+          </label>
+        </Tooltip>
 
         {/* Google Drive Status & Connection */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -115,8 +118,8 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
               variant="outline"
               className={`h-8 text-[11px] px-3 flex items-center gap-1.5 ${
                 isConnected
-                  ? 'border-emerald-500/40 text-emerald-300 bg-emerald-950/20'
-                  : 'border-slate-700 text-slate-300 hover:text-white'
+                  ? 'border-primary/40 text-primary bg-primary/10'
+                  : 'border-border text-foreground hover:bg-accent hover:text-accent-foreground'
               }`}
             >
               <Cloud className="w-3.5 h-3.5" />
@@ -124,36 +127,37 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="bg-[#0f172a] border-slate-800 text-slate-100 max-w-md">
+          <DialogContent className="bg-card border-border text-card-foreground max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-base text-white flex items-center gap-2">
-                <Cloud className="w-5 h-5 text-emerald-400" />
+              <DialogTitle className="text-base text-foreground flex items-center gap-2">
+                <Cloud className="w-5 h-5 text-primary" />
                 Configurazione Google Drive (drive.file)
               </DialogTitle>
-              <DialogDescription className="text-slate-400 text-xs mt-1">
-                L'applicazione accede con scope ristretto <code className="text-emerald-400">drive.file</code> unicamente al file cifrato da essa creato (<code className="text-cyan-400">vault_finanze.enc</code>).
+              <DialogDescription className="text-muted-foreground text-xs mt-1">
+                L'applicazione accede con scope ristretto <code className="text-primary font-mono">drive.file</code> unicamente al file cifrato da essa creato (<code className="text-primary font-mono">vault_finanze.enc</code>).
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-2 text-xs">
               {authError && (
-                <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+                <div className="p-3 rounded-lg bg-destructive/15 border border-destructive/40 text-destructive text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{authError}</span>
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label className="text-slate-300 font-medium">Google Cloud OAuth2 Client ID</label>
+                <Label htmlFor="gdrive-client-id" className="text-foreground font-medium">Google Cloud OAuth2 Client ID</Label>
                 <Input
+                  id="gdrive-client-id"
                   placeholder="xxxx.apps.googleusercontent.com"
                   value={clientId}
                   onChange={(e) => setClientId(e.target.value)}
-                  className="bg-slate-950/80 border-slate-700 text-slate-100 text-xs font-mono"
+                  className="bg-background border-input text-foreground text-xs font-mono w-full"
                 />
-                <div className="text-[11px] text-slate-400 space-y-1.5 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                  <p className="font-medium text-slate-300">Origini JavaScript autorizzate (Google Cloud Console):</p>
-                  <ul className="list-disc list-inside space-y-0.5 font-mono text-[10px] text-emerald-400">
+                <div className="text-[11px] text-muted-foreground space-y-1.5 bg-muted/40 p-2.5 rounded-lg border border-border">
+                  <p className="font-medium text-foreground">Origini JavaScript autorizzate (Google Cloud Console):</p>
+                  <ul className="list-disc list-inside space-y-0.5 font-mono text-[10px] text-primary">
                     <li>http://localhost:5180</li>
                     <li>https://simoneborghimk-png.github.io</li>
                   </ul>
@@ -164,7 +168,7 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
                 <Button
                   onClick={handleConnectGoogle}
                   disabled={isConnecting}
-                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs py-2.5 flex items-center justify-center gap-2 font-medium"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-2.5 flex items-center justify-center gap-2 font-medium"
                 >
                   <Cloud className="w-4 h-4" />
                   {isConnecting
@@ -177,7 +181,7 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
                   <Button
                     variant="outline"
                     onClick={handleDisconnect}
-                    className="w-full border-rose-500/30 text-rose-300 hover:bg-rose-950/30 text-xs py-2"
+                    className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 text-xs py-2"
                   >
                     Disconnetti Account
                   </Button>

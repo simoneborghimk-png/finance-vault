@@ -1,0 +1,117 @@
+/**
+ * ============================================================================
+ * COMPONENT: Drawer
+ * Category: Molecule (Livello 2: Overlay & Feedback)
+ * Source of Truth: Figma Component "Drawer" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .drawer-overlay: backdrop oscurato
+ *   - .drawer-content: cassetto ancorato in basso (bottom sheet) con angoli superiori arrotondati
+ *   - Contiene:
+ *     1. .drawer-handle: barretta centrata di trascinamento touch
+ *     2. .drawer-header (.drawer-title + .drawer-description)
+ *     3. .drawer-body (contenuto scorrevole)
+ *     4. .drawer-footer (.btn)
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Backdrop Overlay
+   -------------------------------------------------------------------------- */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: color-mix(in oklch, var(--background) 80%, transparent);
+  -webkit-backdrop-filter: var(--backdrop-filter-xs);
+  backdrop-filter: var(--backdrop-filter-xs);
+  animation: overlay-fade-in 200ms ease;
+}
+
+/* --------------------------------------------------------------------------
+   2. Drawer Container (Bottom Sheet)
+   -------------------------------------------------------------------------- */
+.drawer-content {
+  position: fixed;
+  inset-x: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+
+  background-color: var(--background);
+  color: var(--foreground);
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: var(--shadow-2xl);
+
+  animation: drawer-slide-up 250ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes drawer-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Drag Handle
+   -------------------------------------------------------------------------- */
+.drawer-handle {
+  align-self: center;
+  width: 2.5rem; /* 40px */
+  height: 0.25rem; /* 4px */
+  border-radius: var(--radius-full);
+  background-color: var(--muted-foreground);
+  opacity: 0.35;
+  margin-top: var(--tw-space-3);
+  margin-bottom: var(--tw-space-4);
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   4. Slots (Header, Body, Footer)
+   -------------------------------------------------------------------------- */
+.drawer-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-1-5);
+  padding: 0 var(--tw-space-6) var(--tw-space-4) var(--tw-space-6);
+  text-align: center;
+}
+
+.drawer-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg-font-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--text-lg-line-height);
+  color: var(--foreground);
+  margin: 0;
+}
+
+.drawer-description {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.drawer-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 var(--tw-space-6) var(--tw-space-4) var(--tw-space-6);
+}
+
+.drawer-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-2);
+  padding: var(--tw-space-4) var(--tw-space-6) var(--tw-space-6) var(--tw-space-6);
+  margin-top: auto;
+}

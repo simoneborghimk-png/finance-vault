@@ -1,0 +1,14 @@
+/**
+ * ============================================================================
+ * COMPONENTS - LAYER 3: ORGANISMS (7 Componenti Enterprise)
+ * Source of Truth: docs/FIGMA-COMPONENTS.md & Figma File pu2nlKYplmTCtTs0FVELdw
+ * ============================================================================
+ */
+
+@import './sidebar.css';
+@import './calendar.css';
+@import './chart.css';
+@import './kpi-blocks.css';
+@import './data-grid.css';
+@import './app-header.css';
+@import './activity-feed.css';

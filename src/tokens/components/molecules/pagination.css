@@ -1,0 +1,130 @@
+/**
+ * ============================================================================
+ * COMPONENT: Pagination
+ * Category: Molecule (Livello 2: Navigazione & Disclosure)
+ * Source of Truth: Figma Component "Pagination" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - <nav class="pagination">
+ *   - <ul class="pagination-content"> contiene:
+ *     1. .pagination-item contenente .pagination-link (.btn.btn-ghost.btn-sm)
+ *     2. .pagination-previous / .pagination-next con frecce
+ *     3. .pagination-ellipsis (span con puntini)
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Pagination Nav & Content
+   -------------------------------------------------------------------------- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pagination-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tw-space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pagination-item {
+  display: inline-flex;
+}
+
+/* --------------------------------------------------------------------------
+   2. Pagination Links & Actions
+   -------------------------------------------------------------------------- */
+
+/* Shared base for ALL interactive pagination elements */
+.pagination-link,
+.pagination-previous,
+.pagination-next {
+  /* Reset <button> browser defaults */
+  appearance: none;
+  background: transparent;
+  border: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem; /* 32px – Figma: PaginationItem height */
+  border-radius: var(--radius-md); /* 8px – Figma: corner=8 */
+  color: var(--foreground);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+/* Number links – square 32×32 */
+.pagination-link {
+  min-width: 2rem;
+  padding: 0 var(--tw-space-1);
+}
+
+.pagination-link:hover,
+.pagination-previous:hover,
+.pagination-next:hover {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.pagination-link:focus-visible,
+.pagination-previous:focus-visible,
+.pagination-next:focus-visible {
+  box-shadow: var(--shadow-focus);
+}
+
+/* Active Page (Pagina corrente selezionata) */
+.pagination-link.is-active,
+.pagination-link[aria-current='page'] {
+  border: 1px solid var(--border);
+  background-color: var(--background);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Previous – Figma: paddingLeft=10px, paddingRight=16px, gap=4px */
+.pagination-previous {
+  justify-content: flex-start;
+  padding: var(--tw-space-2) var(--tw-space-4) var(--tw-space-2) var(--tw-space-2-5);
+  gap: var(--tw-space-1);
+}
+
+/* Next – Figma: paddingLeft=16px, paddingRight=10px, gap=4px */
+.pagination-next {
+  justify-content: flex-end;
+  padding: var(--tw-space-2) var(--tw-space-2-5) var(--tw-space-2) var(--tw-space-4);
+  gap: var(--tw-space-1);
+}
+
+.pagination-previous:disabled,
+.pagination-next:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.pagination-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--muted-foreground);
+}

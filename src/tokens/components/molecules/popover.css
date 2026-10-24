@@ -1,0 +1,73 @@
+/**
+ * ============================================================================
+ * COMPONENT: Popover
+ * Category: Molecule (Livello 2: Overlay & Feedback)
+ * Source of Truth: Figma Component "Popover" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .popover-wrapper: trigger ancorato
+ *   - .popover-content: pannello a comparsa non modale
+ *   - Accetta: form compatti, elenchi di filtri o schede informative con bottoni
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Anchor Wrapper
+   -------------------------------------------------------------------------- */
+.popover-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+/* --------------------------------------------------------------------------
+   2. Popover Content Panel
+   -------------------------------------------------------------------------- */
+.popover-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: var(--tw-space-2);
+  z-index: 50;
+
+  width: 18rem; /* 288px standard */
+  padding: var(--tw-space-4);
+
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  outline: none;
+
+  animation: popover-fade-in 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popover-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Alignment Modifiers */
+.popover-right {
+  left: auto;
+  right: 0;
+}
+
+.popover-center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.popover-top {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: var(--tw-space-2);
+}

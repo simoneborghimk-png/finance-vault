@@ -1,0 +1,405 @@
+/**
+ * ============================================================================
+ * ORGANISM 3.6: GLOBAL HEADER & APPLICATION NAVBAR (.app-header)
+ * Source of Truth: Desktop Shell Navigation & High-Density Design System
+ * ============================================================================
+ * 
+ * Component Hierarchy:
+ * - .app-header: Barra orizzontale fissa con backdrop-blur e bordo
+ *   - .app-header-left: Sezione sinistra (toggle sidebar, workspace pill, breadcrumbs)
+ *     - .app-header-toggle-btn: Tasto icona hamburger/rail per sidebar
+ *     - .app-header-workspace: Selettore organizzazione / tenant
+ *     - .app-header-breadcrumb: Percorso gerarchico contestuale
+ *   - .app-header-center: Sezione centrale (Command palette trigger)
+ *     - .app-header-command-btn: Pulsante finto-input con icona ricerca e kbd ⌘K
+ *   - .app-header-right: Sezione destra (Docs, Notifiche, Tema, Profilo)
+ *     - .app-header-action-btn: Bottoni icona quadrati (help, settings)
+ *     - .app-header-notify-btn: Trigger notifiche con badge conteggio/pulso
+ *     - .app-header-theme-btn: Switch rapido Dark/Light
+ *     - .app-header-profile: Trigger utente con avatar, nome, ruolo e presenza
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Header Container
+   -------------------------------------------------------------------------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 3.5rem; /* 56px standard */
+  padding: 0 var(--tw-space-5);
+  background-color: color-mix(in oklch, var(--background) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   2. Left Section (Sidebar Toggle, Workspace, Breadcrumbs)
+   -------------------------------------------------------------------------- */
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-3);
+  min-width: 0;
+}
+
+.app-header-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+  flex-shrink: 0;
+}
+
+.app-header-toggle-btn:hover {
+  color: var(--foreground);
+  background-color: var(--accent);
+  border-color: var(--input);
+}
+
+.app-header-workspace {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+  padding: 4px 8px;
+  background-color: color-mix(in oklch, var(--muted) 40%, var(--card));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  white-space: nowrap;
+}
+
+.app-header-workspace:hover {
+  background-color: var(--accent);
+}
+
+.app-header-workspace-logo {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: var(--radius-xs);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.app-header-separator {
+  width: 1px;
+  height: 1.25rem;
+  background-color: var(--border);
+  flex-shrink: 0;
+}
+
+.app-header-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-header-breadcrumb-item {
+  color: var(--muted-foreground);
+  text-decoration: none;
+  font-weight: var(--font-weight-normal, 400);
+  cursor: pointer;
+  border-radius: var(--radius-sm, 3px);
+  padding: 0.125rem 0.25rem;
+  margin: -0.125rem -0.25rem;
+  transition:
+    color 140ms ease,
+    background-color 140ms ease;
+}
+
+.app-header-breadcrumb-item:hover {
+  color: var(--foreground);
+  background-color: var(--accent);
+  text-decoration: none;
+}
+
+.app-header-breadcrumb-item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.app-header-breadcrumb-item.is-static {
+  cursor: default;
+  pointer-events: none;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.app-header-breadcrumb-separator {
+  color: var(--muted-foreground);
+  opacity: 0.35;
+  font-size: 0.75rem;
+  font-weight: 300;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0.125rem;
+}
+
+.app-header-breadcrumb-current {
+  color: var(--foreground);
+  font-weight: var(--font-weight-semibold, 600);
+  padding: 0.125rem 0.25rem;
+  margin: -0.125rem -0.25rem;
+  cursor: default;
+}
+
+/* --------------------------------------------------------------------------
+   3. Center Section (Global Command Bar Trigger)
+   -------------------------------------------------------------------------- */
+.app-header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  max-width: 440px;
+  margin: 0 var(--tw-space-4);
+}
+
+.app-header-command-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 2.125rem;
+  padding: 0 var(--tw-space-3);
+  background-color: color-mix(in oklch, var(--muted) 35%, var(--card));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.app-header-command-btn:hover {
+  border-color: var(--input);
+  background-color: var(--card);
+  color: var(--foreground);
+}
+
+.app-header-command-btn:focus-visible {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: var(--shadow-focus);
+}
+
+.app-header-command-left {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+}
+
+.app-header-command-kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 5px;
+  font-size: 0.625rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  background: var(--background);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+}
+
+/* --------------------------------------------------------------------------
+   4. Right Section (Actions, Notifications, Profile)
+   -------------------------------------------------------------------------- */
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+  flex-shrink: 0;
+}
+
+.app-header-icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.app-header-icon-btn:hover {
+  color: var(--foreground);
+  background-color: var(--accent);
+  border-color: var(--border);
+}
+
+/* Badge Notifiche */
+.app-header-notify-badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0.875rem;
+  height: 0.875rem;
+  padding: 0 3px;
+  font-size: 0.5625rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  background-color: var(--destructive);
+  color: var(--destructive-foreground);
+  box-shadow: 0 0 0 1.5px var(--background);
+}
+
+.app-header-notify-pulse {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background-color: var(--primary);
+  box-shadow: 0 0 0 1.5px var(--background);
+}
+
+/* User Profile Trigger Button */
+.app-header-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+  padding: 3px 6px 3px 3px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.app-header-profile-btn:hover {
+  background-color: var(--accent);
+  border-color: var(--input);
+}
+
+.app-header-profile-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.app-header-profile-avatar {
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-header-status-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background-color: var(--success);
+  border: 1.5px solid var(--card);
+}
+
+.app-header-status-dot.is-busy {
+  background-color: var(--destructive);
+}
+
+.app-header-status-dot.is-away {
+  background-color: var(--warning);
+}
+
+.app-header-profile-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.1;
+  padding-right: 4px;
+}
+
+.app-header-profile-name {
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+}
+
+.app-header-profile-role {
+  font-size: 0.625rem;
+  color: var(--muted-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   5. Responsive Breakpoint Handling
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 var(--tw-space-3);
+  }
+
+  .app-header-center {
+    display: none;
+  }
+
+  .app-header-breadcrumb {
+    display: none;
+  }
+
+  .app-header-profile-info {
+    display: none;
+  }
+}

@@ -1,0 +1,116 @@
+/**
+ * ============================================================================
+ * COMPONENT: Date Picker
+ * Category: Molecule (Livello 2: Controlli di Form & Input Composti)
+ * Source of Truth: Figma Component "Date Picker" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .date-picker: contenitore trigger + popover
+ *   - Contiene:
+ *     1. .date-picker-trigger: pulsante (.btn.btn-outline) con icona calendario e testo data
+ *     2. .date-picker-content: menu a comparsa (.popover-content)
+ *     3. All'interno del content alloggia il componente calendario o time-picker
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Date Picker Wrapper
+   -------------------------------------------------------------------------- */
+.date-picker {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   2. Date Picker Trigger Button
+   -------------------------------------------------------------------------- */
+.date-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 2.5rem; /* 40px */
+  padding: var(--tw-space-2) var(--tw-space-3);
+  gap: var(--tw-space-2);
+
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2xs);
+
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  font-weight: var(--font-weight-normal);
+  text-align: left;
+  user-select: none;
+  cursor: pointer;
+  outline: none;
+
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+/* Placeholder quando nessuna data è selezionata */
+.date-picker-trigger.is-empty,
+.date-picker-placeholder {
+  color: var(--muted-foreground);
+}
+
+.date-picker-trigger:hover:not(:disabled) {
+  border-color: var(--border);
+}
+
+.date-picker-trigger:focus-visible {
+  border-color: var(--ring);
+  box-shadow: var(--shadow-focus);
+}
+
+.date-picker-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: var(--muted);
+}
+
+/* Icona Calendario */
+.date-picker-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   3. Popover Panel for Calendar Dropdown
+   -------------------------------------------------------------------------- */
+.date-picker-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 50;
+  margin-top: var(--tw-space-1);
+  padding: var(--tw-space-3);
+  width: auto;
+
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+
+  animation: date-picker-fade 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes date-picker-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

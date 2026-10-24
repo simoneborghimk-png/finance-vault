@@ -44,6 +44,8 @@
 - [x] Eredità pratiche `agent-core-knowledge`: guardrail, regole `.agents/rules/`, memoria calda/fredda
 - [x] Portabilità cross-device, porta fissa 5180, base path GitHub Pages e CI/CD Actions
 - [x] Tabella Transazioni Interattiva (ricerca, filtri, editing categoria/tag, aggiunta manuale)
+- [x] Allineamento token system DTCG e importazione catalogo Shadcn UI (46 componenti) da `agent-core-knowledge`
+- [x] Adozione standard UX/UI/A11y Tier 0: `.agents/rules/ux-ui-accessibility-standards.md`, table expansion rows, zero `title` nativi, form resilienti
 - [ ] Budget Cap & Monitoraggio Soglie Spesa mensili
 - [ ] Ottimizzazione bundle: Code Splitting dinamico (Lazy loading SheetJS / Dropzone)
 - [ ] Lettura automatica buste paga aggiornate da cartella su Google Drive

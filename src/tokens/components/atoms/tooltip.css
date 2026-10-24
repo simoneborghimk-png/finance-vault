@@ -1,0 +1,105 @@
+/**
+ * ============================================================================
+ * COMPONENT: Tooltip
+ * Source of Truth: Figma Component "Tooltip" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Tooltip Trigger Wrapper
+   -------------------------------------------------------------------------- */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+/* --------------------------------------------------------------------------
+   2. Tooltip Overlay Bubble
+   -------------------------------------------------------------------------- */
+.tooltip-content {
+  position: absolute;
+  z-index: 50;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+
+  /* Superficie & Tipografia */
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-sm);
+  padding: var(--tw-space-1-5) var(--tw-space-3);
+  box-shadow: var(--shadow-md);
+
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+
+  /* Animazione di dissolvenza */
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+/* Mostra unicamente al passaggio del mouse (hover puro) */
+.tooltip-wrapper:hover .tooltip-content {
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   3. Placements (Attivi unicamente sull'hover)
+   -------------------------------------------------------------------------- */
+/* Top (Default) */
+.tooltip-top,
+.tooltip-content:not([class*='tooltip-bottom']):not([class*='tooltip-left']):not(
+    [class*='tooltip-right']
+  ) {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-0.375rem) scale(0.96);
+  margin-bottom: var(--tw-space-1);
+}
+.tooltip-wrapper:hover .tooltip-top,
+.tooltip-wrapper:hover
+  .tooltip-content:not([class*='tooltip-bottom']):not([class*='tooltip-left']):not(
+    [class*='tooltip-right']
+  ) {
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Bottom */
+.tooltip-bottom {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0.375rem) scale(0.96);
+  margin-top: var(--tw-space-1);
+}
+.tooltip-wrapper:hover .tooltip-bottom {
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Left */
+.tooltip-left {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-0.375rem) scale(0.96);
+  margin-right: var(--tw-space-1);
+}
+.tooltip-wrapper:hover .tooltip-left {
+  transform: translateY(-50%) translateX(0) scale(1);
+}
+
+/* Right */
+.tooltip-right {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(0.375rem) scale(0.96);
+  margin-left: var(--tw-space-1);
+}
+.tooltip-wrapper:hover .tooltip-right {
+  transform: translateY(-50%) translateX(0) scale(1);
+}

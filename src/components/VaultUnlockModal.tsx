@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Lock, Unlock, Fingerprint, ShieldCheck, KeyRound, AlertCircle } from 'lucide-react';
 import { isWebAuthnAvailable, hasBiometricSetup, authenticateWithBiometrics, registerBiometricUnlock } from '@/lib/crypto';
-import { Button, Input, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Badge } from './ui';
+import { Button, Input, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, Badge, Checkbox, Label } from './ui';
 
 interface VaultUnlockModalProps {
   isLocked: boolean;
@@ -67,33 +67,33 @@ export const VaultUnlockModal: React.FC<VaultUnlockModalProps> = ({ isLocked, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-      <Card className="w-full max-w-md border-emerald-500/30 bg-[#0d1321] text-slate-100 shadow-2xl">
+      <Card className="w-full max-w-md border-primary/30 bg-card text-card-foreground shadow-2xl">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 flex items-center justify-center mb-3">
-            <Lock className="w-7 h-7 text-emerald-400" />
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center mb-3">
+            <Lock className="w-7 h-7 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
+          <CardTitle className="text-2xl font-bold tracking-tight text-foreground flex items-center justify-center gap-2">
             Personal Finance Vault
           </CardTitle>
-          <CardDescription className="text-slate-400 text-sm">
+          <CardDescription className="text-muted-foreground text-sm">
             Architettura Zero-Knowledge e Cifratura AES-GCM 256-bit
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4 pt-4">
           <div className="flex items-center justify-center gap-2 text-xs">
-            <Badge variant="outline" className="border-emerald-500/40 text-emerald-300 bg-emerald-950/40 py-1 px-2.5 flex items-center gap-1.5">
+            <Badge variant="outline" className="border-primary/40 text-primary bg-primary/10 py-1 px-2.5 flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5" />
               PBKDF2 100k Iterazioni
             </Badge>
-            <Badge variant="outline" className="border-cyan-500/40 text-cyan-300 bg-cyan-950/40 py-1 px-2.5 flex items-center gap-1.5">
+            <Badge variant="outline" className="border-primary/40 text-primary bg-primary/10 py-1 px-2.5 flex items-center gap-1.5">
               <KeyRound className="w-3.5 h-3.5" />
               AES-256-GCM
             </Badge>
           </div>
 
           {error && (
-            <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+            <div className="p-3 rounded-lg bg-destructive/15 border border-destructive/40 text-destructive text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -101,36 +101,40 @@ export const VaultUnlockModal: React.FC<VaultUnlockModalProps> = ({ isLocked, on
 
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-300">Master Password</label>
+              <Label htmlFor="vault-master-password" className="text-xs font-medium text-foreground">
+                Master Password <span className="text-destructive">*</span>
+              </Label>
               <Input
+                id="vault-master-password"
                 type="password"
                 placeholder="Inserisci la tua Master Password..."
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoFocus
-                className="bg-slate-900/80 border-slate-700 text-slate-100 placeholder:text-slate-500 focus-visible:ring-emerald-500"
+                className="bg-background border-input text-foreground placeholder:text-muted-foreground focus-visible:ring-ring w-full"
               />
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-muted-foreground">
                 La chiave di cifratura viene derivata esclusivamente in locale nel tuo browser.
               </p>
             </div>
 
             {supportsBiometrics && !hasBiometric && (
-              <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer pt-1">
-                <input
-                  type="checkbox"
+              <div className="flex items-center gap-2 pt-1">
+                <Checkbox
+                  id="enable-biometrics"
                   checked={enableBiometricsOnUnlock}
-                  onChange={(e) => setEnableBiometricsOnUnlock(e.target.checked)}
-                  className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500"
+                  onCheckedChange={(checked) => setEnableBiometricsOnUnlock(Boolean(checked))}
                 />
-                Abilita sblocco rapido biometrico (Face ID / Touch ID)
-              </label>
+                <Label htmlFor="enable-biometrics" className="text-xs text-foreground cursor-pointer font-normal">
+                  Abilita sblocco rapido biometrico (Face ID / Touch ID)
+                </Label>
+              </div>
             )}
 
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 transition-all shadow-lg shadow-emerald-900/30"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 transition-all shadow-lg"
             >
               {isLoading ? 'Decifratura in corso...' : (
                 <span className="flex items-center justify-center gap-2">
@@ -144,24 +148,24 @@ export const VaultUnlockModal: React.FC<VaultUnlockModalProps> = ({ isLocked, on
           {supportsBiometrics && hasBiometric && (
             <div className="pt-2">
               <div className="relative my-3">
-                <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-800" /></div>
-                <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#0d1321] px-2 text-slate-400">Oppure</span></div>
+                <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
+                <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Oppure</span></div>
               </div>
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleBiometricUnlock}
                 disabled={isLoading}
-                className="w-full border-cyan-500/30 text-cyan-300 hover:bg-cyan-950/40 flex items-center justify-center gap-2"
+                className="w-full border-primary/30 text-primary hover:bg-primary/10 flex items-center justify-center gap-2"
               >
-                <Fingerprint className="w-4 h-4 text-cyan-400" />
+                <Fingerprint className="w-4 h-4 text-primary" />
                 Accedi con Biometria / Passkey
               </Button>
             </div>
           )}
         </CardContent>
 
-        <CardFooter className="text-center justify-center border-t border-slate-800/80 pt-4 text-xs text-slate-400">
+        <CardFooter className="text-center justify-center border-t border-border pt-4 text-xs text-muted-foreground">
           Nessun dato finanziario in chiaro lascia mai questo dispositivo.
         </CardFooter>
       </Card>

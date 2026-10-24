@@ -1,0 +1,147 @@
+/**
+ * ============================================================================
+ * COMPONENT: Sonner (Toast Notifications)
+ * Category: Molecule (Livello 2: Overlay & Feedback)
+ * Source of Truth: Figma Component "Sonner" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .toast-viewport: contenitore fisso d'angolo (bottom-right / top-right)
+ *   - .toast contiene:
+ *     1. .toast-icon (opzionale): icona semantica di stato (success, error, warning, info)
+ *     2. .toast-content (.toast-title + .toast-description)
+ *     3. .toast-action (opzionale): .btn.btn-sm.btn-outline per azione rapida (es. "Annulla")
+ *     4. .toast-close (opzionale): .btn.btn-ghost.btn-icon.btn-xs
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Toast Viewport (Anchor container)
+   -------------------------------------------------------------------------- */
+.toast-viewport {
+  position: fixed;
+  bottom: var(--tw-space-4);
+  right: var(--tw-space-4);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-2-5);
+  width: 100%;
+  max-width: 24rem; /* 384px */
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   2. Toast Item
+   -------------------------------------------------------------------------- */
+.toast {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tw-space-3);
+  width: 100%;
+  padding: var(--tw-space-4);
+
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+
+  animation: toast-slide-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform 150ms ease,
+    opacity 150ms ease;
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Subcomponents
+   -------------------------------------------------------------------------- */
+.toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.toast-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-0-5);
+}
+
+.toast-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--text-sm-line-height);
+  color: var(--foreground);
+  margin: 0;
+}
+
+.toast-description {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  color: var(--muted-foreground);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.toast-action {
+  flex-shrink: 0;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+.toast-close:hover {
+  color: var(--foreground);
+}
+
+/* --------------------------------------------------------------------------
+   4. Semantic Variants
+   -------------------------------------------------------------------------- */
+.toast-success {
+  border-color: color-mix(in oklch, var(--success) 30%, transparent);
+}
+.toast-success .toast-icon {
+  color: var(--success);
+}
+
+.toast-destructive {
+  border-color: color-mix(in oklch, var(--destructive) 30%, transparent);
+}
+.toast-destructive .toast-icon {
+  color: var(--destructive);
+}
+
+.toast-warning {
+  border-color: color-mix(in oklch, var(--warning) 30%, transparent);
+}
+.toast-warning .toast-icon {
+  color: var(--warning);
+}
+
+.toast-info {
+  border-color: color-mix(in oklch, var(--info) 30%, transparent);
+}
+.toast-info .toast-icon {
+  color: var(--info);
+}

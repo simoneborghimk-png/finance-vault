@@ -1,0 +1,93 @@
+/**
+ * ============================================================================
+ * COMPONENT: Breadcrumb
+ * Category: Molecule (Livello 2: Navigazione & Disclosure)
+ * Source of Truth: Figma Component "Breadcrumb" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - <nav class="breadcrumb">
+ *   - <ol class="breadcrumb-list"> contiene:
+ *     1. .breadcrumb-item con .breadcrumb-link o .breadcrumb-page
+ *     2. .breadcrumb-separator: icona chevron o slash
+ *     3. .breadcrumb-ellipsis: tre puntini per percorsi compressi
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Breadcrumb Nav & List
+   -------------------------------------------------------------------------- */
+.breadcrumb {
+  width: 100%;
+}
+
+.breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tw-space-1-5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  color: var(--muted-foreground);
+  line-height: var(--text-sm-line-height);
+}
+
+/* --------------------------------------------------------------------------
+   2. Breadcrumb Item & Links
+   -------------------------------------------------------------------------- */
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-1-5);
+}
+
+.breadcrumb-link {
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.breadcrumb-link:hover {
+  color: var(--foreground);
+}
+
+.breadcrumb-link:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: var(--radius-xs);
+}
+
+/* Pagina Corrente (Attiva / Non cliccabile) */
+.breadcrumb-page {
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
+}
+
+/* --------------------------------------------------------------------------
+   3. Separator & Ellipsis
+   -------------------------------------------------------------------------- */
+.breadcrumb-separator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  user-select: none;
+}
+
+.breadcrumb-separator svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.breadcrumb-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--muted-foreground);
+}

@@ -49,6 +49,7 @@ Questo file definisce le regole operative vincolanti per qualsiasi assistente o 
   - `no-browser-subagent.md`: Divieto categorico automazione browser interattiva su macOS.
   - `documentation-sync-gate.md`: Sincronizzazione documentale a fine milestone e zero push non autorizzati.
   - `token-optimization.md`: Architettura della memoria calda/fredda e chirurgia del contesto.
+  - `ux-ui-accessibility-standards.md`: Linee guida vincolanti Tier 0 su gerarchia azioni, submit resiliente, divieto `title`, table expansion rows, badge iconografici e a11y WCAG 2.2 AA.
 
 ---
 
@@ -56,8 +57,9 @@ Questo file definisce le regole operative vincolanti per qualsiasi assistente o 
 
 - **Zero-Knowledge Architecture:** Nessun backend proprietario. I dati risiedono esclusivamente nel browser (in-memory quando decifrati) e cifrati con AES-256-GCM + PBKDF2 (100k iterazioni SHA-256) per storage locale o Google Drive (`vault_finanze.enc`).
 - **Scope Google Drive Ristretto:** Esclusivamente `https://www.googleapis.com/auth/drive.file`.
-- **Design System & Semantic Tokens:** Utilizzo dei token semantici HSL (`bg-background`, `bg-card`, `text-foreground`, `border-border`, `text-primary`, ecc.).
+- **Design System & Semantic Tokens:** Utilizzo dei token semantici (`bg-background`, `bg-card`, `text-foreground`, `border-border`, `text-primary`, ecc.).
 - **Divieto di Stili Hardcoded:** Utilizzare palette e classi di utilità coerenti; evitare colori arbitrari non semantici.
+- **Ergonomia e Azioni:** Massimo 1 azione primaria per schermata, pulsante di submit sempre abilitato a riposo, nessun attributo HTML `title`, expansion rows per dati complessi in tabella.
 
 ---
 
@@ -66,4 +68,5 @@ Questo file definisce le regole operative vincolanti per qualsiasi assistente o 
 1. `npx tsc --noEmit` supera senza alcun errore di compilazione TypeScript.
 2. `npm run build` genera il bundle di produzione e i service worker PWA senza errori.
 3. Nessun dato sensibile, password o token Google in chiaro nei file sorgente o versionati.
-4. `PROGRESS.md` mantenuto sintetico e allineato (≤90–100 righe).
+4. Conformità alle regole UX/UI/A11y Tier 0 (`ux-ui-accessibility-standards.md`).
+5. `PROGRESS.md` mantenuto sintetico e allineato (≤90–100 righe).

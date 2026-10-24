@@ -16,6 +16,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   TrendingUp,
   TrendingDown,
   Sparkles,
@@ -41,7 +42,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
+  Tooltip,
+  Label,
+  Checkbox
 } from './ui';
 
 interface TransactionsManagerProps {
@@ -96,6 +100,7 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [expandedTxId, setExpandedTxId] = useState<string | null>(null);
 
   // Form states for Add/Edit
   const [formDate, setFormDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -282,16 +287,16 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
             Registro Movimenti & Transazioni
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted-foreground">
             Consulta, ricerca, correggi categorie o aggiungi nuove uscite/entrate nel Vault cifrato
           </p>
         </div>
         <Button
           onClick={handleOpenAdd}
-          className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs py-2 px-3.5 flex items-center gap-1.5 shrink-0 shadow-lg shadow-emerald-950/40"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-2 px-3.5 flex items-center gap-1.5 shrink-0 shadow-lg"
         >
           <Plus className="w-4 h-4" />
           <span>Nuova Transazione</span>
@@ -300,46 +305,46 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
 
       {/* KPI Stats pills */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card className="bg-slate-900/60 border-slate-800 p-3">
-          <p className="text-[11px] text-slate-400 font-medium">Movimenti Filtrati</p>
-          <p className="text-lg font-bold text-white mt-0.5">{stats.count}</p>
+        <Card className="bg-card border-border p-3">
+          <p className="text-[11px] text-muted-foreground font-medium">Movimenti Filtrati</p>
+          <p className="text-lg font-bold text-foreground mt-0.5">{stats.count}</p>
         </Card>
-        <Card className="bg-slate-900/60 border-slate-800 p-3">
-          <p className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+        <Card className="bg-card border-border p-3">
+          <p className="text-[11px] text-primary font-medium flex items-center gap-1">
             <TrendingUp className="w-3 h-3" /> Totale Entrate
           </p>
-          <p className="text-lg font-bold text-emerald-300 mt-0.5">{formatEuro(stats.income)}</p>
+          <p className="text-lg font-bold text-primary mt-0.5">{formatEuro(stats.income)}</p>
         </Card>
-        <Card className="bg-slate-900/60 border-slate-800 p-3">
-          <p className="text-[11px] text-rose-400 font-medium flex items-center gap-1">
+        <Card className="bg-card border-border p-3">
+          <p className="text-[11px] text-destructive font-medium flex items-center gap-1">
             <TrendingDown className="w-3 h-3" /> Totale Uscite
           </p>
-          <p className="text-lg font-bold text-rose-300 mt-0.5">{formatEuro(stats.expenses)}</p>
+          <p className="text-lg font-bold text-destructive mt-0.5">{formatEuro(stats.expenses)}</p>
         </Card>
-        <Card className="bg-slate-900/60 border-slate-800 p-3">
-          <p className="text-[11px] text-slate-300 font-medium">Saldo Netto Periodo</p>
-          <p className={`text-lg font-bold mt-0.5 ${stats.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+        <Card className="bg-card border-border p-3">
+          <p className="text-[11px] text-foreground font-medium">Saldo Netto Periodo</p>
+          <p className={`text-lg font-bold mt-0.5 ${stats.balance >= 0 ? 'text-primary' : 'text-destructive'}`}>
             {formatEuro(stats.balance)}
           </p>
         </Card>
       </div>
 
       {/* Filter and Search Bar */}
-      <Card className="bg-slate-900/60 border-slate-800 p-4 space-y-3">
+      <Card className="bg-card border-border p-4 space-y-3">
         <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
           {/* Search text input */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Cerca per descrizione, merchant, categoria o tag (#utenze)..."
               value={searchTerm}
               onChange={(e) => handleFilterChange(setSearchTerm, e.target.value)}
-              className="pl-9 bg-slate-950/80 border-slate-700 text-xs text-slate-200 placeholder:text-slate-500 h-9"
+              className="pl-9 bg-background border-input text-xs text-foreground placeholder:text-muted-foreground h-9"
             />
             {searchTerm && (
               <button
                 onClick={() => handleFilterChange(setSearchTerm, '')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -352,7 +357,7 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             <select
               value={selectedMacro}
               onChange={(e) => handleFilterChange(setSelectedMacro, e.target.value)}
-              className="bg-slate-950/80 border border-slate-700 rounded-md text-xs text-slate-300 px-2.5 py-2 focus:ring-1 focus:ring-emerald-500 outline-none"
+              className="bg-background border border-input rounded-md text-xs text-foreground px-2.5 py-2 focus:ring-1 focus:ring-ring outline-none"
             >
               <option value="ALL">Tutte le Macro-Categorie</option>
               <option value="Needs">Needs (Bisogni Primari)</option>
@@ -366,7 +371,7 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             <select
               value={selectedChannel}
               onChange={(e) => handleFilterChange(setSelectedChannel, e.target.value)}
-              className="bg-slate-950/80 border border-slate-700 rounded-md text-xs text-slate-300 px-2.5 py-2 focus:ring-1 focus:ring-emerald-500 outline-none"
+              className="bg-background border border-input rounded-md text-xs text-foreground px-2.5 py-2 focus:ring-1 focus:ring-ring outline-none"
             >
               <option value="ALL">Tutti i Canali</option>
               <option value="BancoBPM">Banco BPM</option>
@@ -380,7 +385,7 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             <select
               value={selectedMonth}
               onChange={(e) => handleFilterChange(setSelectedMonth, e.target.value)}
-              className="bg-slate-950/80 border border-slate-700 rounded-md text-xs text-slate-300 px-2.5 py-2 focus:ring-1 focus:ring-emerald-500 outline-none"
+              className="bg-background border border-input rounded-md text-xs text-foreground px-2.5 py-2 focus:ring-1 focus:ring-ring outline-none"
             >
               <option value="ALL">Tutti i Mesi</option>
               {availableMonths.map((m) => (
@@ -394,7 +399,7 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-slate-950/80 border border-slate-700 rounded-md text-xs text-slate-300 px-2.5 py-2 focus:ring-1 focus:ring-emerald-500 outline-none"
+              className="bg-background border border-input rounded-md text-xs text-foreground px-2.5 py-2 focus:ring-1 focus:ring-ring outline-none"
             >
               <option value="date-desc">Data più recente</option>
               <option value="date-asc">Data meno recente</option>
@@ -406,114 +411,156 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
       </Card>
 
       {/* Transactions Table Card */}
-      <Card className="bg-slate-900/60 border-slate-800 overflow-hidden">
+      <Card className="bg-card border-border overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-slate-950/80">
-              <TableRow className="border-slate-800 hover:bg-transparent">
-                <TableHead className="text-slate-400 font-semibold text-xs w-28">Data</TableHead>
-                <TableHead className="text-slate-400 font-semibold text-xs w-28">Canale</TableHead>
-                <TableHead className="text-slate-400 font-semibold text-xs">Descrizione & Tag</TableHead>
-                <TableHead className="text-slate-400 font-semibold text-xs w-44">Macro / Categoria</TableHead>
-                <TableHead className="text-slate-400 font-semibold text-xs text-right w-32">Importo</TableHead>
-                <TableHead className="text-slate-400 font-semibold text-xs text-center w-20">Azioni</TableHead>
+            <TableHeader className="bg-muted/40">
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground font-semibold text-xs w-28">Data</TableHead>
+                <TableHead className="text-muted-foreground font-semibold text-xs w-28">Canale</TableHead>
+                <TableHead className="text-muted-foreground font-semibold text-xs">Descrizione & Tag</TableHead>
+                <TableHead className="text-muted-foreground font-semibold text-xs w-44">Macro / Categoria</TableHead>
+                <TableHead className="text-muted-foreground font-semibold text-xs text-right w-32">Importo</TableHead>
+                <TableHead className="text-muted-foreground font-semibold text-xs text-center w-20">Azioni</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedTransactions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-slate-500 text-xs">
+                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground text-xs align-middle">
                     Nessun movimento trovato con i filtri correnti.
                   </TableCell>
                 </TableRow>
               ) : (
                 paginatedTransactions.map((tx) => {
                   const style = MACRO_COLORS[tx.macroCategory] || MACRO_COLORS.Needs;
+                  const isExpanded = expandedTxId === tx.id;
                   return (
-                    <TableRow key={tx.id} className="border-slate-800/80 hover:bg-slate-800/30 transition-colors">
-                      {/* Date */}
-                      <TableCell className="font-mono text-xs text-slate-300">
-                        {tx.date}
-                      </TableCell>
+                    <React.Fragment key={tx.id}>
+                      <TableRow
+                        onClick={() => setExpandedTxId(isExpanded ? null : tx.id)}
+                        className={`border-border/80 transition-colors cursor-pointer ${
+                          isExpanded ? 'bg-muted/60' : 'hover:bg-muted/40'
+                        }`}
+                      >
+                        {/* Date */}
+                        <TableCell className="font-mono text-xs text-foreground align-middle">
+                          <div className="flex items-center gap-1.5">
+                            <ChevronDown
+                              className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${
+                                isExpanded ? 'rotate-180 text-primary' : ''
+                              }`}
+                            />
+                            <span>{tx.date}</span>
+                          </div>
+                        </TableCell>
 
-                      {/* Channel */}
-                      <TableCell>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-300">
-                          {CHANNEL_ICONS[tx.channel]}
-                          <span>{tx.channel}</span>
-                        </div>
-                      </TableCell>
+                        {/* Channel */}
+                        <TableCell className="align-middle">
+                          <div className="flex items-center gap-1.5 text-xs text-foreground">
+                            {CHANNEL_ICONS[tx.channel]}
+                            <span>{tx.channel}</span>
+                          </div>
+                        </TableCell>
 
-                      {/* Description & Tags */}
-                      <TableCell className="max-w-md">
-                        <div className="space-y-1">
-                          <p className="text-xs font-medium text-slate-200 line-clamp-1" title={tx.description}>
-                            {tx.description}
-                          </p>
-                          {tx.tags && tx.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {tx.tags.map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
+                        {/* Description */}
+                        <TableCell className="max-w-md align-middle">
+                          <Tooltip content={tx.description}>
+                            <p className="text-xs font-medium text-foreground truncate max-w-sm">
+                              {tx.description}
+                            </p>
+                          </Tooltip>
+                        </TableCell>
+
+                        {/* Category & Macro */}
+                        <TableCell className="align-middle">
+                          <div className="space-y-0.5">
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] px-1.5 py-0.5 border ${style.border} ${style.bg} ${style.text}`}
+                            >
+                              {tx.macroCategory}
+                            </Badge>
+                            <p className="text-[11px] text-muted-foreground truncate max-w-[150px]">
+                              {tx.category}
+                            </p>
+                          </div>
+                        </TableCell>
+
+                        {/* Amount */}
+                        <TableCell className={`text-right font-mono text-xs font-semibold align-middle ${tx.amount > 0 ? 'text-primary' : 'text-foreground'}`}>
+                          {tx.amount > 0 ? `+${formatEuro(tx.amount)}` : formatEuro(tx.amount)}
+                        </TableCell>
+
+                        {/* Actions */}
+                        <TableCell className="text-center align-middle" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-center gap-1">
+                            <Tooltip content="Modifica transazione">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleOpenEdit(tx)}
+                                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </Tooltip>
+                            <Tooltip content="Elimina transazione">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDeletingId(tx.id)}
+                                className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/15"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </Tooltip>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Expansion Row for technical details and tags (§10.2) */}
+                      {isExpanded && (
+                        <TableRow className="bg-muted/30 border-b border-border/70 hover:bg-muted/30">
+                          <TableCell colSpan={6} className="py-2.5 px-6 text-xs align-middle">
+                            <div className="flex flex-wrap items-center justify-between gap-3 text-muted-foreground">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-medium text-foreground">Dettagli:</span>
+                                <code className="text-[10px] font-mono bg-background border border-border px-1.5 py-0.5 rounded text-primary">
+                                  ID: {tx.id}
+                                </code>
+                                {tx.isExtraordinary && (
+                                  <span className="text-[10px] text-destructive bg-destructive/15 border border-destructive/30 px-1.5 py-0.5 rounded font-medium">
+                                    Spesa Straordinaria (Esclusa dal cash flow)
+                                  </span>
+                                )}
+                                {tx.autoCategorized && (
+                                  <span className="text-[10px] text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded font-medium">
+                                    Auto-categorizzato da regole
+                                  </span>
+                                )}
+                              </div>
+
+                              {tx.tags && tx.tags.length > 0 && (
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[11px] text-foreground font-medium">Tag:</span>
+                                  <div className="flex flex-wrap gap-1">
+                                    {tx.tags.map((tag) => (
+                                      <span
+                                        key={tag}
+                                        className="text-[10px] px-1.5 py-0.5 rounded bg-background border border-border text-foreground font-mono"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          )}
-                          {tx.isExtraordinary && (
-                            <span className="inline-block text-[10px] text-rose-400 bg-rose-950/40 border border-rose-500/30 px-1.5 py-0.2 rounded font-medium">
-                              Straordinaria
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-
-                      {/* Category & Macro */}
-                      <TableCell>
-                        <div className="space-y-1">
-                          <Badge
-                            variant="outline"
-                            className={`text-[10px] px-1.5 py-0.5 border ${style.border} ${style.bg} ${style.text}`}
-                          >
-                            {tx.macroCategory}
-                          </Badge>
-                          <p className="text-[11px] text-slate-400 truncate max-w-[150px]">
-                            {tx.category}
-                          </p>
-                        </div>
-                      </TableCell>
-
-                      {/* Amount */}
-                      <TableCell className={`text-right font-mono text-xs font-semibold ${tx.amount > 0 ? 'text-emerald-400' : 'text-slate-100'}`}>
-                        {tx.amount > 0 ? `+${formatEuro(tx.amount)}` : formatEuro(tx.amount)}
-                      </TableCell>
-
-                      {/* Actions */}
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleOpenEdit(tx)}
-                            className="h-7 w-7 p-0 text-slate-400 hover:text-white hover:bg-slate-800"
-                            title="Modifica transazione"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeletingId(tx.id)}
-                            className="h-7 w-7 p-0 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30"
-                            title="Elimina transazione"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
                   );
                 })
               )}
@@ -523,10 +570,10 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
 
         {/* Pagination bar */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-800 text-xs text-slate-400">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-border text-xs text-muted-foreground">
             <div>
-              Mostrando pagina <span className="font-semibold text-slate-200">{currentPage}</span> di{' '}
-              <span className="font-semibold text-slate-200">{totalPages}</span> ({filteredTransactions.length} movimenti)
+              Mostrando pagina <span className="font-semibold text-foreground">{currentPage}</span> di{' '}
+              <span className="font-semibold text-foreground">{totalPages}</span> ({filteredTransactions.length} movimenti)
             </div>
             <div className="flex items-center gap-1.5">
               <Button
@@ -534,7 +581,7 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="h-7 border-slate-800 text-slate-300 disabled:opacity-40"
+                className="h-7 border-border text-foreground disabled:opacity-40"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 <span>Precedente</span>
@@ -544,7 +591,7 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="h-7 border-slate-800 text-slate-300 disabled:opacity-40"
+                className="h-7 border-border text-foreground disabled:opacity-40"
               >
                 <span>Successiva</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -564,13 +611,13 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
           }
         }}
       >
-        <DialogContent className="bg-[#0f172a] border-slate-800 text-slate-100 max-w-lg">
+        <DialogContent className="bg-card border-border text-card-foreground max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-base text-white flex items-center gap-2">
-              {editingTransaction ? <Edit2 className="w-4 h-4 text-emerald-400" /> : <Plus className="w-4 h-4 text-emerald-400" />}
+            <DialogTitle className="text-base text-foreground flex items-center gap-2">
+              {editingTransaction ? <Edit2 className="w-4 h-4 text-primary" /> : <Plus className="w-4 h-4 text-primary" />}
               {editingTransaction ? 'Modifica Transazione' : 'Nuova Transazione Manuale'}
             </DialogTitle>
-            <DialogDescription className="text-slate-400 text-xs">
+            <DialogDescription className="text-muted-foreground text-xs">
               I dati vengono salvati direttamente nel Vault cifrato (AES-256-GCM).
             </DialogDescription>
           </DialogHeader>
@@ -584,8 +631,8 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
                 onClick={() => setFormType('expense')}
                 className={`flex-1 text-xs py-2 ${
                   formType === 'expense'
-                    ? 'bg-rose-600 hover:bg-rose-500 text-white'
-                    : 'border-slate-700 text-slate-300'
+                    ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground'
+                    : 'border-border text-foreground'
                 }`}
               >
                 Uscita / Spesa (-)
@@ -596,8 +643,8 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
                 onClick={() => setFormType('income')}
                 className={`flex-1 text-xs py-2 ${
                   formType === 'income'
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                    : 'border-slate-700 text-slate-300'
+                    ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                    : 'border-border text-foreground'
                 }`}
               >
                 Entrata / Accredito (+)
@@ -607,22 +654,28 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             {/* Date, Channel & Amount */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1">
-                <label className="text-slate-300 font-medium">Data (AAAA-MM-GG)</label>
+                <Label htmlFor="tx-form-date" className="text-foreground font-medium">
+                  Data (AAAA-MM-GG) <span className="text-destructive">*</span>
+                </Label>
                 <Input
+                  id="tx-form-date"
                   type="date"
                   value={formDate}
                   onChange={(e) => setFormDate(e.target.value)}
                   required
-                  className="bg-slate-950/80 border-slate-700 text-slate-100 text-xs h-9"
+                  className="bg-background border-input text-foreground text-xs h-9 w-full"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-slate-300 font-medium">Canale</label>
+                <Label htmlFor="tx-form-channel" className="text-foreground font-medium">
+                  Canale <span className="text-destructive">*</span>
+                </Label>
                 <select
+                  id="tx-form-channel"
                   value={formChannel}
                   onChange={(e) => setFormChannel(e.target.value as any)}
-                  className="w-full bg-slate-950/80 border border-slate-700 rounded-md text-xs text-slate-200 px-2.5 h-9 focus:ring-1 focus:ring-emerald-500 outline-none"
+                  className="w-full bg-background border border-input rounded-md text-xs text-foreground px-2.5 h-9 focus:ring-1 focus:ring-ring outline-none"
                 >
                   <option value="BancoBPM">Banco BPM</option>
                   <option value="Numia">Carta Numia</option>
@@ -633,14 +686,17 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-slate-300 font-medium">Importo (€)</label>
+                <Label htmlFor="tx-form-amount" className="text-foreground font-medium">
+                  Importo (€) <span className="text-destructive">*</span>
+                </Label>
                 <Input
+                  id="tx-form-amount"
                   type="text"
                   placeholder="0.00"
                   value={formAmount}
                   onChange={(e) => setFormAmount(e.target.value)}
                   required
-                  className="bg-slate-950/80 border-slate-700 text-slate-100 font-mono text-xs h-9"
+                  className="bg-background border-input text-foreground font-mono text-xs h-9 w-full"
                 />
               </div>
             </div>
@@ -648,11 +704,14 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             {/* Macro-Category & Category */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-slate-300 font-medium">Macro Categoria</label>
+                <Label htmlFor="tx-form-macro" className="text-foreground font-medium">
+                  Macro Categoria <span className="text-destructive">*</span>
+                </Label>
                 <select
+                  id="tx-form-macro"
                   value={formMacroCategory}
                   onChange={(e) => setFormMacroCategory(e.target.value as any)}
-                  className="w-full bg-slate-950/80 border border-slate-700 rounded-md text-xs text-slate-200 px-2.5 h-9 focus:ring-1 focus:ring-emerald-500 outline-none"
+                  className="w-full bg-background border border-input rounded-md text-xs text-foreground px-2.5 h-9 focus:ring-1 focus:ring-ring outline-none"
                 >
                   <option value="Needs">Needs (Bisogni Primari & Casa)</option>
                   <option value="Commitments">Commitments (Rate & Fissi)</option>
@@ -663,51 +722,54 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-slate-300 font-medium">Categoria Specifica</label>
+                <Label htmlFor="tx-form-category" className="text-foreground font-medium">Categoria Specifica</Label>
                 <Input
+                  id="tx-form-category"
                   placeholder="es. Supermercato, Utenze Luce, Ristorante..."
                   value={formCategory}
                   onChange={(e) => setFormCategory(e.target.value)}
-                  className="bg-slate-950/80 border-slate-700 text-slate-100 text-xs h-9"
+                  className="bg-background border-input text-foreground text-xs h-9 w-full"
                 />
               </div>
             </div>
 
             {/* Description */}
             <div className="space-y-1">
-              <label className="text-slate-300 font-medium">Descrizione / Merchant / Causale</label>
+              <Label htmlFor="tx-form-desc" className="text-foreground font-medium">
+                Descrizione / Merchant / Causale <span className="text-destructive">*</span>
+              </Label>
               <Input
+                id="tx-form-desc"
                 placeholder="es. Esselunga spesa settimanale, Cena pizzeria..."
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 required
-                className="bg-slate-950/80 border-slate-700 text-slate-100 text-xs h-9"
+                className="bg-background border-input text-foreground text-xs h-9 w-full"
               />
             </div>
 
             {/* Tags & Extraordinary Toggle */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div className="space-y-1">
-                <label className="text-slate-300 font-medium">Tag (separati da virgola)</label>
+                <Label htmlFor="tx-form-tags" className="text-foreground font-medium">Tag (separati da virgola)</Label>
                 <Input
+                  id="tx-form-tags"
                   placeholder="#spesa, #weekend, #utenze"
                   value={formTags}
                   onChange={(e) => setFormTags(e.target.value)}
-                  className="bg-slate-950/80 border-slate-700 text-slate-100 text-xs h-9"
+                  className="bg-background border-input text-foreground text-xs h-9 w-full"
                 />
               </div>
 
               <div className="flex items-center gap-2 pt-6">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="extraordinary_chk"
                   checked={formIsExtraordinary}
-                  onChange={(e) => setFormIsExtraordinary(e.target.checked)}
-                  className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500 w-4 h-4"
+                  onCheckedChange={(checked) => setFormIsExtraordinary(Boolean(checked))}
                 />
-                <label htmlFor="extraordinary_chk" className="text-slate-300 text-xs cursor-pointer">
+                <Label htmlFor="extraordinary_chk" className="text-foreground text-xs cursor-pointer font-normal">
                   Escludi dal cash flow ordinario (Straordinaria)
-                </label>
+                </Label>
               </div>
             </div>
 
@@ -719,13 +781,13 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
                   setIsAddModalOpen(false);
                   setEditingTransaction(null);
                 }}
-                className="border-slate-700 text-slate-300 text-xs"
+                className="border-border text-foreground text-xs"
               >
                 Annulla
               </Button>
               <Button
                 type="submit"
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs py-2 px-4"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-2 px-4"
               >
                 Salva Transazione
               </Button>
@@ -736,13 +798,13 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deletingId !== null} onOpenChange={(open) => !open && setDeletingId(null)}>
-        <DialogContent className="bg-[#0f172a] border-slate-800 text-slate-100 max-w-sm">
+        <DialogContent className="bg-card border-border text-card-foreground max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-base text-white flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-400" />
+            <DialogTitle className="text-base text-foreground flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-destructive" />
               Conferma Eliminazione
             </DialogTitle>
-            <DialogDescription className="text-slate-400 text-xs mt-1">
+            <DialogDescription className="text-muted-foreground text-xs mt-1">
               Sei sicuro di voler rimuovere questa transazione dal Vault? L'operazione non può essere annullata.
             </DialogDescription>
           </DialogHeader>
@@ -750,13 +812,13 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             <Button
               variant="outline"
               onClick={() => setDeletingId(null)}
-              className="border-slate-700 text-slate-300 text-xs"
+              className="border-border text-foreground text-xs"
             >
               Annulla
             </Button>
             <Button
               onClick={handleConfirmDelete}
-              className="bg-rose-600 hover:bg-rose-500 text-white text-xs"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs"
             >
               Elimina Definitivamente
             </Button>

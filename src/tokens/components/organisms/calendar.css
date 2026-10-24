@@ -1,0 +1,447 @@
+/**
+ * ============================================================================
+ * COMPONENT: Calendar
+ * Category: Organism (Livello 3: Date & Time Management)
+ * Source of Truth: Figma Component "Calendar" (Page: 37:1900, Frame: 17085:177702) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Constituent Sub-Elements & Slots:
+ *   - .calendar: contenitore radice con bordo, raggio --radius-lg e sfondo --card
+ *   - .calendar-header: barra superiore con mese centrato e bottoni nav 28x28px
+ *   - .calendar-title: indicatore tipografico mese/anno (14px, weight 500, Geist)
+ *   - .calendar-nav: raggruppamento bottoni freccia o layout flessibile
+ *   - .calendar-nav-btn: bottone icona 28x28px (prev/next) con opacity hover
+ *   - .calendar-table: griglia semantica tabellare (role="grid", border-collapse)
+ *   - .calendar-weekdays: riga giorni feriali senza bordo inferiore
+ *   - .calendar-weekday: colonna giorno abbreviato (12px, muted, larghezza 36px)
+ *   - .calendar-grid: corpo matrice giorni (role="rowgroup")
+ *   - .calendar-cell: cella td con padding 0 per continuità nastro range
+ *   - .calendar-day: bottone interattivo giorno 36x36px (stati: default, hover, today, selected, outside, disabled)
+ *   - .calendar-months / .calendar-dual: layout affiancato per range bimestrale
+ *   - .calendar-presets: pannello scorciatoie rapide per range temporali
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Calendar Container (Radice)
+   -------------------------------------------------------------------------- */
+.calendar {
+  display: inline-flex;
+  flex-direction: column;
+  padding: var(--tw-space-3);
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  user-select: none;
+  font-family: var(--font-sans);
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   2. Calendar Header & Navigation Controls
+   Figma: Height 28px, Titolo centrato (14px, 500), Bottoni 28x28px
+   -------------------------------------------------------------------------- */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  height: 1.75rem; /* 28px */
+  margin-bottom: var(--tw-space-3);
+  padding: 0 var(--tw-space-1);
+}
+
+.calendar-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
+  margin: 0;
+  line-height: 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+.calendar-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-1);
+}
+
+/* Bottone Navigazione Mese (Figma 234:196 - 28x28px) */
+.calendar-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem; /* 28px */
+  height: 1.75rem; /* 28px */
+  padding: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: transparent;
+  color: var(--foreground);
+  opacity: 0.7;
+  cursor: pointer;
+  transition:
+    opacity 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.calendar-nav-btn:hover:not(:disabled) {
+  opacity: 1;
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.calendar-nav-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.calendar-nav-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.calendar-nav-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Selettori Dropdown Mese/Anno in Header (Figma 236:205) */
+.calendar-select-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tw-space-1);
+  flex: 1;
+}
+
+.calendar-select {
+  height: 1.75rem;
+  padding: 0 0.5rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.calendar-select:focus-visible {
+  box-shadow: var(--shadow-focus);
+}
+
+/* --------------------------------------------------------------------------
+   3. Calendar Table & Grid
+   Figma: No border bottom sotto i weekdays, celle a larghezza fissa (36px)
+   -------------------------------------------------------------------------- */
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Intestazione giorni settimanali: NESSUN BORDO INFERIORE */
+.calendar-weekdays {
+  border-bottom: none;
+}
+
+.calendar-weekday {
+  width: 2.25rem; /* 36px */
+  height: 1.75rem; /* 28px */
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* 12px (Figma: 12px) */
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+  text-transform: capitalize;
+}
+
+.calendar-grid {
+  /* Separazione coerente rispetto all'intestazione */
+}
+
+/* Cella TD: padding 0 essenziale per connettere il nastro di range senza fessure */
+.calendar-cell {
+  padding: 0;
+  height: 2.25rem; /* 36px */
+  width: 2.25rem; /* 36px */
+  text-align: center;
+  vertical-align: middle;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   4. Calendar Day Button & States (Figma 234:27)
+   -------------------------------------------------------------------------- */
+.calendar-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem; /* 36px */
+  height: 2.25rem; /* 36px */
+  margin: 0 auto;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  z-index: 1;
+
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease,
+    opacity 150ms ease;
+}
+
+/* Stato Hover */
+.calendar-day:hover:not(:disabled):not(.is-selected) {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+/* Stato Focus da tastiera */
+.calendar-day:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  z-index: 2;
+}
+
+/* Stato Oggi (Figma: Variant=Current) */
+.calendar-day.is-today:not(.is-selected) {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Stato Selezionato (Figma: Variant=Default, State=Selected) */
+.calendar-day.is-selected,
+.calendar-day[aria-selected='true'] {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--font-weight-medium);
+}
+
+.calendar-day.is-selected:hover {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Giorni Fuori Mese (Figma: Variant=Outside) */
+.calendar-day.is-outside {
+  color: var(--muted-foreground);
+  opacity: 0.38;
+}
+
+/* Giorni Disabilitati */
+.calendar-day:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   5. Range Selection Engine (.is-range-start, .is-range-middle, .is-range-end)
+   Figma: Nastro continuo su cella td con raccordo raggi e pulsante pieno agli estremi
+   -------------------------------------------------------------------------- */
+.calendar-cell.is-range-middle {
+  background-color: color-mix(in oklch, var(--primary) 12%, var(--accent));
+}
+
+.calendar-cell.is-range-middle .calendar-day {
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--foreground);
+  font-weight: var(--font-weight-medium);
+}
+
+.calendar-cell.is-range-middle .calendar-day:hover {
+  background-color: color-mix(in oklch, var(--primary) 20%, var(--accent));
+  color: var(--foreground);
+}
+
+/* Inizio Intervallo: mezza cella destra colorata e raggio a sinistra */
+.calendar-cell.is-range-start {
+  background: linear-gradient(
+    to right,
+    transparent 50%,
+    color-mix(in oklch, var(--primary) 12%, var(--accent)) 50%
+  );
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
+}
+
+.calendar-cell.is-range-start .calendar-day {
+  border-radius: var(--radius-md);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Fine Intervallo: mezza cella sinistra colorata e raggio a destra */
+.calendar-cell.is-range-end {
+  background: linear-gradient(
+    to left,
+    transparent 50%,
+    color-mix(in oklch, var(--primary) 12%, var(--accent)) 50%
+  );
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+}
+
+.calendar-cell.is-range-end .calendar-day {
+  border-radius: var(--radius-md);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Intervallo coincidente di un solo giorno (Start == End) */
+.calendar-cell.is-range-start.is-range-end {
+  background: transparent;
+  border-radius: var(--radius-md);
+}
+
+/* Raccordi per inizio e fine riga durante intervallo continuo */
+.calendar-cell.is-range-row-start {
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
+}
+
+.calendar-cell.is-range-row-end {
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+}
+
+/* --------------------------------------------------------------------------
+   6. Dual-Month / Multi-Month Layout (Figma 17179:197385 Range Calendar)
+   -------------------------------------------------------------------------- */
+.calendar-months {
+  display: flex;
+  flex-direction: row;
+  gap: var(--tw-space-4);
+  flex-wrap: wrap;
+}
+
+.calendar-month {
+  display: flex;
+  flex-direction: column;
+  min-width: 252px;
+}
+
+@media (max-width: 640px) {
+  .calendar-months {
+    flex-direction: column;
+    gap: var(--tw-space-4);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. Calendar with Presets Layout (Figma 21203:53693 Calendar / Presets)
+   -------------------------------------------------------------------------- */
+.calendar-with-presets {
+  display: inline-flex;
+  flex-direction: row;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-color: var(--card);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.calendar-sidebar-presets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-1);
+  padding: var(--tw-space-3);
+  border-right: 1px solid var(--border);
+  min-width: 140px;
+  background-color: var(--card);
+}
+
+@media (max-width: 640px) {
+  .calendar-with-presets {
+    flex-direction: column;
+  }
+  .calendar-sidebar-presets {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    min-width: unset;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.calendar-preset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.375rem 0.625rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.calendar-preset-btn:hover {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.calendar-preset-btn.is-active {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Presets orizzontali in footer */
+.calendar-footer-presets {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--tw-space-1-5);
+  margin-top: var(--tw-space-3);
+  padding-top: var(--tw-space-3);
+  border-top: 1px solid var(--border);
+}
+
+/* --------------------------------------------------------------------------
+   8. Calendar with Week Numbers (Figma 21207:3650)
+   -------------------------------------------------------------------------- */
+.calendar-week-number {
+  font-size: 0.6875rem; /* 11px */
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  text-align: center;
+  width: 1.75rem;
+  opacity: 0.6;
+  user-select: none;
+}

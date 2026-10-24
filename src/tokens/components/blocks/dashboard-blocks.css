@@ -1,0 +1,147 @@
+/**
+ * ============================================================================
+ * COMPONENT: Dashboard Blocks (Grids, KPI Cards, Settings)
+ * Category: Layout Block (Livello 4: Dashboard & Pagine Gestionali)
+ * Source of Truth: Figma Blocks / Dashboard-1..7, Pro Blocks Card 1-8, Settings 1-7
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .dashboard-kpi-grid: griglia a 1/2/4 colonne per card metriche KPI
+ *   - .dashboard-content-grid: griglia flessibile a 2 colonne per grafici e tabelle
+ *   - .dashboard-table-block: blocco integrato tabella dati con ricerca e paginazione
+ *   - .settings-card: card per schermate di impostazione con field orizzontali
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Dashboard KPI Grid (Statistiche Sintetiche)
+   -------------------------------------------------------------------------- */
+.dashboard-kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--tw-space-4);
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .dashboard-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-kpi-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Dashboard Content Grids
+   -------------------------------------------------------------------------- */
+/* Griglia Principale Asimmetrica (Grafico largo a sinistra, Feed a destra) */
+.dashboard-grid-2-1 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--tw-space-6);
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid-2-1 {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Griglia Paritetica a 2 Colonne */
+.dashboard-grid-2-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--tw-space-6);
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid-2-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Integrated Table Block with Header Toolbar
+   -------------------------------------------------------------------------- */
+.dashboard-table-block {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.table-toolbar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--tw-space-4) var(--tw-space-6);
+  gap: var(--tw-space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+@media (min-width: 640px) {
+  .table-toolbar {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.table-toolbar-search {
+  max-width: 20rem;
+  width: 100%;
+}
+
+.table-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+}
+
+.table-footer-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--tw-space-3) var(--tw-space-6);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-xs-font-size);
+  color: var(--muted-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   4. Settings Section Block
+   -------------------------------------------------------------------------- */
+.settings-section-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+
+.settings-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-6);
+  padding: var(--tw-space-6);
+}
+
+.settings-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--tw-space-3);
+  padding: var(--tw-space-4) var(--tw-space-6);
+  background-color: color-mix(in oklch, var(--muted) 40%, var(--card));
+  border-top: 1px solid var(--border);
+}

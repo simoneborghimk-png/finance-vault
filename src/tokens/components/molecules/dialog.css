@@ -1,0 +1,125 @@
+/**
+ * ============================================================================
+ * COMPONENT: Dialog (Modal)
+ * Category: Molecule (Livello 2: Overlay & Feedback)
+ * Source of Truth: Figma Component "Dialog" & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .dialog-overlay: sfondo oscurato ad opacità variabile con blur
+ *   - .dialog-content contiene:
+ *     1. .dialog-header (.dialog-title + .dialog-description)
+ *     2. .dialog-close: pulsante per chiudere in alto a destra (.btn-ghost.btn-icon.btn-xs)
+ *     3. .dialog-body: form inputs o corpo informativo
+ *     4. .dialog-footer: pulsanti di azione (.btn)
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Backdrop Overlay
+   -------------------------------------------------------------------------- */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: color-mix(in oklch, var(--background) 80%, transparent);
+  -webkit-backdrop-filter: var(--backdrop-filter-xs);
+  backdrop-filter: var(--backdrop-filter-xs);
+  animation: overlay-fade-in 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   2. Dialog Window
+   -------------------------------------------------------------------------- */
+.dialog-content {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  width: 100%;
+  max-width: var(--tw-max-w-lg); /* 32rem / 512px standard */
+  padding: var(--tw-space-6);
+
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+
+  animation: modal-scale-in 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dialog Sizes */
+.dialog-sm {
+  max-width: var(--tw-max-w-sm);
+} /* 24rem */
+.dialog-md {
+  max-width: var(--tw-max-w-lg);
+} /* 32rem */
+.dialog-lg {
+  max-width: var(--tw-max-w-2xl);
+} /* 42rem */
+.dialog-xl {
+  max-width: var(--tw-max-w-4xl);
+} /* 56rem */
+
+/* --------------------------------------------------------------------------
+   3. Close Button
+   -------------------------------------------------------------------------- */
+.dialog-close {
+  position: absolute;
+  top: var(--tw-space-4);
+  right: var(--tw-space-4);
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+.dialog-close:hover {
+  color: var(--foreground);
+}
+
+/* --------------------------------------------------------------------------
+   4. Slots (Header, Body, Footer)
+   -------------------------------------------------------------------------- */
+.dialog-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-1-5);
+  padding-right: var(--tw-space-6);
+  margin-bottom: var(--tw-space-4);
+}
+
+.dialog-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg-font-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--text-lg-line-height);
+  color: var(--foreground);
+  margin: 0;
+}
+
+.dialog-description {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.dialog-body {
+  padding: var(--tw-space-2) 0;
+}
+
+.dialog-footer {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--tw-space-2);
+  margin-top: var(--tw-space-6);
+}
+
+@media (min-width: 640px) {
+  .dialog-footer {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}

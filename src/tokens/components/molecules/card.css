@@ -1,0 +1,103 @@
+/**
+ * ============================================================================
+ * COMPONENT: Card
+ * Source of Truth: Figma Component "Card" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Card Container
+   -------------------------------------------------------------------------- */
+.card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+
+  /* Transizione per hover / focus */
+  transition-property: border-color, box-shadow, transform;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --------------------------------------------------------------------------
+   2. Modular Card Slots
+   -------------------------------------------------------------------------- */
+/* Header */
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-1-5);
+  padding: var(--tw-space-6);
+}
+
+/* Titolo della Card */
+.card-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg-font-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--text-lg-line-height);
+  letter-spacing: -0.015em;
+  color: var(--card-foreground);
+  margin: 0;
+}
+
+/* Descrizione secondaria */
+.card-description {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Corpo Contenuto */
+.card-content {
+  padding: 0 var(--tw-space-6) var(--tw-space-6) var(--tw-space-6);
+  flex: 1 1 auto;
+}
+
+/* Se la card non ha header, il content ha padding completo */
+.card > .card-content:first-child {
+  padding-top: var(--tw-space-6);
+}
+
+/* Footer con azioni */
+.card-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+  padding: 0 var(--tw-space-6) var(--tw-space-6) var(--tw-space-6);
+}
+
+/* --------------------------------------------------------------------------
+   3. Card Variants
+   -------------------------------------------------------------------------- */
+/* Interactive Card (Hoverabile / Cliccabile) */
+.card-interactive {
+  cursor: pointer;
+  text-decoration: none;
+}
+.card-interactive:hover {
+  border-color: var(--ring);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.card-interactive:focus-visible {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Flat / Subtle Variant (Senza ombra, sfondo muted leggero) */
+.card-subtle {
+  background-color: var(--muted);
+  border-color: transparent;
+  box-shadow: none;
+}

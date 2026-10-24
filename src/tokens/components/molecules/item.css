@@ -1,0 +1,103 @@
+/**
+ * ============================================================================
+ * COMPONENT: Item (List & Record Row)
+ * Category: Molecule (Livello 2: Dati & Visualizzazione Contenuto)
+ * Source of Truth: Figma Component "Item" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .item: riga polivalente di elenco, file manager o impostazione
+ *   - Contiene:
+ *     1. .item-leading (slot multimediale: .avatar, icona SVG o thumbnail)
+ *     2. .item-content (wrapper per .item-title e .item-description)
+ *     3. .item-trailing (slot di controllo: .badge, .switch o .btn)
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Item Row
+   -------------------------------------------------------------------------- */
+.item {
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  font: inherit;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--tw-space-3) var(--tw-space-4);
+  gap: var(--tw-space-4);
+  border-radius: var(--radius-md);
+  color: var(--foreground);
+  text-decoration: none;
+  transition: background-color 150ms ease;
+}
+
+/* Variante interattiva / hoverabile */
+.item-interactive {
+  cursor: pointer;
+}
+.item-interactive:hover,
+.item:hover:not(:has(:disabled)) {
+  background-color: var(--muted);
+}
+
+.item:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* --------------------------------------------------------------------------
+   2. Slots (Leading, Content, Trailing)
+   -------------------------------------------------------------------------- */
+/* Slot Iniziale (Avatar / Icona) */
+.item-leading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+/* Area Testuale Centrale */
+.item-content {
+  flex: 1 1 auto;
+  min-width: 0; /* Permette il troncamento del testo nei flex child */
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-0-5);
+}
+
+.item-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  color: var(--foreground);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-description {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  color: var(--muted-foreground);
+  line-height: 1.4;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Slot Finale (Badge / Switch / Azione) */
+.item-trailing {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+  flex-shrink: 0;
+}

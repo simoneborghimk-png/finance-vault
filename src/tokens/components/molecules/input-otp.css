@@ -1,0 +1,136 @@
+/**
+ * ============================================================================
+ * COMPONENT: Input OTP (One-Time Password)
+ * Category: Molecule (Livello 2: Controlli di Form & Input Composti)
+ * Source of Truth: Figma Component "Input OTP" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .input-otp: contenitore a slot numerici per codici 2FA/SMS (4 o 6 cifre).
+ *   - Contiene:
+ *     1. .input-otp-group: raggruppamento di celle con bordi fusi
+ *     2. .input-otp-slot: singola cella quadrata
+ *     3. .input-otp-separator: trattino divisore tra gruppi
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. OTP Container
+   -------------------------------------------------------------------------- */
+.input-otp {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-2);
+}
+
+/* Gruppo di celle con bordi continui */
+.input-otp-group {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
+}
+
+/* --------------------------------------------------------------------------
+   2. OTP Single Slot Cell
+   -------------------------------------------------------------------------- */
+.input-otp-slot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem; /* 40px */
+  height: 2.5rem; /* 40px */
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--input);
+  outline: none;
+
+  font-family: var(--font-mono);
+  font-size: var(--text-base-font-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  text-align: center;
+  user-select: none;
+
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    z-index 0s;
+}
+
+/* Gestione bordi uniti nel gruppo */
+.input-otp-group > :not(:first-child) {
+  margin-left: -1px;
+}
+.input-otp-group > :first-child {
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+.input-otp-group > :last-child {
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+/* Stato Cella Attiva / Focused */
+.input-otp-slot.is-active,
+.input-otp-slot:focus-visible {
+  z-index: 2;
+  border-color: var(--ring);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Cursore lampeggiante fittizio se vuoto ma attivo */
+.input-otp-slot.is-active::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 1.25rem;
+  background-color: var(--foreground);
+  animation: otp-caret-blink 1s ease-in-out infinite;
+}
+
+@keyframes otp-caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Stato Cella Compilata */
+.input-otp-slot.is-filled {
+  border-color: var(--border);
+}
+
+/* --------------------------------------------------------------------------
+   3. Separator (Trattino tra gruppi di cifre)
+   -------------------------------------------------------------------------- */
+.input-otp-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tw-space-4);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm-font-size);
+}
+
+/* --------------------------------------------------------------------------
+   4. Large Size (48px)
+   -------------------------------------------------------------------------- */
+.input-otp-lg .input-otp-slot {
+  width: 3rem; /* 48px */
+  height: 3rem;
+  font-size: var(--text-lg-font-size);
+}
+.input-otp-lg .input-otp-group > :first-child {
+  border-top-left-radius: var(--radius-lg);
+  border-bottom-left-radius: var(--radius-lg);
+}
+.input-otp-lg .input-otp-group > :last-child {
+  border-top-right-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+}

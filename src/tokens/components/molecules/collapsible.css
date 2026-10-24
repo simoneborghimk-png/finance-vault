@@ -1,0 +1,38 @@
+/**
+ * ============================================================================
+ * COMPONENT: Collapsible
+ * Category: Molecule (Livello 2: Navigazione & Disclosure)
+ * Source of Truth: Figma Component "Collapsible" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .collapsible: contenitore generico per mostrare/nascondere contenuto a piacimento
+ *   - Contiene:
+ *     1. .collapsible-trigger (elemento interattivo d'apertura, es. pulsante o riga di titolo)
+ *     2. .collapsible-content (area a scomparsa)
+ * ============================================================================
+ */
+
+.collapsible {
+  width: 100%;
+}
+
+.collapsible-trigger {
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapsible-content {
+  overflow: hidden;
+  transition: all 200ms ease-out;
+}
+
+.collapsible[data-state='closed'] .collapsible-content,
+.collapsible-trigger[aria-expanded='false'] + .collapsible-content {
+  display: none;
+}
+
+.collapsible[data-state='open'] .collapsible-content,
+.collapsible-trigger[aria-expanded='true'] + .collapsible-content {
+  display: block;
+}

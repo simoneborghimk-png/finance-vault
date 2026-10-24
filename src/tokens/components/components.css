@@ -1,0 +1,17 @@
+/**
+ * ============================================================================
+ * COMPONENTS - MASTER INDEX
+ * Source of Truth: docs/FIGMA-COMPONENTS.md & Figma File pu2nlKYplmTCtTs0FVELdw
+ *
+ * Architettura Gerarchica:
+ * 1. atoms/atoms.css:          Atomi Base (indipendenti, usano solo i token)
+ * 2. molecules/molecules.css:  Molecole & Controlli composti (usano atomi)
+ * 3. organisms/organisms.css:  Organismi complessi (usano molecole e atomi)
+ * 4. blocks/blocks.css:        Blocchi di pagina e sezioni (assemblaggio finale)
+ * ============================================================================
+ */
+
+@import './atoms/atoms.css';
+@import './molecules/molecules.css';
+@import './organisms/organisms.css';
+@import './blocks/blocks.css';

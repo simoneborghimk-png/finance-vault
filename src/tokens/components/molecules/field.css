@@ -1,0 +1,115 @@
+/**
+ * ============================================================================
+ * COMPONENT: Field (Form Control Unit)
+ * Category: Molecule (Livello 2: Controlli di Form & Input Composti)
+ * Source of Truth: Figma Component "Field" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .field è il contenitore semantico standard per ciascun controllo di form.
+ *   - Accetta:
+ *     1. .field-label: <label> associata tramite 'for' al controllo
+ *     2. .field-control: atomo/molecola di input (.input, .select-trigger, .checkbox-field, .radio-group, textarea.input)
+ *     3. .field-description (opzionale): testo d'aiuto secondario
+ *     4. .field-error (opzionale): messaggio d'errore (visibile quando il controllo ha aria-invalid="true")
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Field Container
+   -------------------------------------------------------------------------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-1-5);
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   2. Horizontal Layout (Impostazioni / Dashboard desktop)
+   -------------------------------------------------------------------------- */
+.field-horizontal {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tw-space-4);
+}
+
+.field-horizontal .field-label-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-0-5);
+  max-width: 60%;
+}
+
+/* --------------------------------------------------------------------------
+   3. Subcomponents (Label, Description, Error)
+   -------------------------------------------------------------------------- */
+/* Label */
+.field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-1);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--text-sm-line-height);
+  color: var(--foreground);
+  user-select: none;
+}
+
+/* Indicatore di campo obbligatorio */
+.field-label-required::after {
+  content: '*';
+  color: var(--destructive);
+  margin-left: var(--tw-space-0-5);
+}
+
+/* Descrizione / Helper Text */
+.field-description {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+
+/* Messaggio di Errore (conforme a 1.4.3 is-invalid) */
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-1, 4px);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size, 0.75rem);
+  font-weight: var(--font-weight-normal);
+  color: var(--destructive);
+  line-height: 1.4;
+  animation: field-error-slide 150ms ease;
+}
+
+/* Invalid styling for input inside field with error (Figma: soft attached ring) */
+.field:has(.field-error:not([style*='display: none'])) .input,
+.field:has([aria-invalid='true']) .input,
+.field > .input.is-invalid,
+.field .input.is-invalid,
+.field .input[aria-invalid='true'] {
+  border-color: var(--destructive);
+  box-shadow: var(--shadow-focus-input-destructive);
+}
+
+@keyframes field-error-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stato Disabilitato */
+.field:has(:disabled) .field-label,
+.field:has([aria-disabled='true']) .field-label {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

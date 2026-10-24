@@ -1,0 +1,86 @@
+/**
+ * ============================================================================
+ * COMPONENT: Aspect Ratio
+ * Source of Truth: Figma Component "Aspect Ratio" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Aspect Ratio Container
+   -------------------------------------------------------------------------- */
+.aspect-ratio {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Tutti i contenuti multimediali figli occupano il 100% con object-fit cover */
+.aspect-ratio > img,
+.aspect-ratio > video,
+.aspect-ratio > iframe,
+.aspect-ratio > picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --------------------------------------------------------------------------
+   2. Ratio Presets (17 preset da Figma)
+   -------------------------------------------------------------------------- */
+/* Quadrato (1:1) */
+.aspect-square,
+.aspect-1-1 {
+  aspect-ratio: 1 / 1;
+}
+
+/* Widescreen Video (16:9) */
+.aspect-video,
+.aspect-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+/* Standard Foto (4:3) */
+.aspect-photo,
+.aspect-4-3 {
+  aspect-ratio: 4 / 3;
+}
+
+/* Cinema Ultrawide (21:9) */
+.aspect-cinema,
+.aspect-21-9 {
+  aspect-ratio: 21 / 9;
+}
+
+/* Golden Ratio (1.618:1) */
+.aspect-golden {
+  aspect-ratio: 1.618 / 1;
+}
+
+/* Banner Orizzontale (3:1) */
+.aspect-banner,
+.aspect-3-1 {
+  aspect-ratio: 3 / 1;
+}
+
+/* Header Panoramico (2:1) */
+.aspect-header,
+.aspect-2-1 {
+  aspect-ratio: 2 / 1;
+}
+
+/* Ritratti Verticali */
+.aspect-portrait-3-4 {
+  aspect-ratio: 3 / 4;
+}
+
+.aspect-portrait-9-16,
+.aspect-story {
+  aspect-ratio: 9 / 16;
+}
+
+.aspect-portrait-2-3 {
+  aspect-ratio: 2 / 3;
+}

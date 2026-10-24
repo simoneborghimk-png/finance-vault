@@ -82,21 +82,22 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 rounded-xl bg-card border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <UploadCloud className="w-5 h-5 text-emerald-400" />
+          <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+            <UploadCloud className="w-5 h-5 text-primary" />
             Ingestione File Bancari & Riconciliazione (Client-Side)
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Trascina i tuoi file Banco BPM (`movimentiConto.xlsx`) o Carta Numia (`movimenti.xlsx`) per l'auto-categorizzazione istantanea
           </p>
         </div>
 
         <Button
+          variant="outline"
           onClick={onSyncDrive}
           disabled={isSyncing}
-          className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs px-4 py-2 flex items-center gap-2 shadow-lg shadow-emerald-950/50"
+          className="border-border text-foreground hover:bg-accent hover:text-accent-foreground font-medium text-xs px-4 py-2 flex items-center gap-2 shrink-0"
         >
           {isSyncing ? (
             <>
@@ -105,7 +106,7 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
             </>
           ) : (
             <>
-              <CloudUpload className="w-4 h-4" />
+              <CloudUpload className="w-4 h-4 text-muted-foreground" />
               Sincronizza su Google Drive
             </>
           )}
@@ -120,8 +121,8 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
         onClick={() => fileInputRef.current?.click()}
         className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
           isDragging
-            ? 'border-emerald-400 bg-emerald-500/10 scale-[1.01]'
-            : 'border-slate-800 hover:border-slate-700 bg-slate-950/40 hover:bg-slate-900/40'
+            ? 'border-primary bg-primary/10 scale-[1.01]'
+            : 'border-border hover:border-border/80 bg-background/50 hover:bg-accent/30'
         }`}
       >
         <input
@@ -131,28 +132,28 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
-          <FileSpreadsheet className="w-8 h-8 text-emerald-400" />
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
+          <FileSpreadsheet className="w-8 h-8 text-primary" />
         </div>
-        <h3 className="text-sm font-semibold text-white">
+        <h3 className="text-sm font-semibold text-foreground">
           Trascina qui il file Excel (.xlsx) o CSV del conto / carta
         </h3>
-        <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-          Supporto nativo per <span className="text-slate-200">movimentiConto.xlsx</span> (Banco BPM) e <span className="text-slate-200">movimenti (2).xlsx</span> (Carta Numia)
+        <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+          Supporto nativo per <span className="text-foreground font-medium">movimentiConto.xlsx</span> (Banco BPM) e <span className="text-foreground font-medium">movimenti (2).xlsx</span> (Carta Numia)
         </p>
-        <p className="text-[11px] text-emerald-400/80 mt-2">
+        <p className="text-[11px] text-primary/90 mt-2">
           Nessun file viene caricato su server esterni: il parsing avviene in 15 millisecondi nel browser.
         </p>
       </div>
 
       {importStatus && (
-        <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
+        <div className="p-3 rounded-lg bg-card border border-border text-xs text-foreground flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
             <span>{importStatus}</span>
           </div>
           {fileName && (
-            <Badge variant="outline" className="border-slate-700 text-slate-300">
+            <Badge variant="outline" className="border-border text-foreground">
               {fileName}
             </Badge>
           )}
@@ -161,25 +162,25 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
 
       {/* Preview Table of Parsed Transactions */}
       {parsedItems.length > 0 && (
-        <Card className="bg-slate-900/60 border-slate-800">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-base text-white flex items-center gap-2">
+              <CardTitle className="text-base text-foreground flex items-center gap-2">
                 <span>Anteprima Movimenti Estratti ({parsedItems.length})</span>
                 {detectedChannel && (
-                  <Badge variant="outline" className="border-cyan-500/40 text-cyan-300 bg-cyan-950/30 text-xs">
+                  <Badge variant="outline" className="border-info/40 text-info bg-info/10 text-xs">
                     Canale: {detectedChannel}
                   </Badge>
                 )}
               </CardTitle>
-              <CardDescription className="text-xs text-slate-400 mt-0.5">
+              <CardDescription className="text-xs text-muted-foreground mt-0.5">
                 Verifica le categorie assegnate dalle regole prima di confermare l'importazione
               </CardDescription>
             </div>
 
             <Button
               onClick={handleConfirmImport}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs px-4 py-2 flex items-center gap-1.5"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-xs px-4 py-2 flex items-center gap-1.5"
             >
               <Check className="w-4 h-4" />
               Conferma ed Importa nel Vault
@@ -190,7 +191,7 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
             <div className="overflow-x-auto max-h-96">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-slate-800 text-xs text-slate-400">
+                  <TableRow className="border-border text-xs text-muted-foreground">
                     <TableHead className="w-24">Data</TableHead>
                     <TableHead>Descrizione Movimento</TableHead>
                     <TableHead className="w-32">Macro-Categoria</TableHead>
@@ -201,21 +202,21 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
                 </TableHeader>
                 <TableBody className="text-xs">
                   {parsedItems.map((item) => (
-                    <TableRow key={item.id} className="border-slate-800/60 hover:bg-slate-800/30">
-                      <TableCell className="font-mono text-slate-300">{item.date}</TableCell>
-                      <TableCell className="text-slate-200">
+                    <TableRow key={item.id} className="border-border/60 hover:bg-accent/40">
+                      <TableCell className="font-mono text-foreground align-middle">{item.date}</TableCell>
+                      <TableCell className="text-foreground align-middle">
                         <div className="font-medium">{item.description}</div>
                         {item.tags.length > 0 && (
                           <div className="flex gap-1 mt-0.5">
                             {item.tags.map((tg) => (
-                              <span key={tg} className="text-[10px] text-slate-500">
+                              <span key={tg} className="text-[10px] text-muted-foreground">
                                 {tg}
                               </span>
                             ))}
                           </div>
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="align-middle">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
                           item.macroCategory === 'Needs' ? 'bg-sky-950 text-sky-300 border border-sky-800/40' :
                           item.macroCategory === 'Commitments' ? 'bg-violet-950 text-violet-300 border border-violet-800/40' :
@@ -226,19 +227,21 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
                           {item.macroCategory}
                         </span>
                       </TableCell>
-                      <TableCell className="text-slate-300">{item.category}</TableCell>
-                      <TableCell className={`text-right font-mono font-medium ${
-                        item.amount > 0 ? 'text-emerald-400' : 'text-slate-100'
+                      <TableCell className="text-foreground align-middle">{item.category}</TableCell>
+                      <TableCell className={`text-right font-mono font-medium align-middle ${
+                        item.amount > 0 ? 'text-primary' : 'text-foreground'
                       }`}>
                         {formatEuro(item.amount)}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center align-middle">
                         {item.autoCategorized ? (
-                          <Badge variant="outline" className="text-[10px] border-emerald-500/40 text-emerald-400 bg-emerald-950/20">
+                          <Badge variant="outline" className="text-[10px] border-primary/40 text-primary bg-primary/10 inline-flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 text-primary" />
                             Auto
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-400 bg-amber-950/20">
+                          <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-400 bg-amber-950/20 inline-flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3 text-amber-400" />
                             Verifica
                           </Badge>
                         )}

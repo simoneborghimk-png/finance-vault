@@ -1,0 +1,140 @@
+/**
+ * ============================================================================
+ * COMPONENT: Table & Data Table
+ * Category: Molecule (Livello 2: Dati & Visualizzazione Contenuto)
+ * Source of Truth: Figma Component "Table" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .table-wrapper: contenitore scrollabile con bordo e angoli arrotondati
+ *   - <table> semantico nativo con:
+ *     1. .table-header (thead) con .table-head (th)
+ *     2. .table-body (tbody) con .table-row (tr) e .table-cell (td)
+ *     3. .table-footer (tfoot)
+ *     4. .table-caption (caption)
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Table Responsive Wrapper
+   -------------------------------------------------------------------------- */
+.table-wrapper {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background-color: var(--card);
+}
+
+/* --------------------------------------------------------------------------
+   2. Base Table Element
+   -------------------------------------------------------------------------- */
+.table {
+  width: 100%;
+  caption-side: bottom;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm-font-size);
+  text-align: left;
+}
+
+/* --------------------------------------------------------------------------
+   3. Table Header & Cells
+   -------------------------------------------------------------------------- */
+.table-header {
+  background-color: color-mix(in oklch, var(--muted) 50%, var(--card));
+  border-bottom: 1px solid var(--border);
+}
+
+.table-head {
+  height: 2.5rem; /* 40px */
+  padding: 0 var(--tw-space-4);
+  vertical-align: middle;
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   4. Table Body, Rows & Cells
+   -------------------------------------------------------------------------- */
+.table-body {
+  border-bottom: 1px solid var(--border);
+}
+
+.table-row {
+  border-bottom: 1px solid var(--border);
+  transition: background-color 150ms ease;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+/* Hover su riga */
+.table-row:hover {
+  background-color: color-mix(in oklch, var(--muted) 40%, transparent);
+}
+
+/* Riga selezionata (es. checkbox) */
+.table-row[data-state='selected'],
+.table-row.is-selected {
+  background-color: var(--muted);
+}
+
+.table-cell {
+  padding: var(--tw-space-3) var(--tw-space-4);
+  vertical-align: middle;
+  color: var(--card-foreground);
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   5. Table Footer & Caption
+   -------------------------------------------------------------------------- */
+.table-footer {
+  border-top: 1px solid var(--border);
+  background-color: var(--muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.table-caption {
+  margin-top: var(--tw-space-4);
+  font-size: var(--text-xs-font-size);
+  color: var(--muted-foreground);
+  padding: 0 var(--tw-space-4) var(--tw-space-2) var(--tw-space-4);
+}
+
+/* --------------------------------------------------------------------------
+   6. Table Density & Sorting Utilities
+   -------------------------------------------------------------------------- */
+.table-compact .table-head {
+  height: 2rem;
+  padding: 0 var(--tw-space-2-5);
+  font-size: var(--text-xs-font-size);
+}
+
+.table-compact .table-cell {
+  padding: var(--tw-space-2) var(--tw-space-2-5);
+  font-size: var(--text-xs-font-size);
+}
+
+.table-sort-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-1);
+}
+
+.table-sort-btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}

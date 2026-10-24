@@ -1,0 +1,183 @@
+/**
+ * ============================================================================
+ * COMPONENT: Landing Page Blocks (Hero, Pricing, Features)
+ * Category: Layout Block (Livello 4: Marketing & Landing Pages)
+ * Source of Truth: Figma Pro Blocks Hero 1-22, Header 1-20, LP Navbar 1-7, Pricing 1-5
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .lp-navbar: testata marketing con effetto glassmorphism
+ *   - .lp-hero: sezione hero centrata ad alto impatto con scala responsive
+ *   - .lp-pricing-grid: griglia tariffaria a 3 colonne con card in evidenza
+ *   - .lp-features-grid: griglia di funzionalità a schede
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Glassmorphic Landing Navbar
+   -------------------------------------------------------------------------- */
+.lp-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4.5rem; /* 72px */
+  padding: 0 var(--container-padding-x, var(--tw-space-6));
+
+  background-color: color-mix(in oklch, var(--background) 75%, transparent);
+  -webkit-backdrop-filter: var(--backdrop-filter-md);
+  backdrop-filter: var(--backdrop-filter-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: var(--container-7xl);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --------------------------------------------------------------------------
+   2. High-Impact Hero Section
+   -------------------------------------------------------------------------- */
+.lp-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: var(--tw-space-16);
+  padding-bottom: var(--tw-space-20);
+  padding-left: var(--container-padding-x, var(--tw-space-6));
+  padding-right: var(--container-padding-x, var(--tw-space-6));
+  overflow: hidden;
+}
+
+.lp-hero-eyebrow {
+  margin-bottom: var(--tw-space-4);
+}
+
+.lp-hero-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-5xl-font-size);
+  font-weight: var(--font-weight-black);
+  line-height: var(--text-5xl-line-height);
+  letter-spacing: var(--text-5xl-tracking);
+  color: var(--foreground);
+  max-width: 56rem;
+  margin: 0 0 var(--tw-space-6) 0;
+}
+
+.lp-hero-description {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg-font-size);
+  line-height: 1.6;
+  color: var(--muted-foreground);
+  max-width: 42rem;
+  margin: 0 0 var(--tw-space-8) 0;
+}
+
+.lp-hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tw-space-4);
+  flex-wrap: wrap;
+}
+
+.lp-hero-media-wrapper {
+  margin-top: var(--tw-space-12);
+  width: 100%;
+  max-width: var(--container-6xl);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-2xl);
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   3. Pricing Section & Cards
+   -------------------------------------------------------------------------- */
+.lp-pricing-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--tw-space-16) var(--container-padding-x, var(--tw-space-6));
+  gap: var(--tw-space-12);
+  width: 100%;
+  max-width: var(--container-7xl);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lp-pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--tw-space-6);
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .lp-pricing-grid {
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+  }
+}
+
+.pricing-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--tw-space-8);
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+  gap: var(--tw-space-6);
+  position: relative;
+}
+
+/* Card in evidenza / Più Popolare */
+.pricing-card-highlight {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-xl);
+  transform: scale(1.03);
+}
+
+.pricing-amount {
+  font-family: var(--font-sans);
+  font-size: var(--text-4xl-font-size);
+  font-weight: var(--font-weight-black);
+  line-height: 1;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.pricing-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-3);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pricing-feature-item {
+  display: flex;
+  align-items: center;
+  gap: var(--tw-space-2-5);
+  font-size: var(--text-sm-font-size);
+  color: var(--foreground);
+}
+
+.pricing-feature-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--chart-2); /* verde spunta */
+  flex-shrink: 0;
+}

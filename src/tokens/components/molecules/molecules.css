@@ -1,0 +1,43 @@
+/**
+ * ============================================================================
+ * COMPONENTS - LAYER 2: MOLECULES (27 Componenti)
+ * Source of Truth: docs/FIGMA-COMPONENTS.md & Figma File pu2nlKYplmTCtTs0FVELdw
+ * ============================================================================
+ */
+
+/* Contenitori Base */
+@import './card.css';
+
+/* Gruppo 2.1: Overlay, Modali & Feedback */
+@import './alert.css';
+@import './alert-dialog.css';
+@import './dialog.css';
+@import './sheet.css';
+@import './drawer.css';
+@import './popover.css';
+@import './sonner.css';
+
+/* Gruppo 2.2: Controlli di Form & Input Composti */
+@import './field.css';
+@import './input-group.css';
+@import './input-otp.css';
+@import './select.css';
+@import './combobox.css';
+@import './date-picker.css';
+
+/* Gruppo 2.3: Navigazione & Disclosure */
+@import './accordion.css';
+@import './collapsible.css';
+@import './tabs.css';
+@import './breadcrumb.css';
+@import './pagination.css';
+@import './dropdown-menu.css';
+@import './navigation-menu.css';
+
+/* Gruppo 2.4: Dati & Visualizzazione Contenuto */
+@import './avatar.css';
+@import './button-group.css';
+@import './hover-card.css';
+@import './item.css';
+@import './empty-state.css';
+@import './table.css';

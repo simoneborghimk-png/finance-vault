@@ -1,0 +1,356 @@
+/**
+ * ============================================================================
+ * COMPONENT: Chart Family (Data Visualization)
+ * Category: Organism (Livello 3: Data Visualization)
+ * Source of Truth: Figma Component "Chart" (Page: 34:6) & docs/FIGMA-COMPONENTS.md
+ * Tokens: src/tokens/tokens.css
+ *
+ * Composition Contract:
+ *   - .chart-container: card responsiva con rapporto d'aspetto per grafici SVG
+ *   - Contiene:
+ *     1. .chart-header (.chart-title + .chart-description)
+ *     2. .chart-canvas o .chart-svg con serie stilizzate via --chart-1 .. --chart-5
+ *     3. .chart-tooltip (scheda fluttuante con metrica)
+ *     4. .chart-legend (.chart-legend-item con indicatore a pallino)
+ * ============================================================================
+ */
+
+/* --------------------------------------------------------------------------
+   1. Base Chart Container Card
+   -------------------------------------------------------------------------- */
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  padding: var(--tw-space-6);
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --------------------------------------------------------------------------
+   2. Chart Header
+   -------------------------------------------------------------------------- */
+.chart-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tw-space-1);
+  margin-bottom: var(--tw-space-6);
+}
+
+.chart-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-base-font-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--text-base-line-height);
+  color: var(--card-foreground);
+  margin: 0;
+}
+
+.chart-description {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   3. Chart SVG Canvas & Series Colors
+   -------------------------------------------------------------------------- */
+.chart-svg {
+  width: 100%;
+  height: auto;
+  min-height: 12rem;
+  overflow: visible;
+}
+
+/* 5 Serie Cromatiche Ufficiali del Design System */
+.chart-series-1,
+.stroke-chart-1 {
+  stroke: var(--chart-1);
+}
+.fill-chart-1 {
+  fill: var(--chart-1);
+}
+
+.chart-series-2,
+.stroke-chart-2 {
+  stroke: var(--chart-2);
+}
+.fill-chart-2 {
+  fill: var(--chart-2);
+}
+
+.chart-series-3,
+.stroke-chart-3 {
+  stroke: var(--chart-3);
+}
+.fill-chart-3 {
+  fill: var(--chart-3);
+}
+
+.chart-series-4,
+.stroke-chart-4 {
+  stroke: var(--chart-4);
+}
+.fill-chart-4 {
+  fill: var(--chart-4);
+}
+
+.chart-series-5,
+.stroke-chart-5 {
+  stroke: var(--chart-5);
+}
+.fill-chart-5 {
+  fill: var(--chart-5);
+}
+
+/* Griglie e Assi SVG */
+.chart-grid {
+  stroke: var(--border);
+  stroke-dasharray: 4 4;
+}
+
+.chart-axis text {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  fill: var(--muted-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   4. Chart Tooltip & Legend
+   -------------------------------------------------------------------------- */
+.chart-tooltip {
+  position: absolute;
+  z-index: 30;
+  padding: var(--tw-space-2) var(--tw-space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  pointer-events: none;
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+  white-space: nowrap;
+}
+
+.chart-crosshair {
+  stroke: color-mix(in oklch, var(--foreground) 35%, transparent);
+  stroke-dasharray: 3 3;
+  stroke-width: 1.5;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.chart-point {
+  cursor: pointer;
+  transition:
+    r 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    stroke-width 150ms ease;
+}
+
+.chart-point:hover,
+.chart-point.is-active {
+  r: 6;
+  stroke-width: 3;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tw-space-4);
+  margin-top: var(--tw-space-4);
+  list-style: none;
+  padding: 0;
+}
+
+.chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-1-5);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  color: var(--muted-foreground);
+}
+
+.chart-legend-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tw-space-1-5);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  color: var(--foreground);
+  cursor: pointer;
+  transition:
+    opacity 150ms ease,
+    background-color 150ms ease;
+}
+
+.chart-legend-btn:hover {
+  background-color: var(--muted);
+}
+
+.chart-legend-btn.is-disabled {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.chart-period-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--muted);
+  padding: 2px;
+  border-radius: var(--radius-md);
+}
+
+.chart-period-btn {
+  padding: 2px 8px;
+  font-size: 0.6875rem;
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.chart-period-btn:hover {
+  color: var(--foreground);
+}
+
+.chart-period-btn.is-active {
+  background: var(--card);
+  color: var(--foreground);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-2xs);
+}
+
+.chart-legend-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   5. Bar Chart & Interactive Elements
+   -------------------------------------------------------------------------- */
+.chart-bar {
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+  cursor: pointer;
+}
+
+.chart-bar:hover {
+  opacity: 0.85;
+  filter: brightness(1.1);
+}
+
+/* --------------------------------------------------------------------------
+   6. Donut & Radial Charts
+   -------------------------------------------------------------------------- */
+.chart-donut-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+}
+
+.chart-donut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.chart-donut-number {
+  font-family: var(--font-sans);
+  font-size: var(--text-2xl-font-size);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-donut-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs-font-size);
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-medium);
+}
+
+.chart-ring-segment {
+  transition:
+    stroke-dashoffset 400ms ease,
+    stroke-width 150ms ease;
+}
+
+.chart-ring-segment:hover {
+  stroke-width: 24;
+}
+
+/* --------------------------------------------------------------------------
+   7. Mini Sparkline Card
+   -------------------------------------------------------------------------- */
+.chart-radial-metric-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--tw-space-2-5) var(--tw-space-4);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  gap: var(--tw-space-3);
+}
+
+.chart-sparkline-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--tw-space-3) var(--tw-space-4);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  gap: var(--tw-space-3);
+}
+
+.chart-sparkline-svg {
+  width: 90px;
+  height: 32px;
+  flex-shrink: 0;
+  overflow: visible;
+}
