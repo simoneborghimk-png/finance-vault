@@ -33,24 +33,22 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
     }
   }, []);
 
-  const handleSaveClientId = async () => {
-    if (!clientId) return;
-    localStorage.setItem('gdrive_client_id', clientId.trim());
-    try {
-      await googleDrive.initClient(clientId.trim());
-      setIsModalOpen(false);
-    } catch (e: any) {
-      setAuthError(e.message);
-    }
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  const handleDisconnect = () => {
+    googleDrive.logout();
+    setIsConnected(false);
+    setIsModalOpen(false);
   };
 
   const handleConnectGoogle = async () => {
+    if (!clientId.trim()) {
+      setAuthError('Inserisci un Client ID Google Cloud valido.');
+      return;
+    }
     setAuthError(null);
+    setIsConnecting(true);
     try {
-      if (!clientId) {
-        setIsModalOpen(true);
-        return;
-      }
       const trimmedId = clientId.trim();
       localStorage.setItem('gdrive_client_id', trimmedId);
       await googleDrive.initClient(trimmedId);
@@ -65,6 +63,8 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
       await onSync();
     } catch (err: any) {
       setAuthError(err.message || 'Errore di connessione a Google Drive');
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -160,20 +160,28 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-2">
+              <div className="space-y-2 pt-2">
                 <Button
-                  onClick={handleSaveClientId}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs py-2"
-                >
-                  Salva e Inizializza
-                </Button>
-                <Button
-                  variant="outline"
                   onClick={handleConnectGoogle}
-                  className="flex-1 border-slate-700 text-slate-200 text-xs py-2"
+                  disabled={isConnecting}
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs py-2.5 flex items-center justify-center gap-2 font-medium"
                 >
-                  Connetti Account
+                  <Cloud className="w-4 h-4" />
+                  {isConnecting
+                    ? 'Connessione in corso...'
+                    : isConnected
+                    ? 'Riconnetti / Sincronizza'
+                    : 'Salva e Connetti Google Drive'}
                 </Button>
+                {isConnected && (
+                  <Button
+                    variant="outline"
+                    onClick={handleDisconnect}
+                    className="w-full border-rose-500/30 text-rose-300 hover:bg-rose-950/30 text-xs py-2"
+                  >
+                    Disconnetti Account
+                  </Button>
+                )}
               </div>
             </div>
           </DialogContent>
