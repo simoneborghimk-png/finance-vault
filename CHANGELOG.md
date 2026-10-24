@@ -7,6 +7,9 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/)
 
 ## [Unreleased]
 
+### Added / Changed
+- **Sincronizzazione Google Drive Trasparente:** Persistenza del token di accesso in `localStorage` con TTL e scadenza automatica; adozione del flusso *Silent Authentication* (`prompt: ''`) per evitare la richiesta ripetuta del consenso ad ogni apertura; auto-connessione all'avvio dell'app se il Client ID è configurato.
+
 ### Planned
 - Export sintetico del bilancio annuale in PDF / CSV formattato.
 - Riconciliazione automatica tra transiti PayPal (`movimentiConto.xlsx`) ed estratto conto PayPal dettagliato.

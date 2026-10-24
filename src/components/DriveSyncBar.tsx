@@ -22,14 +22,22 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsConnected(googleDrive.isConnected());
+    // Se il Client ID è già memorizzato, tenta l'auto-connessione silenziosa
+    const savedClientId = localStorage.getItem('gdrive_client_id');
+    if (savedClientId) {
+      googleDrive.autoConnect().then((connected) => {
+        setIsConnected(connected);
+      });
+    } else {
+      setIsConnected(googleDrive.isConnected());
+    }
   }, []);
 
   const handleSaveClientId = async () => {
     if (!clientId) return;
-    localStorage.setItem('gdrive_client_id', clientId);
+    localStorage.setItem('gdrive_client_id', clientId.trim());
     try {
-      await googleDrive.initClient(clientId);
+      await googleDrive.initClient(clientId.trim());
       setIsModalOpen(false);
     } catch (e: any) {
       setAuthError(e.message);
@@ -43,9 +51,17 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
         setIsModalOpen(true);
         return;
       }
-      await googleDrive.initClient(clientId);
-      await googleDrive.login();
+      const trimmedId = clientId.trim();
+      localStorage.setItem('gdrive_client_id', trimmedId);
+      await googleDrive.initClient(trimmedId);
+      // Tenta prima rinnovo silenzioso; se fallisce o non ancora autorizzato, forza consent
+      try {
+        await googleDrive.login(false);
+      } catch {
+        await googleDrive.login(true);
+      }
       setIsConnected(true);
+      setIsModalOpen(false);
       await onSync();
     } catch (err: any) {
       setAuthError(err.message || 'Errore di connessione a Google Drive');
