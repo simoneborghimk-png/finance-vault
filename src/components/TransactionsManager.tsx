@@ -54,6 +54,7 @@ import {
   Label,
   Checkbox,
   DateRangePicker,
+  Switch,
   Select,
   SelectTrigger,
   SelectValue,
@@ -61,7 +62,7 @@ import {
   SelectItem
 } from './ui';
 import { DateRange } from 'react-day-picker';
-import { format } from 'date-fns';
+import { format, startOfYear } from 'date-fns';
 
 interface TransactionsManagerProps {
   transactions: Transaction[];
@@ -103,12 +104,16 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
   onDeleteTransaction,
   onResetToRealTransactions,
 }) => {
-  // Filtering & Search states
+  // Filtering & Search states (Isolated to this page)
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMacro, setSelectedMacro] = useState<string>('ALL');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedChannel, setSelectedChannel] = useState<string>('ALL');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [excludeExtraordinary, setExcludeExtraordinary] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    const now = new Date();
+    return { from: startOfYear(now), to: now };
+  });
   const [sortField, setSortField] = useState<'date' | 'channel' | 'description' | 'category' | 'amount'>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
@@ -177,7 +182,6 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
     setSelectedMacro('ALL');
     setSelectedCategory('ALL');
     setSelectedChannel('ALL');
-    setDateRange(undefined);
     setCurrentPage(1);
   };
 
@@ -185,8 +189,7 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
     searchTerm.trim() ||
     selectedMacro !== 'ALL' ||
     selectedCategory !== 'ALL' ||
-    selectedChannel !== 'ALL' ||
-    dateRange
+    selectedChannel !== 'ALL'
   );
 
   // Filtered & Sorted Transactions
@@ -219,6 +222,11 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
         return false;
       }
 
+      // Exclude Extraordinary Filter
+      if (excludeExtraordinary && (t.isExtraordinary || t.macroCategory === 'Extraordinary')) {
+        return false;
+      }
+
       // Date Range Filter
       if (dateRange?.from) {
         const fromIso = format(dateRange.from, 'yyyy-MM-dd');
@@ -245,7 +253,7 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
     });
 
     return result;
-  }, [transactions, searchTerm, selectedMacro, selectedCategory, selectedChannel, dateRange, sortField, sortDirection]);
+  }, [transactions, searchTerm, selectedMacro, selectedCategory, selectedChannel, dateRange, excludeExtraordinary, sortField, sortDirection]);
 
   // Summary stats for filtered results
   const stats = useMemo(() => {
@@ -366,9 +374,10 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
           <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+            <ReceiptText className="w-5 h-5 text-primary" />
             Registro Movimenti & Transazioni
           </h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Consulta, ricerca, correggi categorie o aggiungi nuove uscite/entrate nel Vault cifrato
           </p>
         </div>
@@ -494,15 +503,15 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
 
       {/* Filter and Search Bar */}
       <Card className="bg-card border-border p-4 space-y-3">
-        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-          {/* Search text input */}
+        {/* Row 1: Search text input */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Cerca per descrizione, merchant, categoria o tag (#utenze)..."
               value={searchTerm}
               onChange={(e) => handleFilterChange(setSearchTerm, e.target.value)}
-              className="pl-9 bg-background border-input text-xs text-foreground placeholder:text-muted-foreground h-9"
+              className="pl-9 bg-background border-input text-xs text-foreground placeholder:text-muted-foreground h-9 w-full"
             />
             {searchTerm && (
               <button
@@ -514,84 +523,94 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
             )}
           </div>
 
-          {/* Quick Selects */}
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Macro Category Filter */}
-            <Select
-              value={selectedMacro}
-              onValueChange={handleMacroChange}
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetFilters}
+              className="h-9 px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted border-border flex items-center gap-1.5 shrink-0"
             >
-              <SelectTrigger className="w-[195px] h-9 text-xs">
-                <SelectValue placeholder="Macro-Categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">Tutte le Macro-Categorie</SelectItem>
-                <SelectItem value="Needs">Bisogni Primari & Casa</SelectItem>
-                <SelectItem value="Commitments">Rate & Finanziamenti</SelectItem>
-                <SelectItem value="Wants">Stile di Vita & Shopping</SelectItem>
-                <SelectItem value="Savings">Risparmio & Previdenza</SelectItem>
-                <SelectItem value="Extraordinary">Spese Straordinarie</SelectItem>
-              </SelectContent>
-            </Select>
+              <X className="w-3.5 h-3.5" />
+              <span>Azzera filtri</span>
+            </Button>
+          )}
+        </div>
 
-            {/* Specific Category Filter */}
-            <Select
-              value={selectedCategory}
-              onValueChange={(val) => handleFilterChange(setSelectedCategory, val)}
-            >
-              <SelectTrigger className="w-[195px] h-9 text-xs">
-                <SelectValue placeholder="Categoria Specifica" />
-              </SelectTrigger>
-              <SelectContent className="max-h-72">
-                <SelectItem value="ALL">Tutte le Categorie ({availableCategories.length})</SelectItem>
-                {availableCategories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* Row 2: Dimensional & Temporal Filters */}
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/40">
+          {/* Macro Category Filter */}
+          <Select
+            value={selectedMacro}
+            onValueChange={handleMacroChange}
+          >
+            <SelectTrigger className="w-[185px] h-9 text-xs">
+              <SelectValue placeholder="Macro-Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Tutte le Macro ({transactions.length})</SelectItem>
+              <SelectItem value="Needs">Bisogni Primari & Casa</SelectItem>
+              <SelectItem value="Commitments">Rate & Finanziamenti</SelectItem>
+              <SelectItem value="Wants">Stile di Vita & Shopping</SelectItem>
+              <SelectItem value="Savings">Risparmio & Previdenza</SelectItem>
+              <SelectItem value="Extraordinary">Spese Straordinarie</SelectItem>
+            </SelectContent>
+          </Select>
 
-            {/* Channel Filter */}
-            <Select
-              value={selectedChannel}
-              onValueChange={(val) => handleFilterChange(setSelectedChannel, val)}
-            >
-              <SelectTrigger className="w-[145px] h-9 text-xs">
-                <SelectValue placeholder="Canale" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">Tutti i Canali</SelectItem>
-                <SelectItem value="BancoBPM">Banco BPM</SelectItem>
-                <SelectItem value="Numia">Carta Numia</SelectItem>
-                <SelectItem value="Nexi">Carta Nexi</SelectItem>
-                <SelectItem value="PayPal">PayPal</SelectItem>
-                <SelectItem value="Satispay">Satispay</SelectItem>
-                <SelectItem value="Contanti">Contanti</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Specific Category Filter */}
+          <Select
+            value={selectedCategory}
+            onValueChange={(val) => handleFilterChange(setSelectedCategory, val)}
+          >
+            <SelectTrigger className="w-[195px] h-9 text-xs">
+              <SelectValue placeholder="Categoria Specifica" />
+            </SelectTrigger>
+            <SelectContent className="max-h-72">
+              <SelectItem value="ALL">Tutte le Categorie ({availableCategories.length})</SelectItem>
+              {availableCategories.map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {cat}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-            {/* Date Range Picker with Presets & Calendar */}
-            <DateRangePicker
-              value={dateRange}
-              onChange={(range) => {
-                setDateRange(range);
-                setCurrentPage(1);
-              }}
+          {/* Channel Filter */}
+          <Select
+            value={selectedChannel}
+            onValueChange={(val) => handleFilterChange(setSelectedChannel, val)}
+          >
+            <SelectTrigger className="w-[135px] h-9 text-xs">
+              <SelectValue placeholder="Canale" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Tutti i Canali</SelectItem>
+              <SelectItem value="BancoBPM">Banco BPM</SelectItem>
+              <SelectItem value="Numia">Carta Numia</SelectItem>
+              <SelectItem value="Nexi">Carta Nexi</SelectItem>
+              <SelectItem value="PayPal">PayPal</SelectItem>
+              <SelectItem value="Satispay">Satispay</SelectItem>
+              <SelectItem value="Contanti">Contanti</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Date Range Picker with Presets & Calendar */}
+          <DateRangePicker
+            value={dateRange}
+            onChange={(range) => {
+              setDateRange(range);
+              setCurrentPage(1);
+            }}
+            defaultPreset="Anno in corso"
+          />
+
+          {/* Toggle Extraordinary Expenses */}
+          <div className="flex items-center gap-2 bg-background px-3 py-1.5 rounded-lg border border-border h-9 shadow-xs shrink-0">
+            <Filter className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs text-foreground font-medium">Escludi Straordinarie</span>
+            <Switch
+              checked={excludeExtraordinary}
+              onCheckedChange={setExcludeExtraordinary}
             />
-
-            {/* Clear filters button if active */}
-            {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleResetFilters}
-                className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground hover:bg-accent flex items-center gap-1"
-              >
-                <X className="w-3.5 h-3.5" />
-                <span>Azzera filtri</span>
-              </Button>
-            )}
           </div>
         </div>
       </Card>

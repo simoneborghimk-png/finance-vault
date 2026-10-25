@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  ShieldCheck,
   TrendingUp,
   ReceiptText,
+  Repeat,
   Coins,
   Target,
   UploadCloud,
-  Lock,
-  Unlock,
   RefreshCw,
-  Sparkles,
-  PieChart as PieChartIcon
 } from 'lucide-react';
-import { VaultData, Transaction, SavingsGoal } from '@/types/finance';
+import { VaultData, Transaction, SavingsGoal, RecurringOverride } from '@/types/finance';
 import { initialVaultData } from '@/lib/mockData';
 import { encryptVault, decryptVault } from '@/lib/crypto';
 import { googleDrive } from '@/lib/googleDrive';
@@ -20,11 +16,14 @@ import { googleDrive } from '@/lib/googleDrive';
 import { VaultUnlockModal } from '@/components/VaultUnlockModal';
 import { ExecutiveDashboard } from '@/components/ExecutiveDashboard';
 import { DriveSyncBar } from '@/components/DriveSyncBar';
-import { Tabs, TabsList, TabsTrigger, TabsContent, Badge, Button } from '@/components/ui';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui';
 
 // Lazy-loaded tabs with code splitting
 const TransactionsManager = React.lazy(() =>
   import('@/components/TransactionsManager').then((m) => ({ default: m.TransactionsManager }))
+);
+const RecurringTracker = React.lazy(() =>
+  import('@/components/RecurringTracker').then((m) => ({ default: m.RecurringTracker }))
 );
 const TaxPensionSimulator = React.lazy(() =>
   import('@/components/TaxPensionSimulator').then((m) => ({ default: m.TaxPensionSimulator }))
@@ -51,7 +50,7 @@ export function App() {
   const [isLocked, setIsLocked] = useState(true);
   const [masterPassword, setMasterPassword] = useState<string | null>(null);
   const [vault, setVault] = useState<VaultData>(initialVaultData);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'transactions' | 'tax-pension' | 'goals' | 'ingestion'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'transactions' | 'fixed-costs' | 'tax-pension' | 'goals' | 'ingestion'>('dashboard');
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
 
@@ -332,6 +331,18 @@ export function App() {
     }
   };
 
+  const handleUpdateRecurringOverrides = (recurringOverrides: Record<string, RecurringOverride>) => {
+    const updated = {
+      ...vault,
+      recurringOverrides,
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+    }
+  };
+
   const handleApplySalary = (netSalary: number, isExtra?: '13th' | '14th' | null) => {
     let updatedProfile = { ...vault.profile };
     if (isExtra === '14th') {
@@ -366,62 +377,23 @@ export function App() {
       {/* Vault Unlock Modal */}
       <VaultUnlockModal isLocked={isLocked} onUnlock={handleUnlock} />
 
-      {/* Main App Bar */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center shadow-lg">
-              <ShieldCheck className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-bold text-base sm:text-lg tracking-tight text-foreground">
-                  Finance Vault
-                </h1>
-                <Badge variant="outline" className="text-[10px] border-primary/40 text-primary bg-primary/10 py-0.5">
-                  PWA • Zero-Knowledge
-                </Badge>
-              </div>
-              <p className="text-[11px] text-muted-foreground hidden sm:block">
-                Cash Flow, Simulazione Fiscale & Sincronizzazione Google Drive Cifrata
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {syncFeedback && (
-              <span className="text-xs text-primary bg-primary/10 border border-primary/30 px-2.5 py-1 rounded-lg animate-fade-in hidden md:inline">
-                {syncFeedback}
-              </span>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLock}
-              className="border-border text-foreground hover:bg-accent hover:text-accent-foreground text-xs flex items-center gap-1.5"
-            >
-              <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="hidden sm:inline">Blocca Vault</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Unified Main App Bar & Drive/Security Header */}
+      <DriveSyncBar
+        onSync={handleSyncToDrive}
+        onExportLocalEncrypted={handleExportLocalEncrypted}
+        onImportLocalEncrypted={handleImportLocalEncrypted}
+        lastSyncTime={vault.lastUpdated}
+        currentSalary={vault.profile.baseMonthlyNetSalary}
+        onApplySalary={handleApplySalary}
+        onLock={handleLock}
+        syncFeedback={syncFeedback}
+      />
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Drive & Security Bar */}
-        <DriveSyncBar
-          onSync={handleSyncToDrive}
-          onExportLocalEncrypted={handleExportLocalEncrypted}
-          onImportLocalEncrypted={handleImportLocalEncrypted}
-          lastSyncTime={vault.lastUpdated}
-          currentSalary={vault.profile.baseMonthlyNetSalary}
-          onApplySalary={handleApplySalary}
-        />
-
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)} className="space-y-6">
-          <TabsList className="w-full bg-card/80 border border-border p-1.5 rounded-xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 shadow-xs">
+          <TabsList className="w-full bg-card/80 border border-border p-1.5 rounded-xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 shadow-xs">
             <TabsTrigger
               value="dashboard"
               className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-2 transition-all"
@@ -442,6 +414,14 @@ export function App() {
             </TabsTrigger>
 
             <TabsTrigger
+              value="fixed-costs"
+              className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-1.5 transition-all"
+            >
+              <Repeat className="w-4 h-4 shrink-0" />
+              <span className="truncate">Costi Fissi & Utenze</span>
+            </TabsTrigger>
+
+            <TabsTrigger
               value="tax-pension"
               className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-2 transition-all"
             >
@@ -454,7 +434,7 @@ export function App() {
               className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-2 transition-all"
             >
               <Target className="w-4 h-4 shrink-0" />
-              <span className="truncate">Goal Planner</span>
+              <span className="truncate">Budget & Obiettivi</span>
             </TabsTrigger>
 
             <TabsTrigger
@@ -467,17 +447,15 @@ export function App() {
           </TabsList>
 
           {/* Tab 1: Executive Dashboard */}
-          <TabsContent value="dashboard" className="outline-none focus:outline-none">
+          <TabsContent value="dashboard" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <ExecutiveDashboard
               transactions={vault.transactions}
               profile={vault.profile}
-              budgetCaps={vault.budgetCaps}
-              onUpdateBudgetCaps={handleUpdateBudgetCaps}
             />
           </TabsContent>
 
           {/* Tab 2: Transactions Manager */}
-          <TabsContent value="transactions" className="outline-none focus:outline-none">
+          <TabsContent value="transactions" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <React.Suspense fallback={<TabLoadingSkeleton />}>
               <TransactionsManager
                 transactions={vault.transactions}
@@ -489,11 +467,34 @@ export function App() {
             </React.Suspense>
           </TabsContent>
 
+          {/* Tab 3: Costi Fissi & Utenze (1st class view) */}
+          <TabsContent value="fixed-costs" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
+            <React.Suspense fallback={<TabLoadingSkeleton />}>
+              <RecurringTracker
+                transactions={vault.transactions}
+                overrides={vault.recurringOverrides || {}}
+                onSaveOverride={(id, override) => {
+                  const updated = {
+                    ...vault,
+                    recurringOverrides: {
+                      ...(vault.recurringOverrides || {}),
+                      [id]: override,
+                    },
+                    lastUpdated: new Date().toISOString(),
+                  };
+                  setVault(updated);
+                  if (masterPassword) encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+                }}
+              />
+            </React.Suspense>
+          </TabsContent>
+
           {/* Tab 3: Tax & Pension Fund Simulator */}
-          <TabsContent value="tax-pension" className="outline-none focus:outline-none">
+          <TabsContent value="tax-pension" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <React.Suspense fallback={<TabLoadingSkeleton />}>
               <TaxPensionSimulator
                 profile={vault.profile}
+                transactions={vault.transactions}
                 initialContribution={vault.pensionVoluntaryContribution}
                 onSaveContribution={(amt) => {
                   const updated = { ...vault, pensionVoluntaryContribution: amt, lastUpdated: new Date().toISOString() };
@@ -505,19 +506,24 @@ export function App() {
           </TabsContent>
 
           {/* Tab 4: Goal Planner */}
-          <TabsContent value="goals" className="outline-none focus:outline-none">
+          <TabsContent value="goals" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <React.Suspense fallback={<TabLoadingSkeleton />}>
               <GoalPlanner
                 goals={vault.goals}
                 profile={vault.profile}
                 onAddGoal={handleAddGoal}
                 onRemoveGoal={handleRemoveGoal}
+                transactions={vault.transactions}
+                budgetCaps={vault.budgetCaps}
+                onUpdateBudgetCaps={handleUpdateBudgetCaps}
+                recurringOverrides={vault.recurringOverrides}
+                onUpdateRecurringOverrides={handleUpdateRecurringOverrides}
               />
             </React.Suspense>
           </TabsContent>
 
           {/* Tab 5: File Ingestion Dropzone */}
-          <TabsContent value="ingestion" className="outline-none focus:outline-none">
+          <TabsContent value="ingestion" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <React.Suspense fallback={<TabLoadingSkeleton />}>
               <FileIngestionDropzone
                 onImportTransactions={handleImportTransactions}

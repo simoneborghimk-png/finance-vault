@@ -22,42 +22,51 @@
 | **Vault Unlock & Biometrics**   |   ✅  | Master Password + WebAuthn Passkey (Face ID/Touch ID)          |
 | **Tab 1: Executive Dashboard**  |   ✅  | KPI (Entrate, Needs, Wants, Cash Flow, Savings Rate) + Recharts |
 | **Tab 2: Transazioni (Manager)**|   ✅  | Tabella interattiva, ricerca full-text, filtri, editing e inserimento manuale |
-| **Tab 3: Simulatore Fiscale**   |   ✅  | Slider 0-5.164,57 €, deducibilità 730 IRPEF 35-43%, timeline    |
-| **Tab 4: Goal Planner**         |   ✅  | Assorbimento prioritario 14ª Giugno e 730 Luglio               |
-| **Tab 5: Ingestione File**      |   ✅  | Dropzone Excel/CSV Banco BPM, Carta Nexi, Numia, PayPal, Satispay |
+| **Tab 3: Costi Fissi & Utenze** |   ✅  | Promossa a 1° livello: media consuntiva & scostamento utenze, monitor rimodulazioni |
+| **Tab 4: Simulatore Fiscale**   |   ✅  | Slider 0-5.164,57 €, deducibilità 730 IRPEF 35-43%, timeline    |
+| **Tab 5: Goal Planner**         |   ✅  | Assorbimento 14ª, 13ª e 730, Feasibility Engine e BudgetCap mensili |
+| **Tab 6: Ingestione File**      |   ✅  | Dropzone Excel/CSV Banco BPM, Carta Nexi, Numia, PayPal, Satispay |
 | **Drive Sync & Backup**         |   ✅  | Download/Upload `vault_finanze.enc` + Export/Import locale     |
 
-## 3. Indice Decisioni Architetturali (ADR)
+## 3. Indice Decisioni Architetturali (ADR) — Memoria Fredda Decisionale
 
 | ID      | Decisione / Ambito                                              | Riferimento                                 |
 | ------- | --------------------------------------------------------------- | ------------------------------------------- |
 | ADR-001 | Cifratura Client-Side AES-256-GCM + PBKDF2 100k iterazioni      | [`docs/adr/ADR-001-zero-knowledge-crypto.md`](./docs/adr/ADR-001-zero-knowledge-crypto.md) |
 | ADR-002 | Archiviazione Zero-Cost su Google Drive (`drive.file`)           | [`docs/adr/ADR-002-client-side-storage-gdrive.md`](./docs/adr/ADR-002-client-side-storage-gdrive.md) |
 | ADR-003 | Architettura della Memoria Calda/Fredda e Token Hygiene          | [`docs/adr/ADR-003-token-and-memory-architecture.md`](./docs/adr/ADR-003-token-and-memory-architecture.md) |
+| ADR-004 | Blindatura Privacy Git e Fallback Demo Runtime                  | [`docs/adr/ADR-004-git-privacy-and-demo-fallback.md`](./docs/adr/ADR-004-git-privacy-and-demo-fallback.md) |
+| ADR-005 | Riconciliazione Multi-Fonte e Granularità Transazionale         | [`docs/adr/ADR-005-multi-source-reconciliation.md`](./docs/adr/ADR-005-multi-source-reconciliation.md) |
+| ADR-006 | Sincronizzazione Buste Paga da Drive e Monitoraggio Previdenziale | [`docs/adr/ADR-006-payslip-sync-and-pension-tracking.md`](./docs/adr/ADR-006-payslip-sync-and-pension-tracking.md) |
+| ADR-007 | Isolamento delle Viste e Navigazione Non-Distruttiva tra Tab    | [`docs/adr/ADR-007-view-isolation-and-non-destructive-navigation.md`](./docs/adr/ADR-007-view-isolation-and-non-destructive-navigation.md) |
+| ADR-008 | Metriche Esecutive di Salute Finanziaria e Ripartizione Costi   | [`docs/adr/ADR-008-executive-financial-health-metrics.md`](./docs/adr/ADR-008-executive-financial-health-metrics.md) |
+| ADR-009 | Tracciamento Automatico Deducibilità Fondo Pensione (Art. 51)   | [`docs/adr/ADR-009-automated-pension-deductibility-tracking.md`](./docs/adr/ADR-009-automated-pension-deductibility-tracking.md) |
+| ADR-010 | Monitoraggio Temporale BudgetCap e Feasibility Engine Obiettivi | [`docs/adr/ADR-010-budget-caps-and-dynamic-goal-feasibility.md`](./docs/adr/ADR-010-budget-caps-and-dynamic-goal-feasibility.md) |
+| ADR-011 | Rilevamento Intelligente Uscite Ricorrenti e Abbonamenti       | [`docs/adr/ADR-011-subscription-and-recurring-tracker.md`](./docs/adr/ADR-011-subscription-and-recurring-tracker.md) |
 
-## 4. Backlog Operativo Attivo
+## 4. Backlog Operativo Attivo (Sprint Corrente)
 
-- [x] Inizializzazione stack Vite 8 + React + TypeScript + Tailwind + PWA
-- [x] Implementazione suite crittografica e client Google Drive (`drive.file`)
-- [x] Motore di auto-categorizzazione e parser Banco BPM / Carta Numia
-- [x] Executive Dashboard, Simulatore Fiscale Previdenza, Goal Planner e Ingestion Dropzone
-- [x] Eredità pratiche `agent-core-knowledge`: guardrail, regole `.agents/rules/`, memoria calda/fredda
-- [x] Portabilità cross-device, porta fissa 5180, base path GitHub Pages e CI/CD Actions
-- [x] Tabella Transazioni Interattiva (ricerca, filtri, editing categoria/tag, aggiunta manuale)
-- [x] Allineamento token system DTCG e importazione catalogo Shadcn UI (46 componenti) da `agent-core-knowledge`
-- [x] Adozione standard UX/UI/A11y Tier 0: `.agents/rules/ux-ui-accessibility-standards.md`, table expansion rows, zero `title` nativi, form resilienti
-- [x] Budget Cap & Monitoraggio Soglie Spesa mensili
-- [x] Ottimizzazione bundle: Code Splitting dinamico (Lazy loading SheetJS / Dropzone)
-- [x] Lettura automatica buste paga da cartella Google Drive (`Lavoro > Buste paga > [Anno]`)
-- [x] Alert intelligente promemoria busta paga mancante dopo il 15 del mese
-- [x] Riposizionamento backup manuale `.enc` all'interno del modale Google Drive
-- [x] Riconciliazione & categorizzazione a grana fine (588 movimenti reali verificati, 0 residui in Altre Spese, zero doppi addebiti SDD)
-- [x] Paginazione avanzata tabella transazioni con selettore righe per pagina (10, 20, 50, 100, 250)
-- [x] Riconciliazione ordini Amazon reali (86 ordini estratti, 79 movimenti carte/banca riclassificati al centesimo: cibo, libri, tech, farmacia, cura persona, casa, brico, rate)
-- [x] Riclassificazione rate finanziamenti TIMFIN (21 movimenti spostati da Fibra a Rate Finanziamenti / Commitments)
-- [x] Restyling modale sincronizzazione buste paga Drive (risoluzione collisioni header, zero clipping lista, trigger primario nel footer)
-- [x] Blindatura privacy & portabilità git: esclusione data/, scripts/ e realTransactions.json con fallback demo resiliente
-- [ ] Export sintetico del bilancio annuale in PDF / CSV formattato
+- [x] Blindatura privacy git (esclusione `data/`, `scripts/`, `realTransactions.json` e fallback demo resiliente — ADR-004)
+- [x] Riconciliazione multi-fonte: Banco BPM, carte Numia/Nexi, 86 ordini Amazon reali, rate TIMFIN in Commitments (ADR-005)
+- [x] Restyling modale sincronizzazione buste paga Drive e unificazione header Zero-Knowledge (ADR-006)
+- [x] Perfezionamento Executive Dashboard: KPI reali del periodo filtrato, Donut centrale, BarChart centrato ad alto contrasto
+- [x] Ricollocazione contestuale di `BudgetCapManager` in "Budget & Obiettivi"
+- [x] Standard isolamento filtri per vista & navigazione non distruttiva `forceMount` (ADR-007)
+- [x] Layout toolbar a due livelli (ricerca full-width + filtri responsivi) e preset deterministici
+- [x] Potenziamento Executive Dashboard: Regola 50/30/20, Costi Fissi vs Variabili, Burn Rate (ADR-008)
+- [x] Potenziamento Tab Fisco: calcolo deducibilità residua art. 51 TUIR dai versamenti reali dell'anno (ADR-009)
+- [x] Potenziamento Tab Budget & Obiettivi: stima traguardi su tasso risparmio reale e selettore mese per BudgetCap (ADR-010)
+- [x] Subscription & Recurring Tracker: piani ammortamento certificati (Amazon TV/Watch, Cofidis Soundbar/Switch, Vorwerk Folletto VR7s, Bimby TM7 HeyLight/Compass, TIMFin & Compass vecchi chiusi) (ADR-011)
+- [x] Data prossimo pagamento e badge urgenza visibili a card chiusa in `RecurringTracker` (sia contratti che rate ammortamento)
+- [x] Bonifica ricorrenti: Iren Luce vs Gas, YouTube 15,99 € Numia, Game Pass PayPal, Audible sospeso, UNHCR una tantum (ADR-011)
+- [x] Costi Fissi & Utenze 1° livello: media consuntiva utenze, monitor rimodulazioni flat, segmentazione Google Play (Philips Hue, tado°, Hiya) (ADR-011)
+- [x] Costi Fissi & Utenze: periodo dinamico DateRangePicker, Recharts LineChart utenze, unificazione card KPI e toolbar filtri avanzata (ADR-011)
+- [x] Standardizzazione header di pagina: fuori dalle card, icone tab semantiche, azioni e selettore periodo allineati a destra
+- [x] Abbonamenti annuali certificati: Netflix (120 €/anno, atteso 2026) e Crunchyroll (15 €/anno, pagato 2026) (ADR-011)
+- [ ] **Abilitazione e collaudo reale accesso biometrico** (WebAuthn Passkey Touch ID / Face ID)
+- [ ] **Check regole parsing per canale** (BPM, Nexi, Numia, PayPal, Satispay), test nuovo file e verifica deduplica
+- [ ] [APPROVATO - IN STANDBY] Financial Advisor & Spending Optimizer: roadmap stagionale investimenti, tranches pensione estive/autunnali e plafond consigliati (ADR-012)
+- [ ] Bilancio Annuale & Reportistica Fiscale (a bassa priorità su richiesta utente)
 
 ## 5. Riferimenti Rapidi & Comandi
 

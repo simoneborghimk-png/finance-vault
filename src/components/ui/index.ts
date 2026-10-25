@@ -45,3 +45,4 @@ export * from './input-otp';
 export * from './form';
 export * from './label';
 export * from './date-range-picker';
+export * from './month-target-picker';

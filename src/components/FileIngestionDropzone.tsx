@@ -81,36 +81,38 @@ export const FileIngestionDropzone: React.FC<FileIngestionDropzoneProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="p-4 rounded-xl bg-card border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Top Header fuori dalla card */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+          <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <UploadCloud className="w-5 h-5 text-primary" />
             Ingestione File Bancari & Riconciliazione (Client-Side)
           </h2>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Trascina i tuoi file Banco BPM (`movimentiConto.xlsx`) o Carta Numia (`movimenti.xlsx`) per l'auto-categorizzazione istantanea
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          onClick={onSyncDrive}
-          disabled={isSyncing}
-          className="border-border text-foreground hover:bg-accent hover:text-accent-foreground font-medium text-xs px-4 py-2 flex items-center gap-2 shrink-0"
-        >
-          {isSyncing ? (
-            <>
-              <RefreshCw className="w-4 h-4 animate-spin" />
-              Cifratura AES-GCM & Invio...
-            </>
-          ) : (
-            <>
-              <CloudUpload className="w-4 h-4 text-muted-foreground" />
-              Sincronizza su Google Drive
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            variant="outline"
+            onClick={onSyncDrive}
+            disabled={isSyncing}
+            className="border-border text-foreground hover:bg-accent hover:text-accent-foreground font-medium text-xs px-4 py-2 flex items-center gap-2 shrink-0 shadow-xs"
+          >
+            {isSyncing ? (
+              <>
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Cifratura AES-GCM & Invio...
+              </>
+            ) : (
+              <>
+                <CloudUpload className="w-4 h-4 text-primary" />
+                Sincronizza su Google Drive
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Drag & Drop Zone */}

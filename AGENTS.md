@@ -50,6 +50,7 @@ Questo file definisce le regole operative vincolanti per qualsiasi assistente o 
   - `documentation-sync-gate.md`: Sincronizzazione documentale a fine milestone e zero push non autorizzati.
   - `token-optimization.md`: Architettura della memoria calda/fredda e chirurgia del contesto.
   - `ux-ui-accessibility-standards.md`: Linee guida vincolanti Tier 0 su gerarchia azioni, submit resiliente, divieto `title`, table expansion rows, badge iconografici e a11y WCAG 2.2 AA.
+  - `tab-isolation-and-state-preservation.md`: Isolamento filtri per vista, navigazione non distruttiva (`forceMount`), preset deterministici nel DateRangePicker e layout toolbar a due livelli.
 
 ---
 

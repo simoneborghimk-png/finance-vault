@@ -20,6 +20,7 @@ export interface DateRangePickerProps {
   onChange: (range: DateRange | undefined, presetLabel?: string) => void;
   className?: string;
   align?: 'start' | 'center' | 'end';
+  defaultPreset?: string;
 }
 
 interface Preset {
@@ -33,10 +34,24 @@ const PRESETS: Preset[] = [
     getRange: () => ({ from: undefined, to: undefined }),
   },
   {
-    label: 'Ultimo mese',
+    label: 'Anno in corso',
     getRange: () => {
       const now = new Date();
-      return { from: subMonths(now, 1), to: now };
+      return { from: startOfYear(now), to: now };
+    },
+  },
+  {
+    label: 'Questo mese',
+    getRange: () => {
+      const now = new Date();
+      return { from: startOfMonth(now), to: endOfMonth(now) };
+    },
+  },
+  {
+    label: 'Mese precedente',
+    getRange: () => {
+      const prev = subMonths(new Date(), 1);
+      return { from: startOfMonth(prev), to: endOfMonth(prev) };
     },
   },
   {
@@ -60,27 +75,6 @@ const PRESETS: Preset[] = [
       return { from: subMonths(now, 12), to: now };
     },
   },
-  {
-    label: 'Questo mese',
-    getRange: () => {
-      const now = new Date();
-      return { from: startOfMonth(now), to: endOfMonth(now) };
-    },
-  },
-  {
-    label: 'Mese precedente',
-    getRange: () => {
-      const prev = subMonths(new Date(), 1);
-      return { from: startOfMonth(prev), to: endOfMonth(prev) };
-    },
-  },
-  {
-    label: 'Anno in corso',
-    getRange: () => {
-      const now = new Date();
-      return { from: startOfYear(now), to: now };
-    },
-  },
 ];
 
 export function DateRangePicker({
@@ -88,15 +82,39 @@ export function DateRangePicker({
   onChange,
   className,
   align = 'start',
+  defaultPreset,
 }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedRange, setSelectedRange] = React.useState<DateRange | undefined>(value);
-  const [activePreset, setActivePreset] = React.useState<string>('Tutto lo storico');
+  const [activePreset, setActivePreset] = React.useState<string>(() => {
+    if (defaultPreset) return defaultPreset;
+    if (!value || (!value.from && !value.to)) return 'Tutto lo storico';
+    return 'Personalizzato';
+  });
 
   // Sync internal range with external value
   React.useEffect(() => {
     setSelectedRange(value);
   }, [value]);
+
+  // Deterministically match range to known presets
+  const matchedPreset = React.useMemo(() => {
+    if (!value || (!value.from && !value.to)) {
+      return 'Tutto lo storico';
+    }
+    for (const p of PRESETS) {
+      if (p.label === 'Tutto lo storico') continue;
+      const pr = p.getRange();
+      if (pr.from && pr.to && value.from && value.to) {
+        if (isSameDay(pr.from, value.from) && isSameDay(pr.to, value.to)) {
+          return p.label;
+        }
+      }
+    }
+    return undefined;
+  }, [value]);
+
+  const currentActivePreset = matchedPreset || activePreset;
 
   const handleApplyPreset = (preset: Preset) => {
     const range = preset.getRange();
@@ -123,7 +141,7 @@ export function DateRangePicker({
   };
 
   const handleClose = () => {
-    onChange(selectedRange, activePreset);
+    onChange(selectedRange, currentActivePreset);
     setIsOpen(false);
   };
 
@@ -131,6 +149,11 @@ export function DateRangePicker({
   const formattedTriggerLabel = React.useMemo(() => {
     if (!value || (!value.from && !value.to)) {
       return 'Tutto lo storico';
+    }
+    const preset = currentActivePreset;
+    if (preset && preset !== 'Personalizzato' && preset !== 'Tutto lo storico') {
+      const yearStr = value.from ? format(value.from, 'yyyy') : '';
+      return `${preset}${preset === 'Anno in corso' && yearStr ? ` (${yearStr})` : ''}`;
     }
     if (value.from && value.to) {
       if (isSameDay(value.from, value.to)) {
@@ -142,7 +165,7 @@ export function DateRangePicker({
       return `Dal ${format(value.from, 'd MMM yyyy', { locale: it })}`;
     }
     return 'Periodo personalizzato';
-  }, [value]);
+  }, [value, currentActivePreset]);
 
   return (
     <div className={cn('relative inline-block', className)}>
@@ -181,7 +204,7 @@ export function DateRangePicker({
                 Filtro Rapido
               </p>
               {PRESETS.map((preset) => {
-                const isActive = activePreset === preset.label;
+                const isActive = currentActivePreset === preset.label;
                 return (
                   <button
                     key={preset.label}

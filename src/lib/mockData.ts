@@ -11,6 +11,7 @@ export const initialProfile: UserFinancialProfile = {
   extraSalaries: {
     fourteenthNetJune: 1848.00,
     thirteenthNetDec: 1850.00,
+    taxRefund730: 2290.00,
   },
   pensionFund: {
     provider: 'Allianz Orizzonte Previdenza',
@@ -20,10 +21,11 @@ export const initialProfile: UserFinancialProfile = {
     targetAnnualContribution: 5164.57,
   },
   activeLoans: [
-    { provider: 'Compass Banca', monthlyInstallment: 115.00, remainingMonths: 18 },
-    { provider: 'Cofidis', monthlyInstallment: 85.00, remainingMonths: 8 },
-    { provider: 'Vorwerk Bimby', monthlyInstallment: 45.00, remainingMonths: 12 },
-    { provider: 'TIMFin', monthlyInstallment: 25.00, remainingMonths: 14 },
+    { provider: 'Amazon: LG OLED TV 65"', monthlyInstallment: 134.92, remainingMonths: 7 },
+    { provider: 'Amazon: Samsung Galaxy Watch9', monthlyInstallment: 77.80, remainingMonths: 2 },
+    { provider: 'Cofidis: Soundbar LG', monthlyInstallment: 56.25, remainingMonths: 8 },
+    { provider: 'Vorwerk: Robot Folletto VR7s', monthlyInstallment: 41.66, remainingMonths: 6 },
+    { provider: 'Compass / HeyLight: Bimby TM7', monthlyInstallment: 52.17, remainingMonths: 29 },
   ],
 };
 
@@ -34,8 +36,9 @@ export const initialGoals: SavingsGoal[] = [
     targetAmount: 4500.00,
     targetDate: '2027-04',
     allocatedJuneExtra: 1848.00,
-    allocatedJuly730: 1500.00,
-    notes: 'Copertura con quattordicesima e rimborso 730 per azzerare l’impatto sul cash flow mensile',
+    allocatedJuly730: 2290.00,
+    allocatedDecExtra: 362.00,
+    notes: 'Copertura 100% da bonus straordinari: 14ª (1.848 €), 730 reale (2.290 €) e quota 13ª (362 €)',
   },
 ];
 

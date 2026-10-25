@@ -9,7 +9,9 @@ import {
   CheckCircle2,
   AlertOctagon,
   TrendingDown,
-  Layers
+  Layers,
+  Calendar,
+  Check,
 } from 'lucide-react';
 import {
   Card,
@@ -27,7 +29,7 @@ import {
   DialogDescription,
   DialogFooter,
   Input,
-  Label
+  Label,
 } from './ui';
 
 interface BudgetCapManagerProps {
@@ -44,6 +46,12 @@ const formatEuro = (amount: number): string => {
   }).format(amount);
 };
 
+const formatMonthLabel = (m: string) => {
+  const [y, mon] = m.split('-');
+  const date = new Date(parseInt(y, 10), parseInt(mon, 10) - 1, 1);
+  return date.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+};
+
 export const BudgetCapManager: React.FC<BudgetCapManagerProps> = ({
   transactions,
   budgetCaps = {},
@@ -54,24 +62,44 @@ export const BudgetCapManager: React.FC<BudgetCapManagerProps> = ({
   const [newCategory, setNewCategory] = useState('');
   const [newLimit, setNewLimit] = useState('');
 
+  // Estrae tutti i mesi presenti nelle transazioni in ordine decrescente
+  const availableMonths = useMemo(() => {
+    const months = Array.from(new Set(transactions.map((t) => t.date.substring(0, 7)))).sort().reverse();
+    if (months.length === 0) {
+      return [new Date().toISOString().substring(0, 7)];
+    }
+    return months;
+  }, [transactions]);
+
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => availableMonths[0] || new Date().toISOString().substring(0, 7));
+
+  // Sincronizza se i mesi disponibili cambiano
+  React.useEffect(() => {
+    if (availableMonths.length > 0 && !availableMonths.includes(selectedMonth)) {
+      setSelectedMonth(availableMonths[0]);
+    }
+  }, [availableMonths, selectedMonth]);
+
   // Sincronizza quando cambiano le props
   React.useEffect(() => {
     setEditableCaps(budgetCaps);
   }, [budgetCaps]);
 
-  // Calcola la spesa reale dell'ultimo mese attivo per ogni categoria con un cap
+  // Calcola la spesa reale del mese selezionato per ogni categoria con un cap
   const spendingMetrics = useMemo(() => {
-    // Determina l'ultimo mese presente nelle transazioni
-    const months = Array.from(new Set(transactions.map((t) => t.date.substring(0, 7)))).sort();
-    const latestMonth = months[months.length - 1] || new Date().toISOString().substring(0, 7);
-
-    // Mappa della spesa per categoria nell'ultimo mese
+    // Mappa della spesa per categoria nel mese selezionato
     const monthlySpending: Record<string, number> = {};
     transactions
-      .filter((t) => t.date.startsWith(latestMonth) && t.amount < 0)
+      .filter((t) => t.date.startsWith(selectedMonth) && t.amount < 0)
       .forEach((t) => {
         monthlySpending[t.category] = (monthlySpending[t.category] || 0) + Math.abs(t.amount);
       });
+
+    let totalBudget = 0;
+    let totalSpent = 0;
+    let exceededCount = 0;
+    let warningCount = 0;
+    let okCount = 0;
 
     const entries = Object.entries(budgetCaps).map(([category, limit]) => {
       const spent = monthlySpending[category] || 0;
@@ -79,6 +107,12 @@ export const BudgetCapManager: React.FC<BudgetCapManagerProps> = ({
       const remaining = limit - spent;
       const isExceeded = spent > limit;
       const isWarning = !isExceeded && percentage >= 75;
+
+      totalBudget += limit;
+      totalSpent += spent;
+      if (isExceeded) exceededCount++;
+      else if (isWarning) warningCount++;
+      else okCount++;
 
       return {
         category,
@@ -91,11 +125,19 @@ export const BudgetCapManager: React.FC<BudgetCapManagerProps> = ({
       };
     });
 
+    const totalRemaining = totalBudget - totalSpent;
+
     return {
-      latestMonth,
+      selectedMonth,
+      totalBudget,
+      totalSpent: Math.round(totalSpent),
+      totalRemaining: Math.round(totalRemaining),
+      exceededCount,
+      warningCount,
+      okCount,
       entries: entries.sort((a, b) => b.percentage - a.percentage),
     };
-  }, [transactions, budgetCaps]);
+  }, [transactions, budgetCaps, selectedMonth]);
 
   const handleSaveCaps = () => {
     onUpdateBudgetCaps?.(editableCaps);
@@ -122,8 +164,14 @@ export const BudgetCapManager: React.FC<BudgetCapManagerProps> = ({
     });
   };
 
+  // Categorie uniche disponibili dalle transazioni per auto-completamento rapido
+  const availableCategories = useMemo(() => {
+    const cats = new Set(transactions.map((t) => t.category).filter(Boolean));
+    return Array.from(cats).sort();
+  }, [transactions]);
+
   return (
-    <Card className="bg-card border-border relative overflow-hidden">
+    <Card className="bg-card border-border relative overflow-hidden shadow-xs">
       <CardHeader className="pb-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -134,26 +182,93 @@ export const BudgetCapManager: React.FC<BudgetCapManagerProps> = ({
               </CardTitle>
             </div>
             <CardDescription className="text-xs text-muted-foreground mt-0.5">
-              Controllo in tempo reale dell'assorbimento delle soglie di spesa (riferimento {spendingMetrics.latestMonth})
+              Controllo in tempo reale dell'assorbimento delle soglie di spesa nelle categorie critiche
             </CardDescription>
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setEditableCaps(budgetCaps);
-              setIsModalOpen(true);
-            }}
-            className="h-8 text-xs border-border hover:bg-muted/50 gap-1.5 self-start sm:self-auto"
-          >
-            <Sliders className="w-3.5 h-3.5 text-primary" />
-            <span>Imposta Soglie Budget</span>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+            {/* Selettore Mese Storico */}
+            <div className="flex items-center gap-1.5 bg-background border border-border rounded-lg px-2.5 py-1">
+              <Calendar className="w-3.5 h-3.5 text-primary" />
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="bg-transparent text-xs font-semibold text-foreground focus:outline-none cursor-pointer capitalize"
+              >
+                {availableMonths.map((m) => (
+                  <option key={m} value={m} className="bg-card text-foreground capitalize">
+                    {formatMonthLabel(m)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setEditableCaps(budgetCaps);
+                setIsModalOpen(true);
+              }}
+              className="h-8 text-xs border-border hover:bg-muted/50 gap-1.5"
+            >
+              <Sliders className="w-3.5 h-3.5 text-primary" />
+              <span>Imposta Soglie Budget</span>
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* Mini-Cruscotto Aggregato se sono presenti cap */}
+        {spendingMetrics.entries.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-xl bg-background border border-border">
+            <div>
+              <span className="text-[10px] text-muted-foreground font-medium block">Budget Totale Monitorato</span>
+              <span className="text-sm font-bold text-foreground font-mono">
+                {formatEuro(spendingMetrics.totalBudget)}
+              </span>
+            </div>
+
+            <div>
+              <span className="text-[10px] text-muted-foreground font-medium block">Speso a {formatMonthLabel(selectedMonth)}</span>
+              <span className="text-sm font-bold text-foreground font-mono">
+                {formatEuro(spendingMetrics.totalSpent)}
+              </span>
+            </div>
+
+            <div>
+              <span className="text-[10px] text-muted-foreground font-medium block">Margine Residuo</span>
+              <span
+                className={`text-sm font-bold font-mono ${
+                  spendingMetrics.totalRemaining >= 0 ? 'text-emerald-500' : 'text-destructive'
+                }`}
+              >
+                {spendingMetrics.totalRemaining >= 0 ? `+${formatEuro(spendingMetrics.totalRemaining)}` : formatEuro(spendingMetrics.totalRemaining)}
+              </span>
+            </div>
+
+            <div>
+              <span className="text-[10px] text-muted-foreground font-medium block">Stato delle Soglie</span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-semibold">
+                  {spendingMetrics.okCount} OK
+                </span>
+                {spendingMetrics.warningCount > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-500 font-semibold">
+                    {spendingMetrics.warningCount} Pre-allarme
+                  </span>
+                )}
+                {spendingMetrics.exceededCount > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/15 text-destructive font-semibold">
+                    {spendingMetrics.exceededCount} Sforati
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {spendingMetrics.entries.length === 0 ? (
           <div className="py-8 text-center text-xs text-muted-foreground">
             Nessun budget cap impostato. Clicca su "Imposta Soglie Budget" per definire i limiti massimi mensili per categoria.
@@ -163,13 +278,11 @@ export const BudgetCapManager: React.FC<BudgetCapManagerProps> = ({
             {spendingMetrics.entries.map((item) => {
               // Determina stili di alert e progress indicator
               let indicatorColor = 'bg-primary';
-              let badgeVariant: 'default' | 'secondary' | 'destructive' | 'outline' = 'secondary';
               let badgeText = `${item.percentage}%`;
               let badgeClass = 'text-muted-foreground';
 
               if (item.isExceeded) {
                 indicatorColor = 'bg-destructive';
-                badgeVariant = 'destructive';
                 badgeText = `Sforato (+${formatEuro(Math.abs(item.remaining))})`;
                 badgeClass = 'bg-destructive text-destructive-foreground';
               } else if (item.isWarning) {
@@ -207,7 +320,7 @@ export const BudgetCapManager: React.FC<BudgetCapManagerProps> = ({
                       {item.isExceeded ? 'Limite superato' : 'Margine residuo'}
                     </span>
                     <span
-                      className={`font-semibold ${
+                      className={`font-semibold font-mono ${
                         item.isExceeded
                           ? 'text-destructive'
                           : item.isWarning
@@ -248,91 +361,93 @@ export const BudgetCapManager: React.FC<BudgetCapManagerProps> = ({
                   key={cat}
                   className="flex items-center justify-between gap-3 p-2 rounded-lg bg-background border border-border"
                 >
-                  <span className="font-medium truncate text-foreground flex-1">{cat}</span>
+                  <span className="font-medium text-foreground truncate">{cat}</span>
                   <div className="flex items-center gap-2">
-                    <div className="relative w-28">
-                      <Input
-                        type="number"
-                        min="0"
-                        step="10"
-                        value={limit}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value) || 0;
-                          setEditableCaps((prev) => ({ ...prev, [cat]: val }));
-                        }}
-                        className="h-8 text-xs font-mono pr-6 text-right"
-                      />
-                      <span className="absolute right-2 top-2 text-muted-foreground text-xs pointer-events-none">
-                        €
-                      </span>
-                    </div>
-                    <Button
+                    <span className="font-mono font-bold text-primary">{formatEuro(limit)}/m</span>
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="sm"
                       onClick={() => handleDeleteCap(cat)}
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      className="p-1 text-muted-foreground hover:text-destructive transition-colors rounded"
+                      aria-label={`Rimuovi cap per ${cat}`}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
                   </div>
                 </div>
               ))}
+
+              {Object.keys(editableCaps).length === 0 && (
+                <p className="text-center py-4 text-muted-foreground italic">
+                  Nessun cap definito. Aggiungine uno qui sotto.
+                </p>
+              )}
             </div>
 
-            {/* Aggiungi nuovo Cap */}
-            <div className="p-3 rounded-lg border border-border/80 bg-muted/20 space-y-2">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Aggiungi nuova soglia
+            {/* Form aggiunta nuovo cap */}
+            <div className="p-3 rounded-lg bg-background border border-border space-y-3">
+              <p className="font-semibold text-foreground flex items-center gap-1.5">
+                <Plus className="w-3.5 h-3.5 text-primary" />
+                Aggiungi o Modifica Soglia
               </p>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Nome Categoria (es. Trasporti, Uscite...)"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  className="h-8 text-xs flex-1"
-                />
-                <div className="relative w-28">
-                  <Input
-                    placeholder="Budget"
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <Label htmlFor="cap-category" className="text-[11px] text-muted-foreground">Categoria</Label>
+                  <input
+                    id="cap-category"
+                    list="categories-list"
+                    type="text"
+                    placeholder="es. Supermercato"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="w-full mt-1 bg-card border border-input rounded px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                  <datalist id="categories-list">
+                    {availableCategories.map((c) => (
+                      <option key={c} value={c} />
+                    ))}
+                  </datalist>
+                </div>
+                <div>
+                  <Label htmlFor="cap-limit" className="text-[11px] text-muted-foreground">Tetto Mensile (€)</Label>
+                  <input
+                    id="cap-limit"
                     type="number"
-                    min="1"
+                    placeholder="es. 400"
                     value={newLimit}
                     onChange={(e) => setNewLimit(e.target.value)}
-                    className="h-8 text-xs font-mono pr-6 text-right"
+                    className="w-full mt-1 bg-card border border-input rounded px-2.5 py-1.5 text-xs font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   />
-                  <span className="absolute right-2 top-2 text-muted-foreground text-xs pointer-events-none">
-                    €
-                  </span>
                 </div>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleAddCap}
-                  className="h-8 text-xs bg-primary hover:bg-primary/90 text-primary-foreground px-3 gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Aggiungi</span>
-                </Button>
               </div>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleAddCap}
+                disabled={!newCategory.trim() || !newLimit}
+                className="w-full h-8 text-xs font-medium"
+              >
+                Aggiungi alla Lista
+              </Button>
             </div>
           </div>
 
-          <DialogFooter className="pt-2 flex gap-2">
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               type="button"
               variant="outline"
+              size="sm"
               onClick={() => setIsModalOpen(false)}
-              className="h-8 text-xs border-border"
+              className="text-xs"
             >
               Annulla
             </Button>
             <Button
               type="button"
+              size="sm"
               onClick={handleSaveCaps}
-              className="h-8 text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-4 shadow-sm"
+              className="text-xs"
             >
-              Salva Soglie nel Vault
+              Salva Modifiche
             </Button>
           </DialogFooter>
         </DialogContent>

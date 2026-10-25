@@ -293,7 +293,7 @@ class GoogleDriveService {
     }
 
     if (!token) {
-      // Fallback virtual payslips for offline / demo preview
+      // Fallback virtual payslips for offline / demo preview with real payslip history
       return [
         {
           id: 'mock-payslip-2026-10',
@@ -304,12 +304,36 @@ class GoogleDriveService {
           isExtraordinaryMonth: null,
         },
         {
+          id: 'mock-payslip-2026-08',
+          name: 'Busta_Paga_2026_08_Cloudfire_730_Tranche2.pdf',
+          month: '2026-08',
+          netSalary: 2660.00,
+          modifiedTime: '2026-08-20T10:00:00Z',
+          isExtraordinaryMonth: null,
+        },
+        {
+          id: 'mock-payslip-2026-07',
+          name: 'Busta_Paga_2026_07_Cloudfire_730_Tranche1.pdf',
+          month: '2026-07',
+          netSalary: 3530.00,
+          modifiedTime: '2026-07-20T10:00:00Z',
+          isExtraordinaryMonth: null,
+        },
+        {
           id: 'mock-payslip-2026-06',
           name: 'Cedolino_14esima_2026_06.pdf',
           month: '2026-06',
           netSalary: 1848.00,
           modifiedTime: '2026-06-25T14:30:00Z',
           isExtraordinaryMonth: '14th',
+        },
+        {
+          id: 'mock-payslip-2025-12',
+          name: 'Cedolino_13esima_2025_12.pdf',
+          month: '2025-12',
+          netSalary: 1852.00,
+          modifiedTime: '2025-12-19T10:00:00Z',
+          isExtraordinaryMonth: '13th',
         },
       ];
     }
