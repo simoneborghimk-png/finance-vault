@@ -9,7 +9,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { VaultData, Transaction, SavingsGoal, RecurringOverride } from '@/types/finance';
-import { initialVaultData } from '@/lib/mockData';
+import { initialVaultData, hasLocalRealTransactions } from '@/lib/mockData';
 import { encryptVault, decryptVault } from '@/lib/crypto';
 import { googleDrive } from '@/lib/googleDrive';
 
@@ -55,6 +55,7 @@ export function App() {
   const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
 
   const isLegacyMockData = (v: VaultData): boolean => {
+    if (!hasLocalRealTransactions) return false;
     if (!v.transactions || v.transactions.length === 0) return true;
     const hasOldMock = v.transactions.some((t) => t.id.startsWith('mock-') || t.id.startsWith('virtual-'));
     const hasGastroBug = v.transactions.some(
@@ -113,7 +114,7 @@ export function App() {
 
   // Proactively migrate any legacy mock transactions currently in state to the real reconciled dataset
   useEffect(() => {
-    if (isLegacyMockData(vault)) {
+    if (hasLocalRealTransactions && isLegacyMockData(vault)) {
       console.log('Migrazione automatica: caricamento delle 658 transazioni reali...');
       const upgraded: VaultData = {
         ...vault,

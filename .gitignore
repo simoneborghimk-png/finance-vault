@@ -28,6 +28,7 @@ lerna-debug.log*
 # Editor & OS Artifacts
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 .DS_Store?

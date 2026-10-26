@@ -5,6 +5,7 @@ import { generatePresetVirtualTransactions } from './parsers/bankParsers';
 // Su un nuovo clone pubblico o in assenza del file, effettua il fallback automatico sui dati demo.
 const realDataModules = import.meta.glob<any>('./realTransactions.json', { eager: true });
 const localTransactions = (realDataModules['./realTransactions.json']?.default as Transaction[]) || null;
+export const hasLocalRealTransactions = Boolean(localTransactions && localTransactions.length > 0);
 
 export const initialProfile: UserFinancialProfile = {
   baseMonthlyNetSalary: 1953.00,

@@ -7,6 +7,14 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/)
 
 ## [Unreleased]
 
+### Fixed
+- **Risoluzione Loop di Re-Render al Mount in Assenza di `realTransactions.json`:**
+  - Corretta la condizione di migrazione automatica in `App.tsx` ed esportato `hasLocalRealTransactions` in `mockData.ts`: in assenza del dataset reale su disco (clone Git pulito o nuova macchina), il dataset simulato demo non viene più scambiato per dati obsoleti, prevenendo il crash di React (`Maximum update depth exceeded`) e garantendo un avvio istantaneo e fluido.
+- **Resilienza Runtime & ErrorBoundary:**
+  - Introdotto `ErrorBoundary` con design semantico dark/glassmorphic, gestione dell'errore ed ergonomico pulsante di ricarica per evitare qualsiasi schermata bianca silente in caso di eccezioni JavaScript non gestite.
+- **Configurazione Workspace Editor:**
+  - Aggiunto `.vscode/settings.json` tracciato per silenziare i falsi positivi del linter CSS nativo sulle direttive `@tailwind`.
+
 ### Added / Changed
 - **Integrazione Sottoscrizioni Annuali Certificate (Netflix & Crunchyroll — ADR-011):**
   - **Netflix — Quota Gabriele Zaniboni (120,00 € / anno su PayPal):** Riconciliato come contratto annuale (`Abbonamenti Digitali` / Streaming Video). Riconoscimento automatico in `normalizeMerchant` delle transazioni PayPal verso *Gabriele Zaniboni*. Registrato lo storico con addebito annuale 2025 al 15/10/2025 (-120,00 €); per il 2026 lo stato è attivo con scadenza attesa al `2026-10-15` e alert informativo (*"Rinnovo annuale 2026 atteso intorno al 15 Ottobre non ancora contabilizzato"*), senza incidere sulla spesa consuntivata del periodo 2026 fino al reale addebito (impatto previsionale annuo 120,00 €/anno, 10,00 €/mese).
