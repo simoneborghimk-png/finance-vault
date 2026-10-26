@@ -127,7 +127,14 @@ export function normalizeMerchant(
     return { key: 'vorwerk-folletto', displayName: 'Vorwerk: Robot Folletto VR7s', preferredType: 'loan' };
   }
   if (cleaned.includes('cofidis')) {
-    return { key: 'cofidis-soundbar', displayName: 'Cofidis (Soundbar LG)', preferredType: 'loan' };
+    const absAmt = amount !== undefined ? Math.abs(amount) : undefined;
+    if (absAmt !== undefined && Math.abs(absAmt - 89.14) < 0.2) {
+      return { key: 'cofidis-switch2', displayName: 'Cofidis (Nintendo Switch 2)', preferredType: 'loan' };
+    }
+    if (absAmt !== undefined && Math.abs(absAmt - 56.25) < 0.2) {
+      return { key: 'cofidis-soundbar', displayName: 'Cofidis (Soundbar LG)', preferredType: 'loan' };
+    }
+    return { key: 'cofidis-multi', displayName: 'Cofidis (Rate Cumulative)', preferredType: 'loan' };
   }
   // Rate Amazon ufficiali rateizzate
   if (cleaned.includes('amazon: rata')) {
@@ -170,8 +177,19 @@ export function normalizeMerchant(
   if (cleaned.includes('enel energia')) {
     return { key: 'enel-energia', displayName: 'Enel Energia (Utenza)', preferredType: 'utility' };
   }
-  if (cleaned.includes('condominio')) {
-    return { key: 'condominio', displayName: raw.trim(), preferredType: 'utility' };
+  if (
+    cleaned.includes('pulizia scale') ||
+    (cleaned.includes('scale') && (cleaned.includes('condominio') || cleaned.includes('pulizia')))
+  ) {
+    return { key: 'pulizia-scale', displayName: 'Pulizia Scale Condominio', preferredType: 'utility' };
+  }
+  if (
+    cleaned.includes('condominio') ||
+    cleaned.includes('betulla') ||
+    cleaned.includes('rata condominiale') ||
+    (rawDesc && /condominio|betulla/i.test(rawDesc))
+  ) {
+    return { key: 'condominio-betulla', displayName: 'Condominio Betulla (Rate Condominiali)', preferredType: 'utility' };
   }
 
   // 4. Donazioni Periodiche SDD
@@ -250,35 +268,35 @@ function getPredefinedLoanAmortization(
   }
 
   if (key === 'cofidis-soundbar') {
-    // Cofidis Soundbar LG: 675 € in 12 rate da 56,25 € (partito 24 luglio 2026)
-    // 4 rate pagate (Luglio, Agosto, Settembre, Ottobre), 8 rate rimanenti (450 € residui). Scadenza Giugno 2027.
-    const paidInstallments = 4;
+    // Cofidis Soundbar LG: 675 € in 12 rate mensili da 56,25 € (partito ad Agosto 2026)
+    // 3 rate pagate (Agosto, Settembre, Ottobre 2026 = 168,75 €), 9 rate rimanenti (506,25 € residui). Scadenza Luglio 2027.
+    const paidInstallments = 3;
     const totalInstallments = 12;
-    const remainingInstallments = 8;
+    const remainingInstallments = 9;
     const installmentAmount = 56.25;
     return {
       totalInstallments,
       paidInstallments,
       remainingInstallments,
       totalAmount: 675.0,
-      paidAmount: 225.0,
-      remainingDebt: 450.0,
+      paidAmount: 168.75,
+      remainingDebt: 506.25,
       installmentAmount,
-      endDate: '2027-06',
+      endDate: '2027-07',
       isClosed: false,
-      notes: 'Cofidis: 12 rate mensili da 56,25 € (Soundbar LG e-commerce)',
+      notes: 'Cofidis: 12 rate mensili da 56,25 € (Soundbar LG - In ammortamento)',
     };
   }
 
   if (key === 'cofidis-switch2') {
-    // Switch 2: 429,99 € in 5 rate da 89,14 € (da giugno a ottobre 2026).
+    // Nintendo Switch 2: 5 rate da 89,14 € (totale 445,70 € da Giugno a Ottobre 2026).
     // Concluso ed estinto a Ottobre 2026.
     return {
       totalInstallments: 5,
       paidInstallments: 5,
       remainingInstallments: 0,
-      totalAmount: 429.99,
-      paidAmount: 429.99,
+      totalAmount: 445.7,
+      paidAmount: 445.7,
       remainingDebt: 0.0,
       installmentAmount: 89.14,
       endDate: '2026-10',
@@ -444,6 +462,45 @@ export function detectRecurringExpenses(
       }
     }
 
+    if (norm.key === 'cofidis-multi') {
+      // Disaggregazione analitica degli addebiti cumulativi SDD (145,39 € = 89,14 € Switch 2 + 56,25 € Soundbar LG)
+      if (!groups['cofidis-soundbar']) {
+        groups['cofidis-soundbar'] = {
+          key: 'cofidis-soundbar',
+          displayName: 'Cofidis (Soundbar LG)',
+          preferredType: 'loan',
+          transactions: [],
+        };
+      }
+      if (!groups['cofidis-switch2']) {
+        groups['cofidis-switch2'] = {
+          key: 'cofidis-switch2',
+          displayName: 'Cofidis (Nintendo Switch 2)',
+          preferredType: 'loan',
+          transactions: [],
+        };
+      }
+
+      // Quota Soundbar LG: 56,25 €
+      groups['cofidis-soundbar'].transactions.push({
+        ...t,
+        id: `${t.id}-soundbar`,
+        amount: -56.25,
+        description: 'Cofidis: Rata Soundbar LG (quota SDD)',
+        rawDescription: t.rawDescription || t.description,
+      });
+
+      // Quota Nintendo Switch 2: 89,14 €
+      groups['cofidis-switch2'].transactions.push({
+        ...t,
+        id: `${t.id}-switch2`,
+        amount: -89.14,
+        description: 'Cofidis: Rata Nintendo Switch 2 (quota SDD)',
+        rawDescription: t.rawDescription || t.description,
+      });
+      return;
+    }
+
     if (!contractType || norm.key === 'other') {
       return;
     }
@@ -459,15 +516,29 @@ export function detectRecurringExpenses(
     groups[norm.key].transactions.push(t);
   });
 
-  // Aggiungiamo virtualmente il finanziamento Switch 2 concluso (per completezza e trasparenza storica)
+  // Assicuriamo le 5 rate storiche complete per Switch 2 (Giugno, Luglio, Agosto, Settembre, Ottobre 2026)
   if (!groups['cofidis-switch2']) {
-    const cofidisTxs = groups['cofidis-soundbar']?.transactions || [];
     groups['cofidis-switch2'] = {
       key: 'cofidis-switch2',
       displayName: 'Cofidis (Nintendo Switch 2)',
       preferredType: 'loan',
-      transactions: cofidisTxs.filter((t) => t.date <= '2026-10-31'),
+      transactions: [],
     };
+  }
+  const hasJune = groups['cofidis-switch2'].transactions.some((tx) => tx.date.startsWith('2026-06'));
+  if (!hasJune) {
+    groups['cofidis-switch2'].transactions.unshift({
+      id: 'cofidis-switch2-2026-06-01',
+      date: '2026-06-01',
+      channel: 'BancoBPM',
+      amount: -89.14,
+      macroCategory: 'Commitments',
+      category: 'Rate Finanziamenti',
+      description: 'Cofidis: Rata 1/5 Nintendo Switch 2',
+      rawDescription: 'addebito diretto sdd - sdd core: mndtca999102710443p001 cofidis sa',
+      tags: ['#rata', '#prestito', '#debito', '#ricorrente'],
+      autoCategorized: true,
+    });
   }
 
   // Sottoscrizioni annuali certe certificate (Netflix e Crunchyroll)
@@ -527,6 +598,43 @@ export function detectRecurringExpenses(
     };
   }
 
+  // Uscita fissa mensile contanti per Pulizia Scale (15 €/mese il 10 di ogni mese dall'origine dei dati a Settembre 2025)
+  if (!groups['pulizia-scale']) {
+    const scaleMonths = [
+      '2025-09-10',
+      '2025-10-10',
+      '2025-11-10',
+      '2025-12-10',
+      '2026-01-10',
+      '2026-02-10',
+      '2026-03-10',
+      '2026-04-10',
+      '2026-05-10',
+      '2026-06-10',
+      '2026-07-10',
+      '2026-08-10',
+      '2026-09-10',
+      '2026-10-10',
+    ];
+    groups['pulizia-scale'] = {
+      key: 'pulizia-scale',
+      displayName: 'Pulizia Scale Condominio',
+      preferredType: 'utility',
+      transactions: scaleMonths.map((d) => ({
+        id: `cash-scale-${d}`,
+        date: d,
+        channel: 'Contanti',
+        amount: -15.0,
+        macroCategory: 'Needs',
+        category: 'Spese Condominiali',
+        description: 'Pulizia Scale Condominio',
+        rawDescription: 'Quota mensile contanti pulizia scale',
+        tags: ['#spesecondominiali', '#puliziascale', '#contanti', '#ricorrente'],
+        autoCategorized: true,
+      })),
+    };
+  }
+
   const detected: RecurringExpense[] = [];
 
   Object.values(groups).forEach((group) => {
@@ -554,7 +662,10 @@ export function detectRecurringExpenses(
       avgInterval >= 300
     ) {
       frequency = 'annual';
-    } else if (avgInterval >= 80 && avgInterval < 150) {
+    } else if (
+      group.key === 'condominio-betulla' ||
+      (avgInterval >= 80 && avgInterval < 150)
+    ) {
       frequency = 'quarterly';
     } else if (
       group.preferredType === 'utility' &&
@@ -582,8 +693,8 @@ export function detectRecurringExpenses(
     // Prossimo addebito
     let { nextExpectedDate, daysUntilNext, isActive: baseIsActive } = calculateNextBilling(lastTx.date, frequency, referenceDate);
 
-    // Override utente
-    const override = overrides[group.key];
+    // Override utente (con retrocompatibilità per vecchia chiave 'condominio')
+    const override = overrides[group.key] || (group.key === 'condominio-betulla' ? overrides['condominio'] : undefined);
     const finalName = override?.customName || group.displayName;
     let finalFrequency = override?.customFrequency || frequency;
     const isIgnored = override?.ignored === true;
@@ -696,10 +807,10 @@ export function detectRecurringExpenses(
     if (group.preferredType === 'loan') {
       pricingModel = 'loan';
     } else if (group.preferredType === 'utility') {
-      if (group.key === 'telecomitalia') {
-        pricingModel = 'flat'; // La connettività ha un canone flat (soggetto a rimodulazioni)
+      if (group.key === 'telecomitalia' || group.key === 'pulizia-scale') {
+        pricingModel = 'flat'; // Canone fisso (connettività o pulizia scale)
       } else {
-        pricingModel = 'variable_utility'; // Utenze variabili in base ai consumi (Luce, Gas, Acqua, Rifiuti)
+        pricingModel = 'variable_utility'; // Utenze variabili in base ai consumi e rate condominiali
       }
     } else {
       pricingModel = 'flat';
@@ -783,6 +894,7 @@ export function detectRecurringExpenses(
       group.key === 'google-tado' ||
       group.key === 'netflix' ||
       group.key === 'crunchyroll' ||
+      group.key === 'pulizia-scale' ||
       baseIsActive
     );
 
@@ -802,9 +914,19 @@ export function detectRecurringExpenses(
     detected.push({
       id: group.key,
       name: finalName,
-      category: override?.customCategory || (group.preferredType === 'donation' ? 'Donazioni & Volontariato' : lastTx.category) || 'Rate Finanziamenti',
-      macroCategory: lastTx.macroCategory || 'Commitments',
-      channel: lastTx.channel || 'BancoBPM',
+      category:
+        override?.customCategory ||
+        (group.key === 'condominio-betulla' || group.key === 'pulizia-scale'
+          ? 'Spese Condominiali'
+          : group.preferredType === 'donation'
+          ? 'Donazioni & Volontariato'
+          : lastTx.category) ||
+        'Rate Finanziamenti',
+      macroCategory:
+        group.key === 'condominio-betulla' || group.key === 'pulizia-scale'
+          ? 'Needs'
+          : lastTx.macroCategory || 'Commitments',
+      channel: lastTx.channel || (group.key === 'pulizia-scale' ? 'Contanti' : 'BancoBPM'),
       channels: uniqueChannels,
       channelTransition,
       type: group.preferredType,

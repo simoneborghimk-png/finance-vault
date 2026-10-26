@@ -67,8 +67,8 @@ export const initialBudgetRules: BudgetRule[] = [
   {
     id: 'rule-betulla',
     name: 'Condominio Betulla',
-    amount: 95.00,
-    frequency: 'monthly',
+    amount: 250.00,
+    frequency: 'quarterly',
     macroCategory: 'Needs',
     category: 'Spese Condominiali',
     channel: 'BancoBPM',
@@ -217,18 +217,20 @@ export function generate12MonthsMockTransactions(): Transaction[] {
       autoCategorized: true,
     });
 
-    // Needs: Condominio Betulla
-    transactions.push({
-      id: `mock-condo-${ym}`,
-      date: `${ym}-10`,
-      channel: 'BancoBPM',
-      amount: -95.00,
-      macroCategory: 'Needs',
-      category: 'Spese Condominiali',
-      description: 'CONDOMINIO BETULLA RATA ORDINARIA',
-      tags: ['#condominio'],
-      autoCategorized: true,
-    });
+    // Needs: Condominio Betulla (3-4 rate l'anno a cadenza trimestrale)
+    if (idx === 1 || idx === 3 || idx === 7 || idx === 11) {
+      transactions.push({
+        id: `mock-condo-${ym}`,
+        date: `${ym}-15`,
+        channel: 'BancoBPM',
+        amount: -250.00,
+        macroCategory: 'Needs',
+        category: 'Spese Condominiali',
+        description: 'CONDOMINIO BETULLA RATA ORDINARIA',
+        tags: ['#condominio', '#casa', '#fisse'],
+        autoCategorized: true,
+      });
+    }
 
     // Needs: Spesa Conad
     transactions.push({
@@ -251,6 +253,20 @@ export function generate12MonthsMockTransactions(): Transaction[] {
       category: 'Spesa Alimentare',
       description: 'SDD GESTIONE CARTE CONAD SPESA',
       tags: ['#supermercato', '#cibo'],
+      autoCategorized: true,
+    });
+
+    // Needs: Spese Condominiali fisse - Pulizia Scale (15 €/mese contanti il 10 di ogni mese)
+    transactions.push({
+      id: `mock-scale-${ym}`,
+      date: `${ym}-10`,
+      channel: 'Contanti',
+      amount: -15.00,
+      macroCategory: 'Needs',
+      category: 'Spese Condominiali',
+      description: 'Pulizia Scale Condominio',
+      rawDescription: 'Quota mensile contanti pulizia scale',
+      tags: ['#spesecondominiali', '#puliziascale', '#contanti', '#ricorrente'],
       autoCategorized: true,
     });
 

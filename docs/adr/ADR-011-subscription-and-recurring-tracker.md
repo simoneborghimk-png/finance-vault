@@ -27,6 +27,12 @@
      - Salvataggio delle preferenze di esclusione/silenziamento utente (`recurringOverrides`) all'interno del payload `VaultData` protetto da crittografia AES-256-GCM.
   4. **Riconciliazione Quote Condivise & Canali Reali:**
      - Mappatura intelligente dei trasferimenti P2P per abbonamenti condivisi (es. Crunchyroll su Satispay verso Silvio Leuci, Netflix su PayPal verso Gabriele Zaniboni).
+  5. **Segmentazione Spese Condominiali (Condominio Betulla vs Pulizia Scale):**
+     - Separazione rigorosa tra le rate ordinarie/conguaglio condominiali su Banco BPM (`condominio-betulla`, 3-4 rate all'anno a cadenza trimestrale, pricing model `variable_utility`) e la pulizia scale fissa mensile in contanti (`pulizia-scale`, 15 €/mese fissa, pricing model `flat`).
+     - Iconografia dedicata (`Building2`) e badge contestuale "Spesa Condominiale" per distinguere le spese di gestione dell'immobile dalle utenze energetiche a consumo.
+  6. **Disaggregazione Analitica Addebiti Cumulativi SDD (Cofidis Switch 2 vs Soundbar LG):**
+     - Riconoscimento del mandato SDD cumulativo Cofidis su Banco BPM (`mndtca999102710443p001 cofidis sa`): quando più finanziamenti coesistono nello stesso mese (145,39 €), il prelievo viene disaggregato analiticamente nelle rispettive quote contrattuali: 89,14 € per Nintendo Switch 2 (5 rate concluse ed estinte a Ottobre 2026, 0 € debito residuo) e 56,25 € per Soundbar LG (12 rate mensili in corso, 3 pagate e 9 rimanenti per 506,25 € di debito residuo con scadenza Luglio 2027).
+     - Icone e visual dedicati: `Gamepad2` in rosso per Switch 2 ed `Speaker` in viola per Soundbar LG.
 
 - **Conseguenze:**
   - **Positive:** Totale visibilità preventiva sui rinnovi imminenti e sul peso reale dei costi fissi annuali; eliminazione di abbonamenti fantasma o dimenticati; perfetta coerenza tra media consuntiva delle bollette stagionali e canoni fissi; zero latenza grazie all'esecuzione pura in-memory sul client.

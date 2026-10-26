@@ -21,8 +21,8 @@
 | ------------------------------- | :---: | -------------------------------------------------------------- |
 | **Vault Unlock & Biometrics**   |   ✅  | Master Password + WebAuthn Passkey (Face ID/Touch ID)          |
 | **Tab 1: Executive Dashboard**  |   ✅  | KPI (Entrate, Needs, Wants, Cash Flow, Savings Rate) + Recharts |
-| **Tab 2: Transazioni (Manager)**|   ✅  | Tabella interattiva, ricerca full-text, filtri, editing e inserimento manuale |
-| **Tab 3: Costi Fissi & Utenze** |   ✅  | Promossa a 1° livello: media consuntiva & scostamento utenze, monitor rimodulazioni |
+| **Tab 2: Costi Fissi & Utenze** |   ✅  | Canoni flat, utenze consuntivate, ammortamenti rate, accordion comparativo |
+| **Tab 3: Transazioni (Manager)**|   ✅  | Tabella interattiva, ricerca full-text, filtri, editing e inserimento manuale |
 | **Tab 4: Simulatore Fiscale**   |   ✅  | Slider 0-5.164,57 €, deducibilità 730 IRPEF 35-43%, timeline    |
 | **Tab 5: Goal Planner**         |   ✅  | Assorbimento 14ª, 13ª e 730, Feasibility Engine e BudgetCap mensili |
 | **Tab 6: Ingestione File**      |   ✅  | Dropzone Excel/CSV Banco BPM, Carta Nexi, Numia, PayPal, Satispay |
@@ -59,10 +59,16 @@
 - [x] Subscription & Recurring Tracker: piani ammortamento certificati (Amazon TV/Watch, Cofidis Soundbar/Switch, Vorwerk Folletto VR7s, Bimby TM7 HeyLight/Compass, TIMFin & Compass vecchi chiusi) (ADR-011)
 - [x] Data prossimo pagamento e badge urgenza visibili a card chiusa in `RecurringTracker` (sia contratti che rate ammortamento)
 - [x] Bonifica ricorrenti: Iren Luce vs Gas, YouTube 15,99 € Numia, Game Pass PayPal, Audible sospeso, UNHCR una tantum (ADR-011)
-- [x] Costi Fissi & Utenze 1° livello: media consuntiva utenze, monitor rimodulazioni flat, segmentazione Google Play (Philips Hue, tado°, Hiya) (ADR-011)
-- [x] Costi Fissi & Utenze: periodo dinamico DateRangePicker, Recharts LineChart utenze, unificazione card KPI e toolbar filtri avanzata (ADR-011)
+- [x] Costi Fissi & Utenze: spostata a Tab 2, media consuntiva utenze, monitor rimodulazioni flat, segmentazione Google Play (Philips Hue, tado°, Hiya) (ADR-011)
+- [x] Periodo dinamico DateRangePicker, Recharts LineChart utenze, unificazione card KPI e toolbar filtri avanzata (ADR-011)
 - [x] Standardizzazione header di pagina: fuori dalle card, icone tab semantiche, azioni e selettore periodo allineati a destra
 - [x] Abbonamenti annuali certificati: Netflix (120 €/anno, atteso 2026) e Crunchyroll (15 €/anno, pagato 2026) (ADR-011)
+- [x] Segmentazione spese condominiali: Condominio Betulla (3-4 rate/anno trimestrali su BPM) vs Pulizia Scale (15 €/mese contanti) (ADR-011)
+- [x] Standardizzazione semantica simbologia & isolamento colori di stato (positive, warning, error, info) (ADR-011)
+- [x] Grafico ricorrenti universale e dinamico: select categoria, serie con toggle chip e card riepilogo speculari (ADR-011)
+- [x] Palette e iconografia distintive per serie: icone tematiche (Film, Play, Gamepad2, Lightbulb, Thermometer, ecc.) e colori ad alto contrasto senza sovrapposizioni (ADR-011)
+- [x] Disaggregazione prelievi SDD Cofidis: Switch 2 (5 rate concluse ed estinte) vs Soundbar LG (12 rate da 56,25 € in corso) (ADR-011)
+- [x] Accordion comprimibile per card comparative del grafico in Costi Fissi & rimozione duplicato da GoalPlanner (ADR-011)
 - [ ] **Abilitazione e collaudo reale accesso biometrico** (WebAuthn Passkey Touch ID / Face ID)
 - [ ] **Check regole parsing per canale** (BPM, Nexi, Numia, PayPal, Satispay), test nuovo file e verifica deduplica
 - [ ] [APPROVATO - IN STANDBY] Financial Advisor & Spending Optimizer: roadmap stagionale investimenti, tranches pensione estive/autunnali e plafond consigliati (ADR-012)

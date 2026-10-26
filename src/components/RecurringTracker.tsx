@@ -35,6 +35,26 @@ import {
   SlidersHorizontal,
   Activity,
   Layers,
+  Building2,
+  Trash2,
+  Wifi,
+  HeartHandshake,
+  Play,
+  Film,
+  Gamepad2,
+  Lightbulb,
+  Thermometer,
+  Package,
+  Clapperboard,
+  Headphones,
+  Music,
+  Globe,
+  Briefcase,
+  ShieldCheck,
+  Watch,
+  Speaker,
+  CookingPot,
+  Bot,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -66,6 +86,461 @@ interface RecurringTrackerProps {
   onSaveOverride?: (id: string, override: RecurringOverride) => void;
 }
 
+export interface EntityVisual {
+  icon: React.ElementType;
+  color: string;
+  bg: string;
+  border: string;
+  badgeLabel: string;
+  hex: string;
+}
+
+export const DISTINCT_SERIES_PALETTE = [
+  { hex: '#f97316', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/25' },
+  { hex: '#eab308', color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/25' },
+  { hex: '#06b6d4', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/25' },
+  { hex: '#14b8a6', color: 'text-teal-400', bg: 'bg-teal-500/10', border: 'border-teal-500/25' },
+  { hex: '#8b5cf6', color: 'text-violet-400', bg: 'bg-violet-500/10', border: 'border-violet-500/25' },
+  { hex: '#ef4444', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/25' },
+  { hex: '#10b981', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/25' },
+  { hex: '#3b82f6', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/25' },
+  { hex: '#ec4899', color: 'text-pink-400', bg: 'bg-pink-500/10', border: 'border-pink-500/25' },
+  { hex: '#d946ef', color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/25' },
+  { hex: '#6366f1', color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/25' },
+  { hex: '#a855f7', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/25' },
+];
+
+function getHashIndex(str: string, modulo: number): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash) % modulo;
+}
+
+export function getEntityVisual(item: { id: string; name?: string; category?: string; type?: RecurringExpenseType }): EntityVisual {
+  const id = (item.id || '').toLowerCase();
+  const name = (item.name || '').toLowerCase();
+  const cat = (item.category || '').toLowerCase();
+  const isMatch = (...terms: string[]) => terms.some((t) => id.includes(t) || name.includes(t));
+
+  // --- 1. Utenze Domestiche & Spese Casa ---
+  // Gas Naturale
+  if (isMatch('gas')) {
+    return {
+      icon: Flame,
+      color: 'text-orange-400',
+      bg: 'bg-orange-500/10',
+      border: 'border-orange-500/25',
+      badgeLabel: 'Gas Naturale',
+      hex: '#f97316',
+    };
+  }
+
+  // Luce / Energia Elettrica
+  if (isMatch('luce', 'enel') || (isMatch('iren') && !isMatch('ambiente', 'gas'))) {
+    return {
+      icon: Zap,
+      color: 'text-yellow-400',
+      bg: 'bg-yellow-500/10',
+      border: 'border-yellow-500/25',
+      badgeLabel: 'Energia Elettrica',
+      hex: '#eab308',
+    };
+  }
+
+  // Servizio Idrico / Acqua
+  if (isMatch('acqua', 'arca')) {
+    return {
+      icon: Droplets,
+      color: 'text-cyan-400',
+      bg: 'bg-cyan-500/10',
+      border: 'border-cyan-500/25',
+      badgeLabel: 'Servizio Idrico',
+      hex: '#06b6d4',
+    };
+  }
+
+  // Tassa Rifiuti (TARI)
+  if (isMatch('ambiente', 'tari', 'rifiuti')) {
+    return {
+      icon: Trash2,
+      color: 'text-teal-400',
+      bg: 'bg-teal-500/10',
+      border: 'border-teal-500/25',
+      badgeLabel: 'Tassa Rifiuti (TARI)',
+      hex: '#14b8a6',
+    };
+  }
+
+  // Spese Condominiali & Pulizia Scale
+  if (isMatch('scale', 'pulizia scale')) {
+    return {
+      icon: Sparkles,
+      color: 'text-purple-400',
+      bg: 'bg-purple-500/10',
+      border: 'border-purple-500/25',
+      badgeLabel: 'Pulizia Scale',
+      hex: '#a855f7',
+    };
+  }
+  if (isMatch('condominio', 'betulla') || cat.includes('condomin')) {
+    return {
+      icon: Building2,
+      color: 'text-violet-400',
+      bg: 'bg-violet-500/10',
+      border: 'border-violet-500/25',
+      badgeLabel: 'Spesa Condominiale',
+      hex: '#8b5cf6',
+    };
+  }
+
+  // Connettività & Fibra
+  if (isMatch('telecom', 'tim fibra', 'fibra', 'connettività') && !isMatch('timfin')) {
+    return {
+      icon: Wifi,
+      color: 'text-indigo-400',
+      bg: 'bg-indigo-500/10',
+      border: 'border-indigo-500/25',
+      badgeLabel: 'Fibra & Connettività',
+      hex: '#6366f1',
+    };
+  }
+
+  // --- 2. Abbonamenti Digitali & Streaming (Icone & Colori Specifici Univoci) ---
+  // YouTube Premium
+  if (isMatch('youtube')) {
+    return {
+      icon: Play,
+      color: 'text-red-400',
+      bg: 'bg-red-500/10',
+      border: 'border-red-500/25',
+      badgeLabel: 'Streaming Video',
+      hex: '#ef4444',
+    };
+  }
+
+  // Netflix
+  if (isMatch('netflix', 'zaniboni')) {
+    return {
+      icon: Film,
+      color: 'text-rose-500',
+      bg: 'bg-rose-500/10',
+      border: 'border-rose-500/25',
+      badgeLabel: 'Streaming TV',
+      hex: '#e11d48',
+    };
+  }
+
+  // Xbox Game Pass / Gaming Microsoft
+  if (isMatch('gamepass', 'game pass', 'xbox', 'microsoft')) {
+    return {
+      icon: Gamepad2,
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-500/10',
+      border: 'border-emerald-500/25',
+      badgeLabel: 'Gaming & Cloud',
+      hex: '#10b981',
+    };
+  }
+
+  // Philips Hue
+  if (isMatch('philips', 'hue')) {
+    return {
+      icon: Lightbulb,
+      color: 'text-amber-400',
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/25',
+      badgeLabel: 'Smart Home & TV',
+      hex: '#f59e0b',
+    };
+  }
+
+  // tado° Climatizzazione
+  if (isMatch('tado', 'clima')) {
+    return {
+      icon: Thermometer,
+      color: 'text-sky-400',
+      bg: 'bg-sky-500/10',
+      border: 'border-sky-500/25',
+      badgeLabel: 'Climatizzazione Smart',
+      hex: '#0ea5e9',
+    };
+  }
+
+  // Amazon Prime
+  if (isMatch('prime') && !isMatch('rata')) {
+    return {
+      icon: Package,
+      color: 'text-cyan-400',
+      bg: 'bg-cyan-500/10',
+      border: 'border-cyan-500/25',
+      badgeLabel: 'Spedizioni & Prime',
+      hex: '#06b6d4',
+    };
+  }
+
+  // Crunchyroll
+  if (isMatch('crunchyroll', 'leuci')) {
+    return {
+      icon: Clapperboard,
+      color: 'text-orange-400',
+      bg: 'bg-orange-500/10',
+      border: 'border-orange-500/25',
+      badgeLabel: 'Anime Streaming',
+      hex: '#f97316',
+    };
+  }
+
+  // Spotify
+  if (isMatch('spotify')) {
+    return {
+      icon: Music,
+      color: 'text-lime-400',
+      bg: 'bg-lime-500/10',
+      border: 'border-lime-500/25',
+      badgeLabel: 'Musica Streaming',
+      hex: '#84cc16',
+    };
+  }
+
+  // Audible
+  if (isMatch('audible', 'audiobook')) {
+    return {
+      icon: Headphones,
+      color: 'text-amber-500',
+      bg: 'bg-amber-600/10',
+      border: 'border-amber-600/25',
+      badgeLabel: 'Audiolibri',
+      hex: '#d97706',
+    };
+  }
+
+  // Aruba PEC & Dominio
+  if (isMatch('aruba', 'pec', 'dominio')) {
+    return {
+      icon: Globe,
+      color: 'text-sky-300',
+      bg: 'bg-sky-400/10',
+      border: 'border-sky-400/25',
+      badgeLabel: 'Dominio & PEC',
+      hex: '#38bdf8',
+    };
+  }
+
+  // LinkedIn
+  if (isMatch('linkedin')) {
+    return {
+      icon: Briefcase,
+      color: 'text-blue-500',
+      bg: 'bg-blue-600/10',
+      border: 'border-blue-600/25',
+      badgeLabel: 'Network Professionale',
+      hex: '#2563eb',
+    };
+  }
+
+  // Hiya Caller ID
+  if (isMatch('hiya', 'spam blocker')) {
+    return {
+      icon: ShieldCheck,
+      color: 'text-fuchsia-400',
+      bg: 'bg-fuchsia-500/10',
+      border: 'border-fuchsia-500/25',
+      badgeLabel: 'Protezione Chiamate',
+      hex: '#d946ef',
+    };
+  }
+
+  // Apple iCloud / Services
+  if (isMatch('apple', 'icloud')) {
+    return {
+      icon: Sparkles,
+      color: 'text-slate-300',
+      bg: 'bg-slate-500/10',
+      border: 'border-slate-500/25',
+      badgeLabel: 'Cloud & Servizi Apple',
+      hex: '#94a3b8',
+    };
+  }
+
+  // Disney+
+  if (isMatch('disney')) {
+    return {
+      icon: Film,
+      color: 'text-indigo-400',
+      bg: 'bg-indigo-500/10',
+      border: 'border-indigo-500/25',
+      badgeLabel: 'Streaming TV',
+      hex: '#818cf8',
+    };
+  }
+
+  // --- 3. Rate & Finanziamenti (Icone & Colori di Serie) ---
+  // Amazon Rata TV OLED
+  if (isMatch('oled', 'rata-tv') || (isMatch('amazon') && isMatch('tv'))) {
+    return {
+      icon: Tv,
+      color: 'text-blue-400',
+      bg: 'bg-blue-500/10',
+      border: 'border-blue-500/25',
+      badgeLabel: 'Rata TV OLED',
+      hex: '#3b82f6',
+    };
+  }
+
+  // Amazon Rata Watch
+  if (isMatch('watch', 'galaxy', 'rata-watch')) {
+    return {
+      icon: Watch,
+      color: 'text-cyan-400',
+      bg: 'bg-cyan-500/10',
+      border: 'border-cyan-500/25',
+      badgeLabel: 'Rata Smartwatch',
+      hex: '#06b6d4',
+    };
+  }
+
+  // Cofidis Nintendo Switch 2 (Estinto)
+  if (isMatch('switch', 'switch2', 'switch 2')) {
+    return {
+      icon: Gamepad2,
+      color: 'text-red-400',
+      bg: 'bg-red-500/10',
+      border: 'border-red-500/25',
+      badgeLabel: 'Rata Switch 2 (Estinto)',
+      hex: '#ef4444',
+    };
+  }
+
+  // Cofidis Soundbar LG
+  if (isMatch('soundbar') || (isMatch('cofidis') && !isMatch('switch'))) {
+    return {
+      icon: Speaker,
+      color: 'text-purple-400',
+      bg: 'bg-purple-500/10',
+      border: 'border-purple-500/25',
+      badgeLabel: 'Rata Soundbar LG',
+      hex: '#a855f7',
+    };
+  }
+
+  // Compass Bimby TM7
+  if (isMatch('bimby')) {
+    return {
+      icon: CookingPot,
+      color: 'text-teal-400',
+      bg: 'bg-teal-500/10',
+      border: 'border-teal-500/25',
+      badgeLabel: 'Rata Robot Cucina',
+      hex: '#14b8a6',
+    };
+  }
+
+  // Vorwerk Folletto VR7
+  if (isMatch('vorwerk', 'folletto')) {
+    return {
+      icon: Bot,
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-500/10',
+      border: 'border-emerald-500/25',
+      badgeLabel: 'Rata Robot Aspirapolvere',
+      hex: '#10b981',
+    };
+  }
+
+  // TIMFin
+  if (isMatch('timfin')) {
+    return {
+      icon: CreditCard,
+      color: 'text-indigo-400',
+      bg: 'bg-indigo-500/10',
+      border: 'border-indigo-500/25',
+      badgeLabel: 'Finanziamento TIMFin',
+      hex: '#6366f1',
+    };
+  }
+
+  // Compass generico / pregresso
+  if (isMatch('compass')) {
+    return {
+      icon: CreditCard,
+      color: 'text-amber-400',
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/25',
+      badgeLabel: 'Finanziamento Compass',
+      hex: '#f59e0b',
+    };
+  }
+
+  // Altre rate Amazon o generiche
+  if (item.type === 'loan' || isMatch('rata', 'prestito', 'finanziamento')) {
+    const pal = DISTINCT_SERIES_PALETTE[getHashIndex(item.id, DISTINCT_SERIES_PALETTE.length)];
+    return {
+      icon: CreditCard,
+      color: pal.color,
+      bg: pal.bg,
+      border: pal.border,
+      badgeLabel: 'Rata Finanziamento',
+      hex: pal.hex,
+    };
+  }
+
+  // --- 4. Donazioni Periodiche ---
+  if (isMatch('unhcr')) {
+    return {
+      icon: HeartHandshake,
+      color: 'text-cyan-400',
+      bg: 'bg-cyan-500/10',
+      border: 'border-cyan-500/25',
+      badgeLabel: 'Donazione UNHCR',
+      hex: '#06b6d4',
+    };
+  }
+  if (isMatch('lav')) {
+    return {
+      icon: HeartHandshake,
+      color: 'text-pink-400',
+      bg: 'bg-pink-500/10',
+      border: 'border-pink-500/25',
+      badgeLabel: 'Donazione LAV',
+      hex: '#ec4899',
+    };
+  }
+  if (item.type === 'donation') {
+    return {
+      icon: HeartHandshake,
+      color: 'text-pink-400',
+      bg: 'bg-pink-500/10',
+      border: 'border-pink-500/25',
+      badgeLabel: 'Donazione Periodica',
+      hex: '#ec4899',
+    };
+  }
+
+  // --- 5. Fallback Deterministico per Altre Spese o Abbonamenti Non Mappati ---
+  const pal = DISTINCT_SERIES_PALETTE[getHashIndex(item.id || item.name || 'default', DISTINCT_SERIES_PALETTE.length)];
+  let defaultIcon = Repeat;
+  let defaultBadge = 'Costo Ricorrente';
+  if (item.type === 'subscription' || cat.includes('abbonament')) {
+    defaultIcon = Tv;
+    defaultBadge = 'Canone Flat & Streaming';
+  } else if (item.type === 'utility') {
+    defaultIcon = Zap;
+    defaultBadge = 'Utenza Domestica';
+  }
+
+  return {
+    icon: defaultIcon,
+    color: pal.color,
+    bg: pal.bg,
+    border: pal.border,
+    badgeLabel: defaultBadge,
+    hex: pal.hex,
+  };
+}
+
 const TYPE_CONFIG: Record<
   RecurringExpenseType,
   { label: string; icon: React.ElementType; color: string; bg: string; border: string }
@@ -73,37 +548,37 @@ const TYPE_CONFIG: Record<
   subscription: {
     label: 'Canoni Flat & Streaming',
     icon: Tv,
-    color: 'text-sky-400',
-    bg: 'bg-sky-500/10',
-    border: 'border-sky-500/30',
+    color: 'text-blue-400',
+    bg: 'bg-blue-500/10',
+    border: 'border-blue-500/25',
   },
   loan: {
     label: 'Rate & Finanziamenti',
     icon: CreditCard,
-    color: 'text-purple-400',
-    bg: 'bg-purple-500/10',
-    border: 'border-purple-500/30',
+    color: 'text-fuchsia-400',
+    bg: 'bg-fuchsia-500/10',
+    border: 'border-fuchsia-500/25',
   },
   utility: {
     label: 'Utenze & Connettività',
     icon: Zap,
-    color: 'text-amber-400',
-    bg: 'bg-amber-500/10',
-    border: 'border-amber-500/30',
+    color: 'text-yellow-400',
+    bg: 'bg-yellow-500/10',
+    border: 'border-yellow-500/25',
   },
   donation: {
     label: 'Donazioni Periodiche',
-    icon: Heart,
-    color: 'text-rose-400',
-    bg: 'bg-rose-500/10',
-    border: 'border-rose-500/30',
+    icon: HeartHandshake,
+    color: 'text-pink-400',
+    bg: 'bg-pink-500/10',
+    border: 'border-pink-500/25',
   },
   other: {
     label: 'Altro Costo Ricorrente',
     icon: Repeat,
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-500/10',
-    border: 'border-emerald-500/30',
+    color: 'text-slate-400',
+    bg: 'bg-slate-500/10',
+    border: 'border-slate-500/25',
   },
 };
 
@@ -133,15 +608,19 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
     return { from: startOfYear(now), to: now };
   });
 
-  const [visibleSeries, setVisibleSeries] = useState({
-    luce: true,
-    gas: true,
-    acqua: true,
-    tari: true,
-  });
+  // Selettore tipologia per la sezione del grafico
+  const [chartCategory, setChartCategory] = useState<string>('variable_utility');
+  // Visibilità dinamica delle singole serie nel grafico (default: tutte visibili)
+  const [visibleSeriesMap, setVisibleSeriesMap] = useState<Record<string, boolean>>({});
+  // Accordion per espandere/comprimere le schede comparative sotto al grafico
+  const [isComparisonExpanded, setIsComparisonExpanded] = useState<boolean>(false);
 
-  const toggleSeries = (key: 'luce' | 'gas' | 'acqua' | 'tari') => {
-    setVisibleSeries((prev) => ({ ...prev, [key]: !prev[key] }));
+  const isSeriesVisible = (id: string) => visibleSeriesMap[id] !== false;
+  const toggleSeries = (id: string) => {
+    setVisibleSeriesMap((prev) => ({
+      ...prev,
+      [id]: prev[id] === false ? true : false,
+    }));
   };
 
   const hasActiveFilters =
@@ -305,19 +784,57 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
     };
   }, [enhancedDetected]);
 
-  // Dati mensili per il Grafico a Linee delle Utenze
-  const monthlyUtilitiesChartData = useMemo(() => {
-    const monthsMap = new Map<string, { month: string; rawYm: string; luce?: number; gas?: number; acqua?: number; tari?: number }>();
+  // Voci da visualizzare nella sezione Grafico in base alla categoria selezionata
+  const chartItems = useMemo(() => {
+    return enhancedDetected.filter((item) => {
+      if (item.isIgnored) return false;
+      if (chartCategory === 'all') {
+        return item.periodCount > 0 || item.isActive;
+      }
+      if (chartCategory === 'variable_utility') {
+        return (
+          item.pricingModel === 'variable_utility' ||
+          item.category === 'Spese Condominiali' ||
+          item.type === 'utility'
+        );
+      }
+      if (chartCategory === 'subscription') {
+        return (
+          item.type === 'subscription' ||
+          (item.pricingModel === 'flat' && item.type !== 'loan' && item.type !== 'donation' && item.category !== 'Spese Condominiali')
+        );
+      }
+      if (chartCategory === 'loan') {
+        return item.type === 'loan';
+      }
+      if (chartCategory === 'donation') {
+        return item.type === 'donation';
+      }
+      return true;
+    });
+  }, [enhancedDetected, chartCategory]);
 
-    enhancedDetected.forEach((item) => {
-      let key: 'luce' | 'gas' | 'acqua' | 'tari' | null = null;
-      if (item.id === 'iren-luce') key = 'luce';
-      else if (item.id === 'iren-gas') key = 'gas';
-      else if (item.id.includes('arca')) key = 'acqua';
-      else if (item.id === 'iren-ambiente') key = 'tari';
+  // Dati mensili per il Grafico a Linee Dinamico
+  const monthlyChartData = useMemo(() => {
+    const monthsMap = new Map<string, { month: string; rawYm: string; [itemId: string]: any }>();
 
-      if (!key) return;
+    // Popola tutti i mesi dell'intervallo temporale selezionato per garantire continuità
+    if (fromIso && toIso) {
+      const [startYear, startMonth] = fromIso.split('-').map(Number);
+      const [endYear, endMonth] = toIso.split('-').map(Number);
+      let curr = new Date(startYear, startMonth - 1, 1);
+      const end = new Date(endYear, endMonth - 1, 1);
+      while (curr <= end) {
+        const y = curr.getFullYear();
+        const m = String(curr.getMonth() + 1).padStart(2, '0');
+        const ym = `${y}-${m}`;
+        const label = curr.toLocaleDateString('it-IT', { month: 'short', year: '2-digit' });
+        monthsMap.set(ym, { month: label, rawYm: ym });
+        curr.setMonth(curr.getMonth() + 1);
+      }
+    }
 
+    chartItems.forEach((item) => {
       item.inPeriodPoints.forEach((pt) => {
         const ym = pt.date.substring(0, 7);
         if (!monthsMap.has(ym)) {
@@ -327,12 +844,12 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
           monthsMap.set(ym, { month: label, rawYm: ym });
         }
         const data = monthsMap.get(ym)!;
-        data[key!] = pt.amount;
+        data[item.id] = Math.round(((data[item.id] || 0) + pt.amount) * 100) / 100;
       });
     });
 
     return Array.from(monthsMap.values()).sort((a, b) => a.rawYm.localeCompare(b.rawYm));
-  }, [enhancedDetected]);
+  }, [chartItems, fromIso, toIso]);
 
   // Filtraggio dinamico avanzato
   const filteredItems = useMemo(() => {
@@ -427,22 +944,22 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
-  // Tooltip custom per il grafico a linee delle utenze
-  const UtilityCustomTooltip = ({ active, payload, label }: any) => {
+  // Tooltip custom per il grafico a linee
+  const RecurringCustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-popover/95 border border-border shadow-xl backdrop-blur-md rounded-xl p-3 text-xs min-w-[190px] space-y-1.5">
+        <div className="bg-popover/95 border border-border shadow-xl backdrop-blur-md rounded-xl p-3 text-xs min-w-[200px] space-y-1.5">
           <div className="font-semibold text-foreground pb-1.5 border-b border-border text-[11px] flex items-center justify-between">
-            <span>Bollette del mese</span>
+            <span>Uscite del mese</span>
             <span className="font-mono text-primary font-bold">{label}</span>
           </div>
           {payload.map((entry: any, idx: number) => (
             <div key={idx} className="flex items-center justify-between gap-3 font-mono text-[11px]">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 min-w-0">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: entry.stroke || entry.color }} />
-                <span className="text-muted-foreground">{entry.name}:</span>
+                <span className="text-muted-foreground truncate max-w-[130px]">{entry.name}:</span>
               </div>
-              <span className="font-bold text-foreground">{formatEuro(entry.value)}</span>
+              <span className="font-bold text-foreground shrink-0">{formatEuro(entry.value)}</span>
             </div>
           ))}
         </div>
@@ -545,7 +1062,7 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
           <CardHeader className="pb-1 pt-4 px-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted-foreground">Prossima Scadenza</span>
-              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+              <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-400">
                 <Calendar className="w-4 h-4" />
               </div>
             </div>
@@ -579,213 +1096,257 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
         </Card>
       </div>
 
-      {/* 2. Sezione "Analisi Utenze": Senza Card Wrapper Esterno, Grafico a Linee Interattivo e Card di Riepilogo */}
-      {kpi.variableUtilities.length > 0 && (
+      {/* 2. Sezione "Analisi Temporale & Trend Spese Ricorrenti" con Select Categorie e Controlli Dinamici */}
+      {chartItems.length > 0 && (
         <div className="space-y-3.5 pt-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-amber-400" />
-                Analisi Utenze & Trend Mensile a Consumo
+                <BarChart3 className="w-5 h-5 text-primary" />
+                Analisi Temporale & Trend Spese Ricorrenti
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Confronto temporale continuo tra bollette consuntivate nel periodo per rilevare stagionalità e scostamenti
+                Confronto cronologico continuo tra uscite nel periodo selezionato per monitorare addebiti, scadenze e stagionalità
               </p>
             </div>
 
-            {/* Toggle Serie Grafico */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <button
-                onClick={() => toggleSeries('luce')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition-all ${
-                  visibleSeries.luce
-                    ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-xs'
-                    : 'bg-muted/30 text-muted-foreground border-border hover:bg-muted/50 opacity-50'
-                }`}
+            {/* Select Categoria Grafico */}
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <label htmlFor="chart-category-select" className="text-xs text-muted-foreground font-medium shrink-0">
+                Categoria Grafico:
+              </label>
+              <select
+                id="chart-category-select"
+                value={chartCategory}
+                onChange={(e) => setChartCategory(e.target.value)}
+                className="h-8 text-xs bg-card border border-border rounded-lg px-2.5 text-foreground focus:outline-none cursor-pointer font-medium"
               >
-                <span className="w-2 h-2 rounded-full bg-sky-400" />
-                <span>Luce (Iren)</span>
-              </button>
-              <button
-                onClick={() => toggleSeries('gas')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition-all ${
-                  visibleSeries.gas
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-xs'
-                    : 'bg-muted/30 text-muted-foreground border-border hover:bg-muted/50 opacity-50'
-                }`}
-              >
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
-                <span>Gas (Iren)</span>
-              </button>
-              <button
-                onClick={() => toggleSeries('acqua')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition-all ${
-                  visibleSeries.acqua
-                    ? 'bg-blue-500/20 text-blue-300 border-blue-500/40 shadow-xs'
-                    : 'bg-muted/30 text-muted-foreground border-border hover:bg-muted/50 opacity-50'
-                }`}
-              >
-                <span className="w-2 h-2 rounded-full bg-blue-400" />
-                <span>Acqua (Arca)</span>
-              </button>
-              <button
-                onClick={() => toggleSeries('tari')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition-all ${
-                  visibleSeries.tari
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-xs'
-                    : 'bg-muted/30 text-muted-foreground border-border hover:bg-muted/50 opacity-50'
-                }`}
-              >
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>TARI (Iren)</span>
-              </button>
+                <option value="all">Tutte le Spese Ricorrenti</option>
+                <option value="variable_utility">Utenze & Spese a Consumo</option>
+                <option value="subscription">Canoni Flat & Streaming</option>
+                <option value="loan">Rate Finanziamenti</option>
+                <option value="donation">Donazioni Periodiche</option>
+              </select>
             </div>
           </div>
 
-          {/* Grafico a Linee Recharts */}
+          {/* Toggle Serie Grafico Dinamiche */}
+          <div className="flex items-center justify-between gap-2 flex-wrap pt-0.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {chartItems.map((item) => {
+                const visual = getEntityVisual(item);
+                const Icon = visual.icon;
+                const isVisible = isSeriesVisible(item.id);
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleSeries(item.id)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition-all cursor-pointer ${
+                      isVisible
+                        ? `${visual.bg} ${visual.color} ${visual.border} shadow-xs`
+                        : 'bg-muted/30 text-muted-foreground border-border hover:bg-muted/50 opacity-40'
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 ${isVisible ? visual.color : 'text-muted-foreground'}`} />
+                    <span>{item.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {chartItems.length > 3 && (
+              <div className="flex items-center gap-1 text-[11px] text-muted-foreground ml-auto">
+                <button
+                  onClick={() => setVisibleSeriesMap({})}
+                  className="hover:text-foreground underline px-1 cursor-pointer"
+                >
+                  Tutte
+                </button>
+                <span>•</span>
+                <button
+                  onClick={() => setVisibleSeriesMap(Object.fromEntries(chartItems.map((i) => [i.id, false])))}
+                  className="hover:text-foreground underline px-1 cursor-pointer"
+                >
+                  Nessuna
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Grafico a Linee Recharts Dinamico */}
           <div className="p-4 rounded-xl bg-card border border-border shadow-xs">
-            {monthlyUtilitiesChartData.length > 0 ? (
+            {monthlyChartData.length > 0 && chartItems.some((i) => isSeriesVisible(i.id)) ? (
               <div className="h-[260px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={monthlyUtilitiesChartData} margin={{ top: 10, right: 15, left: -15, bottom: 0 }}>
+                  <LineChart data={monthlyChartData} margin={{ top: 10, right: 15, left: -15, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                     <XAxis dataKey="month" stroke="rgba(255,255,255,0.4)" fontSize={11} tickLine={false} />
                     <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} tickLine={false} unit="€" />
-                    <RechartsTooltip content={<UtilityCustomTooltip />} />
-                    {visibleSeries.luce && (
-                      <Line
-                        type="monotone"
-                        dataKey="luce"
-                        name="Luce"
-                        stroke="#38bdf8"
-                        strokeWidth={2.5}
-                        dot={{ r: 3.5, fill: '#38bdf8' }}
-                        activeDot={{ r: 6 }}
-                        connectNulls
-                      />
-                    )}
-                    {visibleSeries.gas && (
-                      <Line
-                        type="monotone"
-                        dataKey="gas"
-                        name="Gas"
-                        stroke="#fb923c"
-                        strokeWidth={2.5}
-                        dot={{ r: 3.5, fill: '#fb923c' }}
-                        activeDot={{ r: 6 }}
-                        connectNulls
-                      />
-                    )}
-                    {visibleSeries.acqua && (
-                      <Line
-                        type="monotone"
-                        dataKey="acqua"
-                        name="Acqua"
-                        stroke="#60a5fa"
-                        strokeWidth={2.5}
-                        dot={{ r: 3.5, fill: '#60a5fa' }}
-                        activeDot={{ r: 6 }}
-                        connectNulls
-                      />
-                    )}
-                    {visibleSeries.tari && (
-                      <Line
-                        type="monotone"
-                        dataKey="tari"
-                        name="TARI"
-                        stroke="#34d399"
-                        strokeWidth={2.5}
-                        dot={{ r: 3.5, fill: '#34d399' }}
-                        activeDot={{ r: 6 }}
-                        connectNulls
-                      />
-                    )}
+                    <RechartsTooltip content={<RecurringCustomTooltip />} />
+                    {chartItems.map((item) => {
+                      if (!isSeriesVisible(item.id)) return null;
+                      const visual = getEntityVisual(item);
+                      return (
+                        <Line
+                          key={item.id}
+                          type="monotone"
+                          dataKey={item.id}
+                          name={item.name}
+                          stroke={visual.hex}
+                          strokeWidth={2.5}
+                          dot={{ r: 3.5, fill: visual.hex }}
+                          activeDot={{ r: 6 }}
+                          connectNulls
+                        />
+                      );
+                    })}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             ) : (
               <div className="h-[180px] flex items-center justify-center text-xs text-muted-foreground">
-                Nessuna bolletta riscontrata nel periodo selezionato.
+                Nessuna spesa visualizzata. Seleziona almeno una voce tra i controlli in alto.
               </div>
             )}
           </div>
 
-          {/* Card di Riepilogo Utenze Sottostanti */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {kpi.variableUtilities.map((u) => {
-              const isGas = u.id.includes('gas');
-              const isLuce = u.id.includes('luce');
-              const isTari = u.id.includes('ambiente');
-              const Icon = isGas ? Flame : isLuce ? Zap : isTari ? Activity : Droplets;
-              const iconColor = isGas ? 'text-amber-400' : isLuce ? 'text-sky-400' : isTari ? 'text-emerald-400' : 'text-blue-400';
-              const iconBg = isGas ? 'bg-amber-500/10' : isLuce ? 'bg-sky-500/10' : isTari ? 'bg-emerald-500/10' : 'bg-blue-500/10';
-
-              const variance = u.varianceVsAveragePct || 0;
-              const isBelowAvg = variance < 0;
-              const isAboveAvg = variance > 0;
-
-              // Statistiche nel periodo selezionato
-              const inPeriodBills = u.periodCount || u.occurrences;
-              const inPeriodSpent = u.periodSpent > 0 ? u.periodSpent : u.annualCost;
-              const inPeriodAvg = inPeriodBills > 0 ? inPeriodSpent / inPeriodBills : u.averageAmount;
-
-              return (
-                <div
-                  key={u.id}
-                  className="p-3.5 rounded-xl bg-card border border-border shadow-xs flex flex-col justify-between space-y-3"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconBg} ${iconColor}`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="text-xs font-bold text-foreground truncate">
-                          {u.name}
-                        </h4>
-                        <span className="text-[10px] text-muted-foreground block font-mono">
-                          {inPeriodBills} bollette nel periodo
-                        </span>
-                      </div>
-                    </div>
-
-                    {isBelowAvg ? (
-                      <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono shrink-0">
-                        {Math.abs(variance)}% sotto
-                      </Badge>
-                    ) : isAboveAvg ? (
-                      <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[10px] font-mono shrink-0">
-                        +{variance}% sopra
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground shrink-0">
-                        In media
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/50 text-xs">
-                    <div>
-                      <span className="text-[10px] text-muted-foreground block">Media Periodo</span>
-                      <span className="font-bold font-mono text-foreground text-sm">
-                        {formatEuro(inPeriodAvg)}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[10px] text-muted-foreground block">Ultima Bolletta</span>
-                      <span className={`font-bold font-mono text-sm ${isBelowAvg ? 'text-emerald-400' : isAboveAvg ? 'text-amber-300' : 'text-foreground'}`}>
-                        {formatEuro(u.lastAmount)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="pt-1 text-[11px] text-muted-foreground flex items-center justify-between font-mono bg-muted/20 px-2.5 py-1 rounded-md">
-                    <span>Totale periodo:</span>
-                    <strong className="text-foreground">{formatEuro(inPeriodSpent)}</strong>
-                  </div>
+          {/* Card di Riepilogo Dinamiche Sottostanti in Accordion Comprimibile */}
+          <div className="rounded-xl border border-border bg-card/60 overflow-hidden shadow-xs">
+            <button
+              type="button"
+              onClick={() => setIsComparisonExpanded((prev) => !prev)}
+              className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-muted/30 transition-colors cursor-pointer select-none"
+              aria-expanded={isComparisonExpanded}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
+                  <Layers className="w-4 h-4" />
                 </div>
-              );
-            })}
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-foreground">
+                      Schede Dettaglio Comparativo
+                    </span>
+                    <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0 h-4 bg-muted/60 text-muted-foreground">
+                      {chartItems.length} voci
+                    </Badge>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Parametri analitici, medie storiche e spesa periodo per ciascuna voce del grafico
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] font-medium text-muted-foreground hidden sm:inline">
+                  {isComparisonExpanded ? 'Comprimi schede' : 'Espandi schede'}
+                </span>
+                <div className={`p-1 rounded-md text-muted-foreground transition-transform duration-200 ${isComparisonExpanded ? 'rotate-180' : ''}`}>
+                  <ChevronDown className="w-4 h-4" />
+                </div>
+              </div>
+            </button>
+
+            {isComparisonExpanded && (
+              <div className="p-4 pt-1 border-t border-border/60 bg-background/40">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 pt-3">
+                  {chartItems.map((u) => {
+                    const visual = getEntityVisual(u);
+                    const Icon = visual.icon;
+                    const iconColor = visual.color;
+                    const iconBg = visual.bg;
+
+                    const variance = u.varianceVsAveragePct || 0;
+                    const isBelowAvg = variance < 0;
+                    const isAboveAvg = variance > 0;
+
+                    // Statistiche nel periodo selezionato
+                    const inPeriodBills = u.periodCount || u.occurrences;
+                    const inPeriodSpent = u.periodSpent > 0 ? u.periodSpent : u.annualCost;
+                    const inPeriodAvg = inPeriodBills > 0 ? inPeriodSpent / inPeriodBills : u.averageAmount;
+                    const countLabel =
+                      u.type === 'loan'
+                        ? 'rate nel periodo'
+                        : u.category === 'Spese Condominiali'
+                        ? 'rate nel periodo'
+                        : u.type === 'subscription'
+                        ? 'canoni nel periodo'
+                        : 'addebiti nel periodo';
+
+                    return (
+                      <div
+                        key={u.id}
+                        className="p-3.5 rounded-xl bg-card border border-border shadow-xs flex flex-col justify-between space-y-3"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconBg} ${iconColor}`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-bold text-foreground truncate">
+                                {u.name}
+                              </h4>
+                              <span className="text-[10px] text-muted-foreground block font-mono">
+                                {inPeriodBills} {countLabel}
+                              </span>
+                            </div>
+                          </div>
+
+                          {u.pricingModel === 'variable_utility' ? (
+                            isBelowAvg ? (
+                              <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono shrink-0">
+                                {Math.abs(variance)}% sotto
+                              </Badge>
+                            ) : isAboveAvg ? (
+                              <Badge className="bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[10px] font-mono shrink-0">
+                                +{variance}% sopra
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground shrink-0">
+                                In media
+                              </Badge>
+                            )
+                          ) : u.type === 'loan' && u.loanDetails ? (
+                            <Badge variant="outline" className={`text-[10px] font-mono shrink-0 ${visual.bg} ${visual.color} ${visual.border}`}>
+                              {u.loanDetails.isClosed ? 'Estinto' : `${u.loanDetails.paidInstallments}/${u.loanDetails.totalInstallments}`}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className={`text-[10px] font-medium shrink-0 ${visual.bg} ${visual.color} ${visual.border}`}>
+                              {visual.badgeLabel}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/50 text-xs">
+                          <div>
+                            <span className="text-[10px] text-muted-foreground block">
+                              {u.type === 'loan' ? 'Rata Mensile' : 'Media Periodo'}
+                            </span>
+                            <span className="font-bold font-mono text-foreground text-sm">
+                              {formatEuro(u.type === 'loan' ? u.lastAmount : inPeriodAvg)}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[10px] text-muted-foreground block">
+                              {u.pricingModel === 'variable_utility' ? 'Ultima Bolletta' : 'Costo Attuale'}
+                            </span>
+                            <span className={`font-bold font-mono text-sm ${isBelowAvg ? 'text-emerald-400' : isAboveAvg ? 'text-amber-300' : 'text-foreground'}`}>
+                              {formatEuro(u.lastAmount)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="pt-1 text-[11px] text-muted-foreground flex items-center justify-between font-mono bg-muted/20 px-2.5 py-1 rounded-md">
+                          <span>Spesa totale periodo:</span>
+                          <strong className="text-foreground">{formatEuro(inPeriodSpent)}</strong>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -979,8 +1540,8 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
           </Card>
         ) : (
           filteredItems.map((item) => {
-            const cfg = TYPE_CONFIG[item.type] || TYPE_CONFIG.other;
-            const IconComp = cfg.icon;
+            const visual = getEntityVisual(item);
+            const IconComp = visual.icon;
             const isExpanded = expandedId === item.id;
 
             // Indicatori di urgenza sul prossimo addebito
@@ -1015,9 +1576,9 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
                   {/* Left: Icon, Name, Category pills */}
                   <div className="flex items-start sm:items-center gap-3 min-w-0">
                     <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.border} border`}
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${visual.bg} ${visual.border} border`}
                     >
-                      <IconComp className={`w-4 h-4 ${cfg.color}`} />
+                      <IconComp className={`w-4 h-4 ${visual.color}`} />
                     </div>
 
                     <div className="min-w-0 space-y-1">
@@ -1026,12 +1587,13 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
                           {item.name}
                         </span>
 
-                        {/* Badges di tipologia modello */}
-                        {isUtility ? (
-                          <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-300 border-amber-500/30 font-medium">
-                            Utenza a Consumo
-                          </Badge>
-                        ) : isFlat && (item.priceChanges && item.priceChanges.length > 0) ? (
+                        {/* Badge identità entità/categoria */}
+                        <Badge variant="outline" className={`text-[10px] ${visual.bg} ${visual.color} ${visual.border} font-medium`}>
+                          {visual.badgeLabel}
+                        </Badge>
+
+                        {/* Badges di stato semantico (Rimodulazioni e Variazioni) */}
+                        {isFlat && (item.priceChanges && item.priceChanges.length > 0) ? (
                           item.priceChanges[item.priceChanges.length - 1].delta > 0 ? (
                             <Badge variant="outline" className="text-[10px] bg-amber-500/15 text-amber-300 border-amber-500/40 font-medium">
                               Rimodulato (+{formatEuro(item.priceChanges[item.priceChanges.length - 1].delta)})
@@ -1064,7 +1626,7 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
                             Inattivo
                           </Badge>
                         ) : item.loanDetails ? (
-                          <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/30 font-medium">
+                          <Badge variant="outline" className="text-[10px] bg-fuchsia-500/10 text-fuchsia-300 border-fuchsia-500/30 font-medium">
                             Rata {item.loanDetails.paidInstallments} di {item.loanDetails.totalInstallments}
                           </Badge>
                         ) : null}

@@ -404,6 +404,14 @@ export function App() {
             </TabsTrigger>
 
             <TabsTrigger
+              value="fixed-costs"
+              className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-1.5 transition-all"
+            >
+              <Repeat className="w-4 h-4 shrink-0" />
+              <span className="truncate">Costi Fissi & Utenze</span>
+            </TabsTrigger>
+
+            <TabsTrigger
               value="transactions"
               className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-1.5 transition-all"
             >
@@ -412,14 +420,6 @@ export function App() {
               <span className="ml-1 text-[10px] px-1.5 py-0.2 rounded-full bg-muted/80 text-muted-foreground font-mono">
                 {vault.transactions.length}
               </span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="fixed-costs"
-              className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-1.5 transition-all"
-            >
-              <Repeat className="w-4 h-4 shrink-0" />
-              <span className="truncate">Costi Fissi & Utenze</span>
             </TabsTrigger>
 
             <TabsTrigger
@@ -455,20 +455,7 @@ export function App() {
             />
           </TabsContent>
 
-          {/* Tab 2: Transactions Manager */}
-          <TabsContent value="transactions" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
-            <React.Suspense fallback={<TabLoadingSkeleton />}>
-              <TransactionsManager
-                transactions={vault.transactions}
-                onAddTransaction={handleAddTransaction}
-                onUpdateTransaction={handleUpdateTransaction}
-                onDeleteTransaction={handleDeleteTransaction}
-                onResetToRealTransactions={handleResetToRealTransactions}
-              />
-            </React.Suspense>
-          </TabsContent>
-
-          {/* Tab 3: Costi Fissi & Utenze (1st class view) */}
+          {/* Tab 2: Costi Fissi & Utenze (2nd class view) */}
           <TabsContent value="fixed-costs" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <React.Suspense fallback={<TabLoadingSkeleton />}>
               <RecurringTracker
@@ -486,6 +473,19 @@ export function App() {
                   setVault(updated);
                   if (masterPassword) encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
                 }}
+              />
+            </React.Suspense>
+          </TabsContent>
+
+          {/* Tab 3: Transactions Manager */}
+          <TabsContent value="transactions" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
+            <React.Suspense fallback={<TabLoadingSkeleton />}>
+              <TransactionsManager
+                transactions={vault.transactions}
+                onAddTransaction={handleAddTransaction}
+                onUpdateTransaction={handleUpdateTransaction}
+                onDeleteTransaction={handleDeleteTransaction}
+                onResetToRealTransactions={handleResetToRealTransactions}
               />
             </React.Suspense>
           </TabsContent>

@@ -15,7 +15,6 @@ import {
   Coins,
   Wallet,
   Gift,
-  Repeat,
 } from 'lucide-react';
 import {
   Card,
@@ -32,7 +31,6 @@ import {
   MonthTargetPicker,
 } from './ui';
 import { BudgetCapManager } from './BudgetCapManager';
-import { RecurringTracker } from './RecurringTracker';
 
 const formatTargetDateLabel = (dateStr: string) => {
   if (!dateStr || !dateStr.includes('-')) return dateStr;
@@ -64,7 +62,7 @@ export const GoalPlanner: React.FC<GoalPlannerProps> = ({
   recurringOverrides = {},
   onUpdateRecurringOverrides,
 }) => {
-  const [activeSection, setActiveSection] = useState<'goals' | 'budgets' | 'recurring'>('goals');
+  const [activeSection, setActiveSection] = useState<'goals' | 'budgets'>('goals');
   const [title, setTitle] = useState('');
   const [budget, setBudget] = useState<number | ''>(4500);
   const [targetDate, setTargetDate] = useState('2027-04');
@@ -285,19 +283,6 @@ export const GoalPlanner: React.FC<GoalPlannerProps> = ({
           <span>Tetti di Spesa (BudgetCaps)</span>
           <Badge variant="outline" className="text-[10px] py-0 px-1.5 h-4 ml-0.5">
             {Object.keys(budgetCaps).length}
-          </Badge>
-        </Button>
-
-        <Button
-          variant={activeSection === 'recurring' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => setActiveSection('recurring')}
-          className="text-xs h-9 gap-2 rounded-lg font-medium"
-        >
-          <Repeat className="w-4 h-4" />
-          <span>Abbonamenti & Costi Fissi</span>
-          <Badge variant="outline" className="text-[10px] py-0 px-1.5 h-4 ml-0.5 text-primary border-primary/30">
-            Auto
           </Badge>
         </Button>
       </div>
@@ -597,15 +582,6 @@ export const GoalPlanner: React.FC<GoalPlannerProps> = ({
       transactions={transactions}
       budgetCaps={budgetCaps}
       onUpdateBudgetCaps={onUpdateBudgetCaps}
-    />
-  )}
-
-  {/* Sotto-Sezione 3: Abbonamenti & Costi Fissi (Recurring Tracker) */}
-  {activeSection === 'recurring' && (
-    <RecurringTracker
-      transactions={transactions}
-      overrides={recurringOverrides}
-      onUpdateOverrides={onUpdateRecurringOverrides}
     />
   )}
 </div>
