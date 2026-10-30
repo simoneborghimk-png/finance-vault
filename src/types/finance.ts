@@ -46,8 +46,22 @@ export interface BudgetRule {
   patternMatch?: string; // Regex o keyword per auto-categorizzazione
 }
 
+export interface CustomCategoryRule {
+  id: string;
+  name: string;
+  pattern: string; // Keyword o Regex (es. "SAN CARLO", "PANIFICIO")
+  matchField: 'description' | 'rawDescription' | 'both';
+  channel: Transaction['channel'] | 'all';
+  macroCategory: MacroCategory;
+  category: string;
+  tags: string[];
+  isExtraordinary?: boolean;
+  isActive: boolean;
+  createdAt: string;
+}
+
 export interface UserFinancialProfile {
-  baseMonthlyNetSalary: number; // Default: 1953 €
+  baseMonthlyNetSalary: number; // Default: ~1949 €
   extraSalaries: {
     fourteenthNetJune: number; // ~1848 €
     thirteenthNetDec: number;  // ~1850 €
@@ -182,6 +196,7 @@ export interface VaultData {
   profile: UserFinancialProfile;
   transactions: Transaction[];
   rules: BudgetRule[];
+  customCategoryRules?: CustomCategoryRule[];
   goals: SavingsGoal[];
   budgetCaps?: Record<string, number>;
   recurringOverrides?: Record<string, RecurringOverride>;

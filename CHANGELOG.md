@@ -8,6 +8,12 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/)
 ## [Unreleased]
 
 ### Fixed
+### Fixed
+- **Bonifica Accrediti Stipendio e Rimozione Dati Simulati nello Scadenziario (`src/lib/cashFlowScheduler.ts` & `src/components/CashFlowSchedule.tsx`):**
+  - **Allineamento con l'Estratto Conto Reale (CLOUDFIRE SRL):** Rimosso il valore hardcoded del giorno 27 e l'importo piatto simulato di 1.953 €. Il motore ora individua ed estrae tutte le transazioni contabili reali di stipendio da `CLOUDFIRE SRL` nel mese selezionato, riflettendo con precisione il giorno esatto di accredito (intorno al giorno 15 del mese, o venerdì 13/14 in caso di weekend), l'importo effettivo (es. 1.949 € a Ottobre 2026, 2.660 € a Settembre, 3.530 € ad Agosto con 730, 3.798 € a Luglio con 14ª, 1.852 € per la 13ª a Dicembre) e le causali dettagliate con stato `paid`.
+  - **Proiezione Deterministica Mesi Futuri:** Per i mesi futuri o privi di transazioni contabilizzate, la funzione `getExpectedSalaryDay(year, monthNum)` calcola l'accredito al 15 del mese (anticipato al venerdì precedente se cade nel weekend/festivo).
+  - **Ricalcolo Dinamico Buffer di Liquidità BPM:** La metrica `safetyBufferPreSalary` e la dicitura della KPI Card 4 dello scadenziario calcolano ora il cuscinetto necessario prima del giorno esatto dello stipendio (`il ${schedule.salaryDay}`).
+  - **Sanitizzazione Globale Mock:** Bonificati tutti i fallback residui in `financialAdvisor.ts`, `googleDrive.ts` e `mockData.ts` allineandoli alla baseline reale di 1.949 € e verificata la totale assenza di transazioni mock attive nell'applicativo locale.
 - **Risoluzione Loop di Re-Render al Mount in Assenza di `realTransactions.json`:**
   - Corretta la condizione di migrazione automatica in `App.tsx` ed esportato `hasLocalRealTransactions` in `mockData.ts`: in assenza del dataset reale su disco (clone Git pulito o nuova macchina), il dataset simulato demo non viene più scambiato per dati obsoleti, prevenendo il crash di React (`Maximum update depth exceeded`) e garantendo un avvio istantaneo e fluido.
 - **Resilienza Runtime & ErrorBoundary:**
@@ -16,6 +22,66 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/)
   - Aggiunto `.vscode/settings.json` tracciato per silenziare i falsi positivi del linter CSS nativo sulle direttive `@tailwind`.
 
 ### Added / Changed
+- **Simulatore di Estinzione Anticipata Prestiti (Loan Payoff Simulator — `src/lib/loanPayoffSimulator.ts`, `src/components/LoanPayoffSimulator.tsx`, `src/components/RecurringTracker.tsx` & `src/App.tsx`):**
+  - **Motore di Simulazione & Ottimizzazione:** Creato modulo puro `loanPayoffSimulator.ts` per estrarre e analizzare i piani di ammortamento attivi (*Galaxy Watch9*, *Vorwerk Folletto VR7s*, *Cofidis Soundbar LG*, *LG OLED TV 65"*, *Bimby TM7*). Calcolo dell'indice di efficienza della rata (% di costo fisso mensile liberato per ogni 100 € investiti) e calcolo dinamico dell'anticipo della data di estinzione totale (*Debt-Free Date*).
+  - **Strategie a Confronto:**
+    - *Cash Flow Maximizer (Consigliata):* priorità al rimborso dei finanziamenti con il rapporto rata/debito più alto per massimizzare il reddito disponibile netto mensile (Needs abbattuti).
+    - *Metodo Snowball:* priorità ai debiti dal saldo residuo minore al maggiore per eliminare rapidamente il numero di posizioni aperte.
+    - *Selezione Personalizzata:* selezione manuale con checkbox per combinare liberamente prestiti specifici.
+  - **Cruscotto & Interfaccia Interattiva:** 4 KPI card comparative (Debito Residuo, Rate Mensili, Cash Flow Liberato Subito, Traguardo Debito Zero con mesi risparmiati), slider continuo di liquidità con step 25 € e preset rapidi allineati al profilo finanziario reale (14ª mensilità estiva, 13ª natalizia, rimborso 730, 500 €, 1.000 € ed Estinzione Totale).
+  - **Integrazione Vault Cifrato & Zero-Knowledge:** Azione primaria certificata *"Applica Estinzione al Vault"* con modale di conferma dettagliata: contrassegna i prestiti completamente estinti con `isClosed = true` in `vault.recurringOverrides`, aggiorna all'istante l'Executive Dashboard, il Financial Advisor e lo Scadenziario Mensile, persistendo la modifica in sicurezza su storage cifrato AES-256-GCM e Google Drive.
+  - **Sub-Toggle a 3 Vie in Tab Costi Fissi:** Estesa la barra di navigazione interna di `RecurringTracker.tsx` con i tre toggle `[ Contratti & Rate ]` | `[ Scadenziario Mensile ]` | `[ Simulatore Estinzione ]` conforme agli standard ergonomici Tier 0 e semantic design tokens.
+- **Regole di Categorizzazione Personalizzate In-Vault (`src/lib/userRulesEngine.ts`, `src/components/CategoryRulesManager.tsx` & `src/components/TransactionsManager.tsx`):**
+  - **Motore di Categorizzazione User-Defined:** Introdotto `userRulesEngine.ts` con matching su keyword o regex, filtro canale opzionale, assegnazione automatica di macro-categoria, categoria e tag, con priorità massima di override rispetto alle euristiche generiche.
+  - **Gestore Regole Modale (Tier 0 UX):** Interfaccia dark semantica per visualizzare, creare, modificare, attivare/disattivare ed eliminare regole, con conteggio e anteprima in tempo reale dei movimenti corrispondenti nel Vault.
+  - **Scorciatoia 1-Click su Riga Transazione:** Aggiunta azione rapida con icona `Sparkles` in tabella per creare istantaneamente una regola precompilata a partire da una transazione contabile selezionata.
+  - **Esecuzione Retroattiva con 1 Click:** Pulsante per applicare immediatamente l'intero set di regole a tutte le transazioni storiche salvate nel Vault cifrato con feedback puntuale del numero di record riclassificati.
+  - **Integrazione End-to-End con Ingestione File:** Le nuove regole vengono applicate automaticamente anche durante il parsing multi-file in `FileIngestionDropzone.tsx`.
+- **Multi-File Batch Dropzone Ingestion con Deduplica Automatica (`src/components/FileIngestionDropzone.tsx` & `src/App.tsx`):**
+  - **Caricamento Batch Multiplo:** Abilitato il drag & drop e la selezione simultanea di più file Excel (`.xlsx`, `.xls`) o CSV (`Banco BPM`, `Carta Nexi`, `Carta Numia`, `PayPal`, `Satispay`).
+  - **Parsing Parallelo Resiliente:** Elaborazione concorrente con `Promise.allSettled`: ogni file viene processato in memoria in modo isolato; eventuali file corrotti o non supportati vengono segnalati con badge di errore senza bloccare l'ingestione degli altri file validi.
+  - **Cruscotto Metriche di Batch:** Indicatori real-time su *File Pronti*, *Movimenti Rilevati*, *Nuove Transazioni da Importare* e *Duplicati Riconosciuti* (confrontati automaticamente con le transazioni già presenti nel Vault cifrato).
+  - **Filtro Canale & Tabella di Anteprima Unitaria:** Schede individuali per ciascun file con possibilità di rimozione selettiva dal batch, chip bar di filtro per canale (`Tutti`, `BancoBPM`, `Numia`, `Nexi`, `PayPal`, `Satispay`) e pulsante di importazione unico conforme alle linee guida di ergonomia Tier 0.
+- **Navigazione Deterministica via Path URL (`/dashboard`, `/fixed-costs`, `/advisor`, ecc.):**
+  - **Sincronizzazione Bidirezionale con History API (`src/App.tsx`):**
+    - Tutte le 7 tab di primo livello ora rispondono a URL paths espliciti: `/dashboard`, `/fixed-costs`, `/advisor`, `/transactions`, `/tax-pension`, `/goals`, `/ingestion`.
+    - Supporto completo al reload diretto della pagina, navigazione cronologica con i pulsanti Avanti/Indietro del browser (`popstate`) e fallback trasparente su hash routing (`#/...`).
+- **Vista Calendario Mensile a Griglia (7 Colonne LUN–DOM) nello Scadenziario (`src/components/CashFlowSchedule.tsx`):**
+  - **Matrice Calendario Europea:** Griglia dinamica a 7 colonne con offset deterministico per qualsiasi mese selezionato.
+  - **Identificazione Visiva Immediata:** Evidenziazione dorata per il giorno corrente (`Oggi`), pillole colorate ad alto contrasto per ciascuna voce (spesa o stipendio CCNL del 27), contatore discreto per giorni con più uscite (`+X altri`).
+  - **Pannello di Ispezione Giornaliera 1-Click:** Cliccando su qualsiasi cella della griglia, si apre istantaneamente la scheda di dettaglio dedicata che elenca tutti i movimenti previsti per quella specifica data con importi, canali e stato di contabilizzazione.
+  - **Sub-Toggle Visuale Ergonomico:** Switch rapido in testata tra `[ Calendario Griglia ]` e `[ Lista Timeline ]`.
+- **Scadenziario & Calendario Finanziario Mensile delle Uscite Fisse (Cash Flow Schedule):**
+  - **Motore di Cronologia e Cassa Mensile (`src/lib/cashFlowScheduler.ts`):**
+    - Generazione timeline cronologica per ciascun giorno del mese (1 – 31) integrando sia gli addebiti ricorrenti attivi (canoni flat, utenze, rate di ammortamento prestiti, quote condominiali Betulla e pulizia scale contanti) sia l'accredito dello **Stipendio Base Netto (+1.953 €)** al giorno 27 e delle mensilità straordinarie (14ª a Giugno, 13ª a Dicembre).
+    - Riconciliazione automatica con le transazioni reali del mese: stato `paid` (verde con check), `today` (in scadenza oggi), `due_soon` (in scadenza nei prossimi 3 giorni), `overdue` (scadenza superata non riscontrata) e `pending` (in attesa a fine mese).
+    - Calcolo del **Saldo Minimo di Sicurezza Pre-Stipendio** per prevenire scoperti di conto corrente prima dell'accredito del 27 del mese.
+  - **Interfaccia Scadenziario & Calendario (`src/components/CashFlowSchedule.tsx`):**
+    - Navigatore temporale con frecce mese precedente/successivo e scorciatoia *"Torna a Oggi"*.
+    - Mini-cruscotto KPI di cassa: *Uscite Fisse Totali*, *Già Contabilizzati*, *Ancora in Coda (Pending)*, *Saldo Minimo Pre-Stipendio*.
+    - Filtri rapidi per stato (*Tutti*, *In Attesa*, *Contabilizzati*) e per canale (*Banco BPM*, *Numia*, *Nexi*, *PayPal*, *Satispay*, *Contanti*).
+    - Timeline con badge giorno ad alto contrasto, pillole canale semantiche e note analitiche sul debito residuo delle rate.
+  - **Toggle View Integrato in Costi Fissi & Utenze (`src/components/RecurringTracker.tsx`):**
+    - Aggiunto selettore di vista ergonomico in testata: `[ Contratti & Rate ]` vs `[ Scadenziario Mensile ]`.
+- **Financial Advisor, Seasonal Wealth Roadmap & Spending Optimizer (ADR-012):**
+  - **Nuova Tab di 1° Livello `Financial Advisor` (`src/components/FinancialAdvisor.tsx`):**
+    - Posizionata strategicamente come 3ª tab nella barra di navigazione principale (`App.tsx`), tra *Costi Fissi & Utenze* e *Transazioni*.
+  - **Motore di Calcolo Safe-to-Spend (`src/lib/financialAdvisor.ts`):**
+    - Calcolo del *Safe-to-Spend Cap* mensile per spese discrezionali (*Wants*): `Stipendio netto ordinario - Costi fissi certi (da recurringDetector) - Risparmio 20%`.
+    - Monitoraggio spesa reale Wants sostenuta vs plafond, margine spendibile residuo e calcolo della *Daily Safe Allowance* (budget giornaliero consigliato per i giorni restanti del mese).
+    - Badge semantici di stato di salute del ritmo di spesa (`safe`, `warning` ≥80%, `danger` >100%).
+  - **Roadmap Finanziaria Stagionale a 4 Trimestri:**
+    - Timeline annuale coordinata con gli accrediti CCNL e le scadenze fiscali:
+      - *Q1 (Gen-Mar):* Consolidamento & Routine (nessuna entrata extra, tenuta baseline).
+      - *Q2 (Apr-Giu):* Finestra 14ª Mensilità (~1.848 € a Giugno, 1ª Tranche Fondo Pensione consigliata, allocazione vacanze).
+      - *Q3 (Lug-Set):* Finestra Rimborso Fiscale 730 (~2.290 € a Luglio/Agosto, 2ª Tranche Fondo Pensione, fondo emergenza).
+      - *Q4 (Ott-Dic):* Finestra 13ª Mensilità (~1.850 € a Dicembre, 3ª Tranche a saldo della capienza residua esatta entro il 18 Dicembre).
+    - Evidenziazione dinamica della *Fase Attiva* ("SEI QUI") e calcolo del conto alla rovescia dei giorni alla chiusura dell'anno fiscale (31 Dicembre).
+  - **Strategia Tranches Fondo Pensione (Art. 51 TUIR - 5.164,57 €):**
+    - Rilevamento automatico a consuntivo dei versamenti già effettuati nell'anno solare, capienza residua e stima del credito IRPEF recuperabile nel Modello 730 con selettore aliquota marginale (35% o 43%).
+    - Pianificazione in 3 tranches calendarizzate con monitoraggio dello stato di completamento.
+  - **Insight Tattici Intelligenti (Advisor Cards):**
+    - Rilevamento automatico di: liquidità mensile liberata da prestiti estinti (es. Nintendo Switch 2 con +89,14 €/mese), countdown rate per finanziamenti in chiusura (Soundbar LG), alert capienza previdenziale e scadenze contrattuali.
 - **Perfezionamento Architetturale & Semantico Costi Fissi & Utenze (ADR-011):**
   - **Promozione a 2ª Tab:** Posizionata *Costi Fissi & Utenze* direttamente al 2° posto nella barra di navigazione principale (`App.tsx`), garantendo accesso prioritario immediato subito dopo l'*Executive Dashboard* e prima delle *Transazioni*.
   - **Eliminazione Ridondanze in Budget & Obiettivi:** Rimossa la sotto-tab duplicata *Abbonamenti & Costi Fissi* da `GoalPlanner.tsx`, preservando in tale vista solo i moduli nativi di competenza (*Obiettivi di Risparmio* e *Tetti di Spesa BudgetCaps*).

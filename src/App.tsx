@@ -3,12 +3,14 @@ import {
   TrendingUp,
   ReceiptText,
   Repeat,
+  Compass,
   Coins,
   Target,
   UploadCloud,
   RefreshCw,
 } from 'lucide-react';
-import { VaultData, Transaction, SavingsGoal, RecurringOverride } from '@/types/finance';
+import { VaultData, Transaction, SavingsGoal, RecurringOverride, CustomCategoryRule } from '@/types/finance';
+import { applyRulesToTransactions } from '@/lib/userRulesEngine';
 import { initialVaultData, hasLocalRealTransactions } from '@/lib/mockData';
 import { encryptVault, decryptVault } from '@/lib/crypto';
 import { googleDrive } from '@/lib/googleDrive';
@@ -24,6 +26,9 @@ const TransactionsManager = React.lazy(() =>
 );
 const RecurringTracker = React.lazy(() =>
   import('@/components/RecurringTracker').then((m) => ({ default: m.RecurringTracker }))
+);
+const FinancialAdvisor = React.lazy(() =>
+  import('@/components/FinancialAdvisor').then((m) => ({ default: m.FinancialAdvisor }))
 );
 const TaxPensionSimulator = React.lazy(() =>
   import('@/components/TaxPensionSimulator').then((m) => ({ default: m.TaxPensionSimulator }))
@@ -46,11 +51,81 @@ function TabLoadingSkeleton() {
 
 const SESSION_VAULT_KEY = 'finance_vault_session_key';
 
+const VALID_TABS = [
+  'dashboard',
+  'fixed-costs',
+  'advisor',
+  'transactions',
+  'tax-pension',
+  'goals',
+  'ingestion',
+] as const;
+
+type TabType = (typeof VALID_TABS)[number];
+
+function getTabFromUrl(): TabType {
+  if (typeof window === 'undefined') return 'dashboard';
+
+  // 1. Controlla hash routing (es. #/fixed-costs o #fixed-costs)
+  const hash = window.location.hash.replace(/^#[/]?/, '').trim();
+  if (VALID_TABS.includes(hash as TabType)) {
+    return hash as TabType;
+  }
+
+  // 2. Controlla pathname (es. /fixed-costs o /finance-vault/fixed-costs)
+  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+  let pathname = window.location.pathname;
+  if (base && pathname.startsWith(base)) {
+    pathname = pathname.slice(base.length);
+  }
+  const cleanPath = pathname.replace(/^\/+|\/+$/g, '').trim();
+  if (VALID_TABS.includes(cleanPath as TabType)) {
+    return cleanPath as TabType;
+  }
+
+  return 'dashboard';
+}
+
+function updateUrlForTab(tab: TabType, replace = false) {
+  if (typeof window === 'undefined') return;
+  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+  const newPath = `${base}/${tab}`;
+
+  if (window.location.pathname !== newPath) {
+    if (replace) {
+      window.history.replaceState({ tab }, '', newPath);
+    } else {
+      window.history.pushState({ tab }, '', newPath);
+    }
+  }
+}
+
 export function App() {
   const [isLocked, setIsLocked] = useState(true);
   const [masterPassword, setMasterPassword] = useState<string | null>(null);
   const [vault, setVault] = useState<VaultData>(initialVaultData);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'transactions' | 'fixed-costs' | 'tax-pension' | 'goals' | 'ingestion'>('dashboard');
+  const [activeTab, setActiveTab] = useState<TabType>(() => getTabFromUrl());
+
+  const handleTabChange = useCallback((tab: string) => {
+    if (VALID_TABS.includes(tab as TabType)) {
+      setActiveTab(tab as TabType);
+      updateUrlForTab(tab as TabType);
+    }
+  }, []);
+
+  // Sincronizzazione con il navigatore del browser (avanti/indietro ed URL iniziale)
+  useEffect(() => {
+    const initialTab = getTabFromUrl();
+    updateUrlForTab(initialTab, true);
+
+    const onPopState = () => {
+      const currentTab = getTabFromUrl();
+      setActiveTab(currentTab);
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
 
@@ -228,9 +303,15 @@ export function App() {
     const existingIds = new Set(vault.transactions.map((t) => t.id));
     const uniqueNew = newTransactions.filter((t) => !existingIds.has(t.id));
 
+    // Applica le regole di categorizzazione personalizzate alle nuove transazioni
+    const userRules = vault.customCategoryRules || [];
+    const processedNew = userRules.length > 0
+      ? applyRulesToTransactions(uniqueNew, userRules).updatedTransactions
+      : uniqueNew;
+
     const updated = {
       ...vault,
-      transactions: [...uniqueNew, ...vault.transactions].sort((a, b) => b.date.localeCompare(a.date)),
+      transactions: [...processedNew, ...vault.transactions].sort((a, b) => b.date.localeCompare(a.date)),
       lastUpdated: new Date().toISOString(),
     };
     setVault(updated);
@@ -344,6 +425,68 @@ export function App() {
     }
   };
 
+  // Custom Category Rules CRUD Handlers
+  const handleSaveRule = (rule: CustomCategoryRule) => {
+    const currentRules = vault.customCategoryRules || [];
+    const exists = currentRules.some((r) => r.id === rule.id);
+    const updatedRules = exists
+      ? currentRules.map((r) => (r.id === rule.id ? rule : r))
+      : [...currentRules, rule];
+
+    const updated = {
+      ...vault,
+      customCategoryRules: updatedRules,
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+    }
+  };
+
+  const handleDeleteRule = (id: string) => {
+    const updated = {
+      ...vault,
+      customCategoryRules: (vault.customCategoryRules || []).filter((r) => r.id !== id),
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+    }
+  };
+
+  const handleToggleRule = (id: string, active: boolean) => {
+    const updated = {
+      ...vault,
+      customCategoryRules: (vault.customCategoryRules || []).map((r) =>
+        r.id === id ? { ...r, isActive: active } : r
+      ),
+      lastUpdated: new Date().toISOString(),
+    };
+    setVault(updated);
+    if (masterPassword) {
+      encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+    }
+  };
+
+  const handleApplyRulesToAll = (): { modifiedCount: number } => {
+    const rules = vault.customCategoryRules || [];
+    const { updatedTransactions, modifiedCount } = applyRulesToTransactions(vault.transactions, rules);
+    if (modifiedCount > 0) {
+      const updated = {
+        ...vault,
+        transactions: updatedTransactions,
+        lastUpdated: new Date().toISOString(),
+      };
+      setVault(updated);
+      if (masterPassword) {
+        encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+      }
+    }
+    return { modifiedCount };
+  };
+
   const handleApplySalary = (netSalary: number, isExtra?: '13th' | '14th' | null) => {
     let updatedProfile = { ...vault.profile };
     if (isExtra === '14th') {
@@ -393,8 +536,8 @@ export function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={(val: any) => setActiveTab(val)} className="space-y-6">
-          <TabsList className="w-full bg-card/80 border border-border p-1.5 rounded-xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 shadow-xs">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+          <TabsList className="w-full bg-card/80 border border-border p-1.5 rounded-xl grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 shadow-xs">
             <TabsTrigger
               value="dashboard"
               className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-2 transition-all"
@@ -409,6 +552,14 @@ export function App() {
             >
               <Repeat className="w-4 h-4 shrink-0" />
               <span className="truncate">Costi Fissi & Utenze</span>
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="advisor"
+              className="w-full h-10 text-xs rounded-lg px-3 py-2 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md flex items-center justify-center gap-1.5 transition-all"
+            >
+              <Compass className="w-4 h-4 shrink-0" />
+              <span className="truncate">Financial Advisor</span>
             </TabsTrigger>
 
             <TabsTrigger
@@ -461,6 +612,7 @@ export function App() {
               <RecurringTracker
                 transactions={vault.transactions}
                 overrides={vault.recurringOverrides || {}}
+                profile={vault.profile}
                 onSaveOverride={(id, override) => {
                   const updated = {
                     ...vault,
@@ -473,24 +625,50 @@ export function App() {
                   setVault(updated);
                   if (masterPassword) encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
                 }}
+                onUpdateOverrides={(newOverrides) => {
+                  const updated = {
+                    ...vault,
+                    recurringOverrides: newOverrides,
+                    lastUpdated: new Date().toISOString(),
+                  };
+                  setVault(updated);
+                  if (masterPassword) encryptVault(updated, masterPassword).then(googleDrive.saveLocalVault);
+                }}
               />
             </React.Suspense>
           </TabsContent>
 
-          {/* Tab 3: Transactions Manager */}
+          {/* Tab 3: Financial Advisor & Spending Optimizer (ADR-012) */}
+          <TabsContent value="advisor" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
+            <React.Suspense fallback={<TabLoadingSkeleton />}>
+              <FinancialAdvisor
+                transactions={vault.transactions}
+                profile={vault.profile}
+                overrides={vault.recurringOverrides || {}}
+                onNavigateToTab={handleTabChange}
+              />
+            </React.Suspense>
+          </TabsContent>
+
+          {/* Tab 4: Transactions Manager */}
           <TabsContent value="transactions" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <React.Suspense fallback={<TabLoadingSkeleton />}>
               <TransactionsManager
                 transactions={vault.transactions}
+                rules={vault.customCategoryRules || []}
                 onAddTransaction={handleAddTransaction}
                 onUpdateTransaction={handleUpdateTransaction}
                 onDeleteTransaction={handleDeleteTransaction}
+                onSaveRule={handleSaveRule}
+                onDeleteRule={handleDeleteRule}
+                onToggleRule={handleToggleRule}
+                onApplyRulesToAll={handleApplyRulesToAll}
                 onResetToRealTransactions={handleResetToRealTransactions}
               />
             </React.Suspense>
           </TabsContent>
 
-          {/* Tab 3: Tax & Pension Fund Simulator */}
+          {/* Tab 5: Tax & Pension Fund Simulator */}
           <TabsContent value="tax-pension" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <React.Suspense fallback={<TabLoadingSkeleton />}>
               <TaxPensionSimulator
@@ -506,7 +684,7 @@ export function App() {
             </React.Suspense>
           </TabsContent>
 
-          {/* Tab 4: Goal Planner */}
+          {/* Tab 6: Goal Planner */}
           <TabsContent value="goals" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <React.Suspense fallback={<TabLoadingSkeleton />}>
               <GoalPlanner
@@ -523,7 +701,7 @@ export function App() {
             </React.Suspense>
           </TabsContent>
 
-          {/* Tab 5: File Ingestion Dropzone */}
+          {/* Tab 7: File Ingestion Dropzone */}
           <TabsContent value="ingestion" forceMount className="outline-none focus:outline-none data-[state=inactive]:hidden">
             <React.Suspense fallback={<TabLoadingSkeleton />}>
               <FileIngestionDropzone
@@ -531,6 +709,8 @@ export function App() {
                 onSyncDrive={handleSyncToDrive}
                 isSyncing={isSyncing}
                 driveConnected={googleDrive.isConnected()}
+                existingTransactions={vault.transactions}
+                customRules={vault.customCategoryRules || []}
               />
             </React.Suspense>
           </TabsContent>

@@ -1,5 +1,6 @@
 import { UserFinancialProfile, VaultData, Transaction, SavingsGoal, BudgetRule } from '@/types/finance';
 import { generatePresetVirtualTransactions } from './parsers/bankParsers';
+import { DEFAULT_STARTER_RULES } from './userRulesEngine';
 // Caricamento resiliente per Zero-Knowledge & Portabilità:
 // In ambiente locale con dataset reale (escluso da git), carica i movimenti verificati.
 // Su un nuovo clone pubblico o in assenza del file, effettua il fallback automatico sui dati demo.
@@ -8,7 +9,7 @@ const localTransactions = (realDataModules['./realTransactions.json']?.default a
 export const hasLocalRealTransactions = Boolean(localTransactions && localTransactions.length > 0);
 
 export const initialProfile: UserFinancialProfile = {
-  baseMonthlyNetSalary: 1953.00,
+  baseMonthlyNetSalary: 1949.00,
   extraSalaries: {
     fourteenthNetJune: 1848.00,
     thirteenthNetDec: 1850.00,
@@ -47,7 +48,7 @@ export const initialBudgetRules: BudgetRule[] = [
   {
     id: 'rule-salary',
     name: 'Stipendio Cloudfire',
-    amount: 1953.00,
+    amount: 1949.00,
     frequency: 'monthly',
     macroCategory: 'Savings',
     category: 'Stipendio Ordinario',
@@ -104,7 +105,7 @@ export function generate12MonthsMockTransactions(): Transaction[] {
       id: `mock-sal-${ym}`,
       date: `${ym}-27`,
       channel: 'BancoBPM',
-      amount: 1953.00,
+      amount: 1949.00,
       macroCategory: 'Savings',
       category: 'Stipendio Ordinario',
       description: 'ACCREDITO STIPENDIO CLOUDFIRE SRL',
@@ -434,6 +435,7 @@ export const initialVaultData: VaultData = {
   profile: initialProfile,
   transactions: localTransactions || generate12MonthsMockTransactions(),
   rules: initialBudgetRules,
+  customCategoryRules: DEFAULT_STARTER_RULES,
   goals: initialGoals,
   budgetCaps: defaultBudgetCaps,
   pensionVoluntaryContribution: 2500.00,

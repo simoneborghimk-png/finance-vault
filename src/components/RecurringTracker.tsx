@@ -6,7 +6,10 @@ import {
   RecurringOverride,
   RecurringPricingModel,
   HistoricalAmountPoint,
+  UserFinancialProfile,
 } from '@/types/finance';
+import { CashFlowSchedule } from './CashFlowSchedule';
+import { LoanPayoffSimulator } from './LoanPayoffSimulator';
 import { detectRecurringExpenses } from '@/lib/recurringDetector';
 import {
   Repeat,
@@ -84,6 +87,7 @@ interface RecurringTrackerProps {
   overrides?: Record<string, RecurringOverride>;
   onUpdateOverrides?: (overrides: Record<string, RecurringOverride>) => void;
   onSaveOverride?: (id: string, override: RecurringOverride) => void;
+  profile?: UserFinancialProfile;
 }
 
 export interface EntityVisual {
@@ -594,7 +598,9 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
   overrides = {},
   onUpdateOverrides,
   onSaveOverride,
+  profile,
 }) => {
+  const [viewMode, setViewMode] = useState<'contracts' | 'schedule' | 'payoff'>('contracts');
   // Filter and view states
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedChannel, setSelectedChannel] = useState<string>('all');
@@ -940,6 +946,23 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
     }
   };
 
+  // Applicazione batch estinzione anticipata prestiti simulati
+  const handleApplyPayoffToVault = (loanIds: string[]) => {
+    const updatedOverrides: Record<string, RecurringOverride> = { ...overrides };
+    for (const id of loanIds) {
+      updatedOverrides[id] = {
+        ...(updatedOverrides[id] || {}),
+        isClosed: true,
+      };
+      if (onSaveOverride) {
+        onSaveOverride(id, updatedOverrides[id]);
+      }
+    }
+    if (onUpdateOverrides) {
+      onUpdateOverrides(updatedOverrides);
+    }
+  };
+
   const toggleExpand = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
@@ -981,16 +1004,73 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
             Gestione analitica di canoni flat, utenze a consumo con scostamento vs media storica e rateizzazioni ad ammortamento
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <DateRangePicker
-            value={dateRange}
-            onChange={setDateRange}
-            defaultPreset="Anno in corso"
-          />
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {/* Toggle Vista: Contratti vs Scadenziario Mensile vs Simulatore Estinzione */}
+          <div className="flex items-center rounded-lg border border-border bg-card/80 p-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setViewMode('contracts')}
+              className={`px-3 py-1.5 rounded-md transition-all font-medium flex items-center gap-1.5 ${
+                viewMode === 'contracts'
+                  ? 'bg-primary text-primary-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Contratti & Rate</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('schedule')}
+              className={`px-3 py-1.5 rounded-md transition-all font-medium flex items-center gap-1.5 ${
+                viewMode === 'schedule'
+                  ? 'bg-primary text-primary-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Scadenziario Mensile</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('payoff')}
+              className={`px-3 py-1.5 rounded-md transition-all font-medium flex items-center gap-1.5 ${
+                viewMode === 'payoff'
+                  ? 'bg-primary text-primary-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>Simulatore Estinzione</span>
+            </button>
+          </div>
+
+          {viewMode === 'contracts' && (
+            <DateRangePicker
+              value={dateRange}
+              onChange={setDateRange}
+              defaultPreset="Anno in corso"
+            />
+          )}
         </div>
       </div>
 
-      {/* 1. Cruscotto KPI Esecutivi: Stile Unificato con TransactionsManager & ExecutiveDashboard */}
+      {viewMode === 'schedule' ? (
+        <CashFlowSchedule
+          expenses={allDetected}
+          transactions={transactions}
+          profile={profile}
+          getEntityVisual={getEntityVisual}
+        />
+      ) : viewMode === 'payoff' ? (
+        <LoanPayoffSimulator
+          expenses={allDetected}
+          profile={profile}
+          onApplyPayoffToVault={handleApplyPayoffToVault}
+        />
+      ) : (
+        <>
+          {/* 1. Cruscotto KPI Esecutivi: Stile Unificato con TransactionsManager & ExecutiveDashboard */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Spesa Ricorrenti nel Periodo */}
         <Card className="bg-card border-border relative overflow-hidden">
@@ -2060,6 +2140,8 @@ export const RecurringTracker: React.FC<RecurringTrackerProps> = ({
           })
         )}
       </div>
+        </>
+      )}
     </div>
   );
 };

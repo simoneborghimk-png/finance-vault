@@ -319,7 +319,7 @@ export const DriveSyncBar: React.FC<DriveSyncBarProps> = ({
                 checkPayslipsAlert();
               }
             }}
-            currentSalary={currentSalary || 1953}
+            currentSalary={currentSalary || 1949}
             onApplySalary={onApplySalary || (() => {})}
           />
         </div>

@@ -8,7 +8,7 @@
 | -------------------- | ----------------------------------------------------------------- |
 | **Progetto**         | Personal Finance Vault & Dashboard (Zero-Knowledge, PWA)          |
 | **Stack**            | React 18+ (React 19) + TypeScript + Vite 8 + Tailwind CSS         |
-| **Visualizzazione**  | Recharts (Donut, Horizontal Bar, 12-Month Area Chart)             |
+| **Visualizzazione**  | Recharts (Donut, Horizontal Bar, 12-Month Area Chart, Multi-Line) |
 | **Parsing**          | SheetJS (`xlsx`) + PapaParse (`csv`)                              |
 | **Crittografia**     | Web Crypto API (AES-GCM 256-bit + PBKDF2 100k it. SHA-256)        |
 | **Sincronizzazione** | Google Identity Services OAuth2 (`drive.file`)                    |
@@ -21,11 +21,12 @@
 | ------------------------------- | :---: | -------------------------------------------------------------- |
 | **Vault Unlock & Biometrics**   |   ✅  | Master Password + WebAuthn Passkey (Face ID/Touch ID)          |
 | **Tab 1: Executive Dashboard**  |   ✅  | KPI (Entrate, Needs, Wants, Cash Flow, Savings Rate) + Recharts |
-| **Tab 2: Costi Fissi & Utenze** |   ✅  | Canoni flat, utenze consuntivate, ammortamenti rate, accordion comparativo |
-| **Tab 3: Transazioni (Manager)**|   ✅  | Tabella interattiva, ricerca full-text, filtri, editing e inserimento manuale |
-| **Tab 4: Simulatore Fiscale**   |   ✅  | Slider 0-5.164,57 €, deducibilità 730 IRPEF 35-43%, timeline    |
-| **Tab 5: Goal Planner**         |   ✅  | Assorbimento 14ª, 13ª e 730, Feasibility Engine e BudgetCap mensili |
-| **Tab 6: Ingestione File**      |   ✅  | Dropzone Excel/CSV Banco BPM, Carta Nexi, Numia, PayPal, Satispay |
+| **Tab 2: Costi Fissi & Utenze** |   ✅  | Canoni flat, utenze consuntivate, ammortamenti rate, scadenziario e simulatore estinzione prestiti |
+| **Tab 3: Financial Advisor**     |   ✅  | Safe-to-Spend mensile, roadmap 4 trimestri, tranches pensione 5.164,57 € (ADR-012) |
+| **Tab 4: Transazioni (Manager)**|   ✅  | Tabella interattiva, ricerca full-text, filtri, editing e inserimento manuale |
+| **Tab 5: Simulatore Fiscale**   |   ✅  | Slider 0-5.164,57 €, deducibilità 730 IRPEF 35-43%, timeline    |
+| **Tab 6: Goal Planner**         |   ✅  | Assorbimento 14ª, 13ª e 730, Feasibility Engine e BudgetCap mensili |
+| **Tab 7: Ingestione File**      |   ✅  | Dropzone Excel/CSV Banco BPM, Carta Nexi, Numia, PayPal, Satispay |
 | **Drive Sync & Backup**         |   ✅  | Download/Upload `vault_finanze.enc` + Export/Import locale     |
 
 ## 3. Indice Decisioni Architetturali (ADR) — Memoria Fredda Decisionale
@@ -43,35 +44,24 @@
 | ADR-009 | Tracciamento Automatico Deducibilità Fondo Pensione (Art. 51)   | [`docs/adr/ADR-009-automated-pension-deductibility-tracking.md`](./docs/adr/ADR-009-automated-pension-deductibility-tracking.md) |
 | ADR-010 | Monitoraggio Temporale BudgetCap e Feasibility Engine Obiettivi | [`docs/adr/ADR-010-budget-caps-and-dynamic-goal-feasibility.md`](./docs/adr/ADR-010-budget-caps-and-dynamic-goal-feasibility.md) |
 | ADR-011 | Rilevamento Intelligente Uscite Ricorrenti e Abbonamenti       | [`docs/adr/ADR-011-subscription-and-recurring-tracker.md`](./docs/adr/ADR-011-subscription-and-recurring-tracker.md) |
+| ADR-012 | Financial Advisor, Seasonal Wealth Roadmap & Spending Optimizer | [`docs/adr/ADR-012-financial-advisor-and-spending-optimizer.md`](./docs/adr/ADR-012-financial-advisor-and-spending-optimizer.md) |
 
 ## 4. Backlog Operativo Attivo (Sprint Corrente)
 
-- [x] Blindatura privacy git (esclusione `data/`, `scripts/`, `realTransactions.json` e fallback demo resiliente — ADR-004)
-- [x] Riconciliazione multi-fonte: Banco BPM, carte Numia/Nexi, 86 ordini Amazon reali, rate TIMFIN in Commitments (ADR-005)
-- [x] Restyling modale sincronizzazione buste paga Drive e unificazione header Zero-Knowledge (ADR-006)
-- [x] Perfezionamento Executive Dashboard: KPI reali del periodo filtrato, Donut centrale, BarChart centrato ad alto contrasto
-- [x] Ricollocazione contestuale di `BudgetCapManager` in "Budget & Obiettivi"
+- [x] Financial Advisor & Spending Optimizer: Safe-to-Spend mensile, roadmap 4 trimestri, tranches pensione e insight tattici (ADR-012)
+- [x] Subscription & Recurring Tracker: piani ammortamento certificati (Switch 2 estinto, Soundbar LG, Vorwerk Folletto, Bimby TM7) e canoni flat (ADR-011)
+- [x] Analizzatore Utenze con Recharts LineChart dinamico, toggle chip serie e card riepilogo comparative con accordion (ADR-011)
 - [x] Standard isolamento filtri per vista & navigazione non distruttiva `forceMount` (ADR-007)
-- [x] Layout toolbar a due livelli (ricerca full-width + filtri responsivi) e preset deterministici
 - [x] Potenziamento Executive Dashboard: Regola 50/30/20, Costi Fissi vs Variabili, Burn Rate (ADR-008)
 - [x] Potenziamento Tab Fisco: calcolo deducibilità residua art. 51 TUIR dai versamenti reali dell'anno (ADR-009)
 - [x] Potenziamento Tab Budget & Obiettivi: stima traguardi su tasso risparmio reale e selettore mese per BudgetCap (ADR-010)
-- [x] Subscription & Recurring Tracker: piani ammortamento certificati (Amazon TV/Watch, Cofidis Soundbar/Switch, Vorwerk Folletto VR7s, Bimby TM7 HeyLight/Compass, TIMFin & Compass vecchi chiusi) (ADR-011)
-- [x] Data prossimo pagamento e badge urgenza visibili a card chiusa in `RecurringTracker` (sia contratti che rate ammortamento)
-- [x] Bonifica ricorrenti: Iren Luce vs Gas, YouTube 15,99 € Numia, Game Pass PayPal, Audible sospeso, UNHCR una tantum (ADR-011)
-- [x] Costi Fissi & Utenze: spostata a Tab 2, media consuntiva utenze, monitor rimodulazioni flat, segmentazione Google Play (Philips Hue, tado°, Hiya) (ADR-011)
-- [x] Periodo dinamico DateRangePicker, Recharts LineChart utenze, unificazione card KPI e toolbar filtri avanzata (ADR-011)
-- [x] Standardizzazione header di pagina: fuori dalle card, icone tab semantiche, azioni e selettore periodo allineati a destra
-- [x] Abbonamenti annuali certificati: Netflix (120 €/anno, atteso 2026) e Crunchyroll (15 €/anno, pagato 2026) (ADR-011)
-- [x] Segmentazione spese condominiali: Condominio Betulla (3-4 rate/anno trimestrali su BPM) vs Pulizia Scale (15 €/mese contanti) (ADR-011)
-- [x] Standardizzazione semantica simbologia & isolamento colori di stato (positive, warning, error, info) (ADR-011)
-- [x] Grafico ricorrenti universale e dinamico: select categoria, serie con toggle chip e card riepilogo speculari (ADR-011)
-- [x] Palette e iconografia distintive per serie: icone tematiche (Film, Play, Gamepad2, Lightbulb, Thermometer, ecc.) e colori ad alto contrasto senza sovrapposizioni (ADR-011)
-- [x] Disaggregazione prelievi SDD Cofidis: Switch 2 (5 rate concluse ed estinte) vs Soundbar LG (12 rate da 56,25 € in corso) (ADR-011)
-- [x] Accordion comprimibile per card comparative del grafico in Costi Fissi & rimozione duplicato da GoalPlanner (ADR-011)
+- [x] Scadenziario & Calendario Mensile Uscite Fisse (timeline + griglia calendario LUN-DOM, stipendio reale al 15) & routing URL path
+- [ ] **Miglioramenti pratici quotidiani:**
+  - [x] Multi-File Dropzone Batch Ingestion (BPM, Nexi, Numia, PayPal contemporanei con deduplica)
+  - [x] Regole di Categorizzazione Personalizzate salvate nel vault cifrato (in-vault user rules)
+  - [x] Simulatore di Estinzione Anticipata Prestiti (Loan Payoff Simulator con Snowball, Cash Flow Maximizer e salvataggio nel vault)
 - [ ] **Abilitazione e collaudo reale accesso biometrico** (WebAuthn Passkey Touch ID / Face ID)
-- [ ] **Check regole parsing per canale** (BPM, Nexi, Numia, PayPal, Satispay), test nuovo file e verifica deduplica
-- [ ] [APPROVATO - IN STANDBY] Financial Advisor & Spending Optimizer: roadmap stagionale investimenti, tranches pensione estive/autunnali e plafond consigliati (ADR-012)
+- [ ] **Check regole parsing per canale** e verifica deduplica con nuovi estratti conto reali
 - [ ] Bilancio Annuale & Reportistica Fiscale (a bassa priorità su richiesta utente)
 
 ## 5. Riferimenti Rapidi & Comandi

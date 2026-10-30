@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Transaction, MacroCategory, MACRO_CATEGORY_LABELS, MACRO_CATEGORY_SHORT_LABELS } from '@/types/finance';
+import { Transaction, MacroCategory, MACRO_CATEGORY_LABELS, MACRO_CATEGORY_SHORT_LABELS, CustomCategoryRule } from '@/types/finance';
+import { CategoryRulesManager } from './CategoryRulesManager';
 import {
   Search,
   Plus,
@@ -66,9 +67,14 @@ import { format, startOfYear } from 'date-fns';
 
 interface TransactionsManagerProps {
   transactions: Transaction[];
+  rules?: CustomCategoryRule[];
   onAddTransaction: (transaction: Transaction) => void;
   onUpdateTransaction: (transaction: Transaction) => void;
   onDeleteTransaction: (id: string) => void;
+  onSaveRule?: (rule: CustomCategoryRule) => void;
+  onDeleteRule?: (id: string) => void;
+  onToggleRule?: (id: string, active: boolean) => void;
+  onApplyRulesToAll?: () => { modifiedCount: number };
   onResetToRealTransactions?: () => void;
 }
 
@@ -99,9 +105,14 @@ const formatEuro = (amount: number): string => {
 
 export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
   transactions,
+  rules = [],
   onAddTransaction,
   onUpdateTransaction,
   onDeleteTransaction,
+  onSaveRule,
+  onDeleteRule,
+  onToggleRule,
+  onApplyRulesToAll,
   onResetToRealTransactions,
 }) => {
   // Filtering & Search states (Isolated to this page)
@@ -136,6 +147,25 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [expandedTxId, setExpandedTxId] = useState<string | null>(null);
+  const [isRulesModalOpen, setIsRulesModalOpen] = useState(false);
+  const [prefilledRule, setPrefilledRule] = useState<Partial<CustomCategoryRule> | null>(null);
+
+  // Crea una regola personalizzata con dati precompilati da una transazione
+  const handleCreateRuleFromTx = (tx: Transaction) => {
+    const cleanWords = tx.description.split(/[\s\-:,/]+/).filter((w) => w.length > 2);
+    const suggestedPattern = cleanWords.slice(0, 2).join(' ') || tx.description;
+    setPrefilledRule({
+      name: `Regola per ${tx.description.substring(0, 25)}`,
+      pattern: suggestedPattern.toUpperCase(),
+      matchField: 'both',
+      channel: tx.channel,
+      macroCategory: tx.macroCategory,
+      category: tx.category,
+      tags: tx.tags,
+      isExtraordinary: tx.isExtraordinary,
+    });
+    setIsRulesModalOpen(true);
+  };
 
   // Form states for Add/Edit
   const [formDate, setFormDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -389,9 +419,20 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
               className="border-border text-foreground hover:bg-accent hover:text-accent-foreground text-xs py-2 px-3 flex items-center gap-1.5 shrink-0"
             >
               <RefreshCw className="w-3.5 h-3.5 text-primary" />
-              <span>Ricarica 658 Dati Reali</span>
+              <span>Ricarica Dati Reali</span>
             </Button>
           )}
+          <Button
+            variant="outline"
+            onClick={() => {
+              setPrefilledRule(null);
+              setIsRulesModalOpen(true);
+            }}
+            className="border-border text-foreground hover:bg-accent hover:text-accent-foreground text-xs py-2 px-3 flex items-center gap-1.5 shrink-0"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <span>Regole ({rules.length})</span>
+          </Button>
           <Button
             onClick={handleOpenAdd}
             className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-2 px-3.5 flex items-center gap-1.5 shrink-0 shadow-lg"
@@ -795,6 +836,17 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
                         {/* Actions */}
                         <TableCell className="text-center align-middle" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center justify-center gap-1">
+                            <Tooltip content="Crea regola da questo movimento">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleCreateRuleFromTx(tx)}
+                                className="h-7 w-7 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                                aria-label="Crea regola da questo movimento"
+                              >
+                                <Sparkles className="w-3.5 h-3.5" />
+                              </Button>
+                            </Tooltip>
                             <Tooltip content="Modifica transazione">
                               <Button
                                 variant="ghost"
@@ -1213,6 +1265,19 @@ export const TransactionsManager: React.FC<TransactionsManagerProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Category Rules Manager Dialog */}
+      <CategoryRulesManager
+        open={isRulesModalOpen}
+        onOpenChange={setIsRulesModalOpen}
+        rules={rules}
+        transactions={transactions}
+        onSaveRule={onSaveRule || (() => {})}
+        onDeleteRule={onDeleteRule || (() => {})}
+        onToggleRule={onToggleRule || (() => {})}
+        onApplyRulesToAll={onApplyRulesToAll || (() => ({ modifiedCount: 0 }))}
+        initialPrefilledRule={prefilledRule}
+      />
     </div>
   );
 };

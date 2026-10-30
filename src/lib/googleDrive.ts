@@ -293,42 +293,42 @@ class GoogleDriveService {
     }
 
     if (!token) {
-      // Fallback virtual payslips for offline / demo preview with real payslip history
+      // Fallback buste paga offline / demo coerenti con la cronologia reale delle transazioni
       return [
         {
-          id: 'mock-payslip-2026-10',
+          id: 'payslip-2026-10',
           name: 'Busta_Paga_2026_10_Cloudfire.pdf',
           month: '2026-10',
-          netSalary: 1953.00,
-          modifiedTime: '2026-10-20T10:00:00Z',
+          netSalary: 1949.00,
+          modifiedTime: '2026-10-15T10:00:00Z',
           isExtraordinaryMonth: null,
         },
         {
-          id: 'mock-payslip-2026-08',
-          name: 'Busta_Paga_2026_08_Cloudfire_730_Tranche2.pdf',
-          month: '2026-08',
+          id: 'payslip-2026-09',
+          name: 'Busta_Paga_2026_09_Cloudfire_Straordinari.pdf',
+          month: '2026-09',
           netSalary: 2660.00,
-          modifiedTime: '2026-08-20T10:00:00Z',
+          modifiedTime: '2026-09-15T10:00:00Z',
           isExtraordinaryMonth: null,
         },
         {
-          id: 'mock-payslip-2026-07',
-          name: 'Busta_Paga_2026_07_Cloudfire_730_Tranche1.pdf',
-          month: '2026-07',
+          id: 'payslip-2026-08',
+          name: 'Busta_Paga_2026_08_Cloudfire_730_Tranche.pdf',
+          month: '2026-08',
           netSalary: 3530.00,
-          modifiedTime: '2026-07-20T10:00:00Z',
+          modifiedTime: '2026-08-14T10:00:00Z',
           isExtraordinaryMonth: null,
         },
         {
-          id: 'mock-payslip-2026-06',
-          name: 'Cedolino_14esima_2026_06.pdf',
-          month: '2026-06',
-          netSalary: 1848.00,
-          modifiedTime: '2026-06-25T14:30:00Z',
+          id: 'payslip-2026-07',
+          name: 'Busta_Paga_2026_07_Cloudfire_14esima.pdf',
+          month: '2026-07',
+          netSalary: 3798.00,
+          modifiedTime: '2026-07-15T10:00:00Z',
           isExtraordinaryMonth: '14th',
         },
         {
-          id: 'mock-payslip-2025-12',
+          id: 'payslip-2025-12',
           name: 'Cedolino_13esima_2025_12.pdf',
           month: '2025-12',
           netSalary: 1852.00,
@@ -485,7 +485,7 @@ class GoogleDriveService {
         }
 
         // 4. Net salary detection or default fallback
-        let netSalary = 1953.00;
+        let netSalary = 1949.00;
         const matchAmount = name.match(/(\d{3,4})[.,](\d{2})/);
         if (matchAmount) {
           netSalary = parseFloat(`${matchAmount[1]}.${matchAmount[2]}`);

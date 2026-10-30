@@ -18,6 +18,7 @@ Ogni decisione tecnica rilevante è documentata in un record atomico e immutabil
 | [ADR-009](./ADR-009-automated-pension-deductibility-tracking.md) | 2026-10-24 | Tracciamento Automatico Deducibilità Fiscale Fondo Pensione (Art. 51 TUIR) | Accettata |
 | [ADR-010](./ADR-010-budget-caps-and-dynamic-goal-feasibility.md) | 2026-10-24 | Monitoraggio Temporale BudgetCap e Feasibility Engine degli Obiettivi | Accettata |
 | [ADR-011](./ADR-011-subscription-and-recurring-tracker.md) | 2026-10-24 | Rilevamento Intelligente e Monitoraggio Uscite Ricorrenti e Abbonamenti | Accettata |
+| [ADR-012](./ADR-012-financial-advisor-and-spending-optimizer.md) | 2026-10-30 | Financial Advisor, Seasonal Wealth Roadmap & Spending Optimizer | Accettata |
 
 ---
 
