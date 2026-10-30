@@ -56,7 +56,7 @@
 - [x] Potenziamento Tab Fisco: calcolo deducibilità residua art. 51 TUIR dai versamenti reali dell'anno (ADR-009)
 - [x] Potenziamento Tab Budget & Obiettivi: stima traguardi su tasso risparmio reale e selettore mese per BudgetCap (ADR-010)
 - [x] Scadenziario & Calendario Mensile Uscite Fisse (timeline + griglia calendario LUN-DOM, stipendio reale al 15) & routing URL path
-- [ ] **Miglioramenti pratici quotidiani:**
+- [x] **Miglioramenti pratici quotidiani:**
   - [x] Multi-File Dropzone Batch Ingestion (BPM, Nexi, Numia, PayPal contemporanei con deduplica)
   - [x] Regole di Categorizzazione Personalizzate salvate nel vault cifrato (in-vault user rules)
   - [x] Simulatore di Estinzione Anticipata Prestiti (Loan Payoff Simulator con Snowball, Cash Flow Maximizer e salvataggio nel vault)
