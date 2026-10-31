@@ -12,8 +12,13 @@ dist-ssr
 .env
 .env.*
 !.env.example
-data/
-scripts/
+data/*
+!data/exports/
+data/exports/*
+!data/exports/README.md
+scripts/*
+!scripts/check-sync.mjs
+!scripts/inspect-export.mjs
 src/lib/realTransactions.json
 
 # Logs

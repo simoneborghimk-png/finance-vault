@@ -84,7 +84,7 @@ Nella [Google Cloud Console](https://console.cloud.google.com/) (sotto **Credenz
 finance-vault/
 ├── .github/workflows/     # CI/CD automatica per GitHub Pages
 ├── .agents/               # Regole operative vincolanti per Agenti AI
-│   └── rules/             # Context hygiene, session guard, no-browser-subagent
+│   └── rules/             # Context hygiene, execution guardrails, documentation sync
 ├── src/
 │   ├── components/        # Dashboard, Simulatori, Dropzone, VaultUnlock, DriveSync
 │   ├── lib/

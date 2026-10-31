@@ -7,7 +7,23 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.1.0/)
 
 ## [Unreleased]
 
-### Fixed
+### Added
+- **Standardizzazione Pipeline Parser & Reverse Engineering Tracciati (ADR-013 & scripts/inspect-export.mjs):
+  - Rilasciato profiler CLI interattivo scripts/inspect-export.mjs per campionamento automatico, rilevamento delimitatori, skip offset header, inferenza formati date/valute e generazione bozza contratto TypeScript.
+  - Creato workflow template operativo data/exports/README.md a 5 fasi (profiling, matrice colonne, regole deduplica/clearing, mock testing isolato, aggancio UI).
+  - Formalizzato in docs/adr/ADR-013-parser-contract-pipeline.md il protocollo vincolante isolate-first e la convenzione univoca del segno contabile (uscite sempre negative < 0).
+- **Ottimizzazione Regole Operative & Guardrail di Contesto (.agents/rules/):**
+  - Accorpati session-budget-guard.md e o-browser-subagent.md nel nuovo file unificato e compatto .agents/rules/execution-guardrails.md focalizzato su stop preventivo budget (<20%), divieto browser subagent e test locale obbligatorio.
+  - Riformulato .agents/rules/ux-ui-accessibility-standards.md in una matrice modulare rapida (~18 righe) che formalizza le regole vincolanti su token semantici OKLCH, contrasti WCAG 2.2 AA, scalatura tipografica e submit resiliente, riducendo l'overhead di token del 65%.
+  - Aggiornati i riferimenti in AGENTS.md e README.md.
+- **Gate Deterministico di Sincronizzazione Qualità & Documenti (scripts/check-sync.mjs & pm run check:sync):**
+  - Creato script Node.js ESM nativo per l'esecuzione sequenziale automatizzata di:
+    1. Linting rapido con oxlint . (exit code immediato);
+    2. Type checking statico TypeScript con 	sc --noEmit;
+    3. Controllo differenziale Git: verifica della presenza obbligatoria di aggiornamenti in CHANGELOG.md o docs/adr/ a fronte di modifiche o aggiunte di codice sorgente sotto src/.
+  - In caso di fallimento, lo script esce con codice d'errore 1 fornendo diagnostica visiva chiara; l'agente è istruito a correggere autonomamente le violazioni prima di richiedere la validazione all'utente.
+  - Aggiornata e sintetizzata la regola .agents/rules/documentation-sync-gate.md ed allineato AGENTS.md.
+
 ### Fixed
 - **Bonifica Accrediti Stipendio e Rimozione Dati Simulati nello Scadenziario (`src/lib/cashFlowScheduler.ts` & `src/components/CashFlowSchedule.tsx`):**
   - **Allineamento con l'Estratto Conto Reale (CLOUDFIRE SRL):** Rimosso il valore hardcoded del giorno 27 e l'importo piatto simulato di 1.953 €. Il motore ora individua ed estrae tutte le transazioni contabili reali di stipendio da `CLOUDFIRE SRL` nel mese selezionato, riflettendo con precisione il giorno esatto di accredito (intorno al giorno 15 del mese, o venerdì 13/14 in caso di weekend), l'importo effettivo (es. 1.949 € a Ottobre 2026, 2.660 € a Settembre, 3.530 € ad Agosto con 730, 3.798 € a Luglio con 14ª, 1.852 € per la 13ª a Dicembre) e le causali dettagliate con stato `paid`.

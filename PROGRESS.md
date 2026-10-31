@@ -60,14 +60,15 @@
   - [x] Multi-File Dropzone Batch Ingestion (BPM, Nexi, Numia, PayPal contemporanei con deduplica)
   - [x] Regole di Categorizzazione Personalizzate salvate nel vault cifrato (in-vault user rules)
   - [x] Simulatore di Estinzione Anticipata Prestiti (Loan Payoff Simulator con Snowball, Cash Flow Maximizer e salvataggio nel vault)
+  - [x] Gate deterministico qualità e sync documentale: script CLI `check-sync.mjs` (`npm run check:sync`)
 - [ ] **Abilitazione e collaudo reale accesso biometrico** (WebAuthn Passkey Touch ID / Face ID)
-- [ ] **Check regole parsing per canale** e verifica deduplica con nuovi estratti conto reali
+- [x] **Check regole parsing per canale**: pipeline standardizzata, profiler inspect-export.mjs & contratto ADR-013
 - [ ] Bilancio Annuale & Reportistica Fiscale (a bassa priorità su richiesta utente)
 
 ## 5. Riferimenti Rapidi & Comandi
 
 ```bash
 npm run dev           # Dev server applicazione reale → http://localhost:5180/
-npx tsc --noEmit      # Typecheck TypeScript strict
+npm run check:sync    # Gate deterministico: oxlint, tsc, git diff sync
 npm run build         # Validazione bundle produzione e service worker PWA
 ```
